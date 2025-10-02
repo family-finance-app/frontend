@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { SignUpFormData, FormErrors } from '@/types/auth';
+import { FormErrors, SignUpFormData } from '@/types/auth';
 import { validateSignUpForm } from '@/utils/validation';
-import { authAPI } from '@/services/authAPI';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const useSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +22,22 @@ export const useSignUp = () => {
     setErrors({});
 
     try {
-      const response = await authAPI.signUp(formData);
+      const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          role: 'MEMBER',
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setErrors(data.errors || { general: data.message });
+        return false;
+      }
+
       setSuccessMessage('Account created. Welcome to FamilyFinance');
       setTimeout(() => {
         setSuccessMessage('');
