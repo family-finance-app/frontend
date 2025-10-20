@@ -101,9 +101,6 @@ pids
 .yarn/install-state.gz
 .pnp.*
 
-# Sentry Config File
-.sentryclirc
-
 # Local Netlify folder
 .netlify
 
@@ -127,9 +124,6 @@ pids
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
-
-# Sentry
-.sentryclirc
 
 # IDE
 .vscode/

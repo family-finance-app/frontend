@@ -2,18 +2,22 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useSignUp } from '@/hooks/useSignUp';
-import { SignUpFormData } from '@/types/auth';
+import { useRouter } from 'next/navigation';
+import { useSignUp } from '@/api/auth/mutations';
+import { SignUpFormData, FormErrors } from '@/types/auth';
+import { validateSignUpForm } from '@/utils/validation';
 
 export default function SignUp() {
+  const router = useRouter();
+  const signUpMutation = useSignUp();
+
   const [formData, setFormData] = useState<SignUpFormData>({
     email: '',
     password: '',
     confirmPassword: '',
     terms: false,
   });
-
-  const { signUp, isLoading, errors, successMessage, clearError } = useSignUp();
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -22,20 +26,52 @@ export default function SignUp() {
       [name]: type === 'checkbox' ? checked : value,
     }));
 
-    clearError(name);
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const request = await signUp(formData);
-    if (request) {
-      setFormData({
-        email: '',
-        password: '',
-        confirmPassword: '',
-        terms: false,
-      });
+    const validationErrors = validateSignUpForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
+
+    try {
+      await signUpMutation.mutateAsync(formData);
+      router.push('/dashboard');
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'error' in error) {
+        const apiError = error as {
+          error: string;
+          details?: Array<{ path: string[]; message: string }>;
+          message?: string;
+        };
+
+        if (apiError.error === 'Validation failed' && apiError.details) {
+          const backendErrors: FormErrors = {};
+          apiError.details.forEach((err) => {
+            backendErrors[err.path[0]] = err.message;
+          });
+          setErrors(backendErrors);
+        } else {
+          setErrors({
+            general:
+              apiError.message || 'Registration failed. Please try again.',
+          });
+        }
+      } else {
+        setErrors({ general: 'An unexpected error occurred' });
+      }
     }
   };
 
@@ -48,15 +84,15 @@ export default function SignUp() {
       </div>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
-        {successMessage && (
+        {signUpMutation.isSuccess && (
           <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md text-sm">
-            {successMessage}
+            Account created successfully! Redirecting...
           </div>
         )}
 
         {errors.general && (
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-            {errors.general}
+            Registration failed. Try again
           </div>
         )}
 
@@ -161,10 +197,10 @@ export default function SignUp() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={signUpMutation.isPending}
           className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Creating account...' : 'Create account'}
+          {signUpMutation.isPending ? 'Creating account...' : 'Create account'}
         </button>
       </form>
 

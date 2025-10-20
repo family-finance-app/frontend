@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Authentication - FamilyFinance',
@@ -15,7 +16,7 @@ export default function AuthLayout({
     <div className="min-h-screen flex">
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
-          <a href="/">
+          <Link href="/">
             <div className="flex items-center justify-center mb-8">
               <Image
                 src="/icons/logo-icon.svg"
@@ -28,7 +29,7 @@ export default function AuthLayout({
                 FamilyFinance
               </span>
             </div>
-          </a>
+          </Link>
 
           {children}
         </div>
