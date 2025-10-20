@@ -2,17 +2,21 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { SignInFormData } from '@/types/auth';
-import { useSignIn } from '@/hooks/useSIgnIn';
+import { useRouter } from 'next/navigation';
+import { SignInFormData, FormErrors } from '@/types/auth';
+import { useSignIn } from '@/api/auth/mutations';
+import { validateSignInForm } from '@/utils/validation';
 
 export default function SignIn() {
+  const router = useRouter();
+  const signInMutation = useSignIn();
+
   const [formData, setFormData] = useState<SignInFormData>({
     email: '',
     password: '',
     rememberMe: false,
   });
-
-  const { signIn, isLoading, errors, successMessage, clearError } = useSignIn();
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -21,19 +25,53 @@ export default function SignIn() {
       [name]: type === 'checkbox' ? checked : value,
     }));
 
-    clearError(name);
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const request = await signIn(formData);
-    if (request) {
-      setFormData({
-        email: '',
-        password: '',
-        rememberMe: false,
-      });
+    const validationErrors = validateSignInForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
+
+    try {
+      await signInMutation.mutateAsync(formData);
+      router.push('/dashboard');
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'error' in error) {
+        const apiError = error as {
+          error: string;
+          details?: Array<{ path: string[]; message: string }>;
+          message?: string;
+        };
+
+        if (apiError.error === 'Validation failed' && apiError.details) {
+          const backendErrors: FormErrors = {};
+          apiError.details.forEach((err) => {
+            backendErrors[err.path[0]] = err.message;
+          });
+          setErrors(backendErrors);
+        } else {
+          setErrors({
+            general:
+              apiError.message ||
+              'Sign in failed. Please check your credentials.',
+          });
+        }
+      } else {
+        setErrors({ general: 'An unexpected error occurred' });
+      }
     }
   };
   return (
@@ -45,15 +83,15 @@ export default function SignIn() {
       </div>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
-        {successMessage && (
+        {signInMutation.isSuccess && (
           <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md text-sm">
-            {successMessage}
+            Signed in successfully! Redirecting...
           </div>
         )}
 
         {errors.general && (
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-            {errors.general}
+            User not found
           </div>
         )}
 
@@ -131,10 +169,10 @@ export default function SignIn() {
 
         <button
           type="submit"
-          disabled={isLoading}
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          disabled={signInMutation.isPending}
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Signing in...' : 'Sign in'}
+          {signInMutation.isPending ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
 

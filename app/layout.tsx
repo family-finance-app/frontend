@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './assets/css/global.css';
 import { poppins } from './assets/fonts/fonts';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: 'FamilyFinance',
@@ -17,7 +18,9 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body className={poppins.className}>{children}</body>
+      <body className={poppins.className}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

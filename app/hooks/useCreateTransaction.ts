@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { CreateTransactionFormData } from '@/types/transaction';
 import { FormErrors } from '@/types/auth';
 import { validateCreateTransactionForm } from '@/utils/validation';
-import { transactionAPI } from '@/services/transactionAPI';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const useCreateTransaction = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,8 +25,27 @@ export const useCreateTransaction = () => {
     setErrors({});
 
     try {
-      const response = await transactionAPI.createTransaction(formData);
-      setSuccessMessage(`New transaction created`);
+      const response = await fetch(`${BACKEND_URL}/api/transaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: formData.type,
+          amount: parseFloat(formData.amount),
+          date: formData.date,
+          userId: 1, // TODO: get from auth context
+          groupId: formData.groupId ? parseInt(formData.groupId) : null,
+          accountId: formData.accountId ? parseInt(formData.accountId) : 1,
+          categoryId: parseInt(formData.categoryId),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setErrors(data.errors);
+        return false;
+      }
+
+      setSuccessMessage('Transaction added');
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -39,7 +59,7 @@ export const useCreateTransaction = () => {
         });
         setErrors(backendErrors);
       } else {
-        setErrors({ general: error.message || 'Registration failed' });
+        setErrors({ general: error.message || 'Error' });
       }
       return false;
     } finally {
