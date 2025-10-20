@@ -18,7 +18,9 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: queryKeys.auth.currentUser,
     queryFn: async (): Promise<User> => {
-      return apiClient.get<User>('/auth/me', { token: token || undefined });
+      return apiClient.get<User>('/api/auth/me', {
+        token: token || undefined,
+      });
     },
     enabled: !!token, // only run query if token exists
     staleTime: 1000 * 60 * 10,

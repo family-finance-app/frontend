@@ -1,16 +1,9 @@
-/**
- * Account mutations
- * Handles creating, updating, and deleting accounts
- */
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import { CreateAccountFormData, AccountResponse } from '@/types/account';
 
-/**
- * Create new account
- */
+// create new user financial account
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
 
@@ -19,30 +12,24 @@ export const useCreateAccount = () => {
       formData: CreateAccountFormData
     ): Promise<AccountResponse> => {
       const token = localStorage.getItem('authToken');
-
       return apiClient.post<AccountResponse>(
-        '/api/accounts',
+        '/api/accounts/create',
         {
-          title: formData.title,
+          name: formData.name,
           type: formData.type,
           balance: formData.balance,
           currency: formData.currency,
-          createdBy: 1, // TODO: get from auth context
-          userId: 1, // TODO: get from auth context
         },
         { token: token || undefined }
       );
     },
     onSuccess: () => {
-      // Invalidate all accounts queries to refetch fresh data
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     },
   });
 };
 
-/**
- * Update existing account
- */
+// update existing account
 export const useUpdateAccount = () => {
   const queryClient = useQueryClient();
 

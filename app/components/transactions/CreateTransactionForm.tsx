@@ -136,7 +136,7 @@ export default function CreateTransactionForm({
               <option value="">Choose account</option>
               {accountsArray.map((account) => (
                 <option key={account.account.id} value={account.account.id}>
-                  {account.account.title} ({account.account.type}) -{' '}
+                  {account.account.name} ({account.account.type}) -{' '}
                   {account.account.currency}
                 </option>
               ))}
@@ -222,13 +222,15 @@ export default function CreateTransactionForm({
 
         {/* Buttons*/}
         <div className="flex gap-3">
-          {/* Submit form button */}
+          {/* Submit */}
           <Button
             type="submit"
             disabled={createMutation.isPending}
             className="submit"
             text="Create Transaction"
           />
+
+          {/* Close form */}
           <Button
             type="button"
             onClick={onCancel}

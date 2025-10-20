@@ -1,16 +1,9 @@
-/**
- * Account queries
- * Handles fetching account data
- */
-
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import { AccountResponse } from '@/types/account';
 
-/**
- * Get all accounts
- */
+// get all accounts
 export const useAccounts = () => {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
@@ -26,9 +19,7 @@ export const useAccounts = () => {
   });
 };
 
-/**
- * Get single account by ID
- */
+// get an account by id
 export const useAccount = (id: number) => {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
@@ -44,9 +35,7 @@ export const useAccount = (id: number) => {
   });
 };
 
-/**
- * Get accounts by user ID
- */
+// get accounts by user's id
 export const useAccountsByUser = (userId: number) => {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
