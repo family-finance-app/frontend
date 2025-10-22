@@ -20,6 +20,9 @@ export interface User {
   email: string;
   role: string;
   createdAt: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export interface AuthResponse {
