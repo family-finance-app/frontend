@@ -24,6 +24,7 @@ export const useCreateAccount = () => {
       );
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     },
   });
@@ -48,18 +49,16 @@ export const useUpdateAccount = () => {
       });
     },
     onSuccess: (data, variables) => {
-      // Invalidate specific account and all accounts list
       queryClient.invalidateQueries({
         queryKey: queryKeys.accounts.detail(variables.id),
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     },
   });
 };
 
-/**
- * Delete account
- */
+// delete account
 export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
@@ -68,14 +67,16 @@ export const useDeleteAccount = () => {
       const token = localStorage.getItem('authToken');
 
       return apiClient.delete<void>(`/api/accounts/${id}`, {
-        token: token || undefined,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
     },
     onSuccess: (_, id) => {
-      // Remove account from cache and invalidate accounts list
       queryClient.removeQueries({
         queryKey: queryKeys.accounts.detail(id),
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     },
   });

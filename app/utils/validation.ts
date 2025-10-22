@@ -72,13 +72,13 @@ export const validateCreateAccountForm = (
 ): FormErrors => {
   const errors: FormErrors = {};
 
-  const titleError = validateTitle(formData.title);
+  const titleError = validateTitle(formData.name);
   if (titleError) errors.title = titleError;
 
-  const typeError = validateTitle(formData.type);
+  const typeError = validateType(formData.type);
   if (typeError) errors.type = typeError;
 
-  const balanceError = validateTitle(formData.balance);
+  const balanceError = validateBalance(String(formData.balance));
   if (balanceError) errors.balance = balanceError;
 
   return errors;
@@ -100,11 +100,11 @@ export const validateCreateTransactionForm = (
 ): FormErrors => {
   const errors: FormErrors = {};
 
-  const categoryError = validateTitle(formData.categoryId);
+  const categoryError = validateCategory(String(formData.categoryId));
   if (categoryError) errors.category = categoryError;
 
-  const amountError = validateTitle(formData.amount);
-  if (amountError) errors.type = amountError;
+  const amountError = validateAmount(String(formData.amount));
+  if (amountError) errors.amount = amountError;
 
   return errors;
 };
