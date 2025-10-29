@@ -1,18 +1,19 @@
+// create, edit, or delete FINANCIAL accounts
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import { CreateAccountFormData, AccountResponse } from '@/types/account';
+import { CreateAccountFormData, Account } from '@/types/account';
+import { getAuthToken } from '@/utils/token';
 
-// create new user financial account
+// create new account (card, cash etc)
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      formData: CreateAccountFormData
-    ): Promise<AccountResponse> => {
-      const token = localStorage.getItem('authToken');
-      return apiClient.post<AccountResponse>(
+    mutationFn: async (formData: CreateAccountFormData): Promise<Account> => {
+      const token = getAuthToken();
+      return apiClient.post<Account>(
         '/api/accounts/create',
         {
           name: formData.name,
@@ -39,16 +40,15 @@ export const useUpdateAccount = () => {
       id,
       data,
     }: {
-      id: number;
+      id: string;
       data: Partial<CreateAccountFormData>;
-    }): Promise<AccountResponse> => {
-      const token = localStorage.getItem('authToken');
-
-      return apiClient.put<AccountResponse>(`/api/accounts/${id}`, data, {
+    }): Promise<Account> => {
+      const token = getAuthToken();
+      return apiClient.put<Account>(`/api/accounts/${id}`, data, {
         token: token || undefined,
       });
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.accounts.detail(variables.id),
       });
@@ -63,13 +63,10 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number): Promise<void> => {
-      const token = localStorage.getItem('authToken');
-
+    mutationFn: async (id: string): Promise<void> => {
+      const token = getAuthToken();
       return apiClient.delete<void>(`/api/accounts/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        token: token || undefined,
       });
     },
     onSuccess: (_, id) => {

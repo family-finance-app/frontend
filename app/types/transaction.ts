@@ -1,16 +1,35 @@
 export interface CreateTransactionFormData {
-  type: string;
+  type: TransactionType;
   amount: number;
   date: string;
+  currency: CurrencyType;
   categoryId: string;
-  accountId?: string;
+  accountId: string;
+  description?: string;
   groupId?: string;
+}
+
+export enum CurrencyType {
+  UAH = 'UAH',
+  USD = 'USD',
+  EUR = 'EUR',
 }
 
 export enum TransactionType {
   INCOME = 'INCOME',
   EXPENSE = 'EXPENSE',
   TRANSFER = 'TRANSFER',
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  type: string;
+  icon?: string;
+  color?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  description?: string;
 }
 
 export interface Transaction {
@@ -53,12 +72,20 @@ export interface TransactionResponse {
   transaction: Transaction;
 }
 
-export interface Category {
+export interface TransactionsListResponse {
+  message: string;
+  transactions: Transaction[];
+}
+
+export interface CreateTransactionResponse extends TransactionResponse {}
+export interface UpdateTransactionResponse extends TransactionResponse {}
+
+export interface DeleteTransactionResponse {
+  message: string;
   id: number;
-  name: string;
-  type: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-  isActive: boolean;
+}
+
+export interface CategoriesListResponse {
+  message: string;
+  categories: Category[];
 }

@@ -22,3 +22,16 @@ export interface AccountResponse {
   message: string;
   account: Account;
 }
+
+export interface AccountsListResponse {
+  message: string;
+  accounts: Account[];
+}
+
+export interface CreateAccountResponse extends AccountResponse {}
+export interface UpdateAccountResponse extends AccountResponse {}
+
+export interface DeleteAccountResponse {
+  message: string;
+  id: number;
+}

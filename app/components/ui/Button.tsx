@@ -4,36 +4,32 @@ interface ButtonProps {
   disabled?: boolean;
   className?: string;
   type: 'button' | 'submit' | 'reset';
-  variant?: 'cancel';
+  variant?: 'cancel' | 'primary' | 'secondary';
 }
+
 export default function Button({
   text,
   onClick,
   disabled,
   type,
-  variant,
+  variant = 'primary',
 }: ButtonProps) {
   let className = '';
-  if (variant === 'cancel') {
-    className =
-      'bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md';
-  } else {
-    switch (type) {
-      case 'submit':
-        className =
-          'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-md';
-        break;
-      case 'reset':
-        className = '';
-        break;
-      case 'button':
-        className =
-          'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-md';
-        break;
-      default:
-        className = 'button-class';
-        break;
-    }
+
+  const baseStyles =
+    'px-6 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95';
+
+  switch (variant) {
+    case 'cancel':
+      className = `${baseStyles} bg-background-200 hover:bg-background-300 text-background-800 focus:ring-background-500`;
+      break;
+    case 'secondary':
+      className = `${baseStyles} bg-primary-100 hover:bg-primary-200 text-primary-800 focus:ring-primary-500`;
+      break;
+    case 'primary':
+    default:
+      className = `${baseStyles} bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white focus:ring-primary-500 shadow-lg hover:shadow-xl`;
+      break;
   }
 
   return (

@@ -2,9 +2,19 @@
 
 import { useState } from 'react';
 import { CreateAccountFormData } from '@/types/account';
-import Button from '../ui/Button';
-// import { useAccounts } from '@/api/accounts/queries';
 import { useCreateAccount } from '@/api/accounts/mutations';
+import { useAccountForm } from '@/hooks/useAccountForm';
+import { useAccountValidation } from '@/hooks/useAccountValidation';
+import { FormActions } from '@/components/shared/forms';
+import {
+  AccountNameInput,
+  AccountBalanceInput,
+  CurrencySelect,
+  CURRENCIES,
+} from './AccountInputs';
+import { AccountTypeSelect, ACCOUNT_TYPES } from './AccountTypeSelect';
+import { AccountPreview } from './AccountPreview';
+import { roboto } from '@/assets/fonts/fonts';
 
 interface CreateAccountFormProps {
   onSuccess?: (accountName: string) => void;
@@ -15,21 +25,25 @@ export default function CreateAccountForm({
   onSuccess,
   onCancel,
 }: CreateAccountFormProps) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [formData, setFormData] = useState<CreateAccountFormData>({
-    name: '',
-    type: 'DEBIT',
-    balance: 0.0,
-    currency: 'UAH',
-  });
-
-  //   const { data: accounts } = useAccounts();
   const createMutation = useCreateAccount();
+  const { formData, setFormField, reset } = useAccountForm();
+  const { validateForm, handleBackendErrors } = useAccountValidation();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const selectedCurrency = CURRENCIES.find(
+    (curr) => curr.value === formData.currency
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setErrors({});
+
+    // Валидируем форму
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
     try {
       const accountData = {
@@ -46,165 +60,95 @@ export default function CreateAccountForm({
       };
 
       const result = await createMutation.mutateAsync(accountData);
+      console.log('Account created:', result);
 
-      console.log(result);
-
-      setFormData({
-        name: '',
-        type: 'DEBIT',
-        balance: 0.0,
-        currency: 'UAH',
-      });
-
-      // Handle different response formats
-      //   let accountName = 'Account';
-      //   if (result && typeof result === 'object') {
-      //     if ('account' in result && result.account) {
-      //       accountName = result.account.name;
-      //     } else if ('name' in result && typeof result.name === 'string') {
-      //       accountName = result.name;
-      //     }
-      //   }
-
-      onSuccess?.(result.account?.name);
+      onSuccess?.(formData.name);
+      reset();
     } catch (error) {
-      if (error && typeof error === 'object' && 'details' in error) {
-        const backendErrors: Record<string, string> = {};
-        const details = error.details as Array<{
-          path: string[];
-          message: string;
-        }>;
-        details.forEach((err) => {
-          backendErrors[err.path[0]] = err.message;
-        });
-        setErrors(backendErrors);
-      } else {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'Failed to create transaction';
-        setErrors({ general: message });
-      }
+      const backendErrors = handleBackendErrors(error);
+      setErrors(backendErrors);
     }
   };
+
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Error message*/}
-        {errors.general && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            {errors.general}
-          </div>
-        )}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Account Name */}
+      <AccountNameInput
+        value={formData.name}
+        onChange={(name) => setFormField('name', name)}
+        error={errors.name}
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Account Title
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              placeholder="e.g., Main Checking"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Account Type
-            </label>
-            <select
-              value={formData.type}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  type: e.target.value as CreateAccountFormData['type'],
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
+      {/* Account Type */}
+      <AccountTypeSelect
+        value={formData.type}
+        onChange={(type) =>
+          setFormField('type', type as CreateAccountFormData['type'])
+        }
+        error={errors.type}
+      />
+
+      {/* Balance and Currency */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Initial Balance */}
+        <AccountBalanceInput
+          value={formData.balance}
+          onChange={(balance) => setFormField('balance', balance)}
+          symbol={selectedCurrency?.symbol || '$'}
+          error={errors.balance}
+        />
+
+        {/* Currency */}
+        <CurrencySelect
+          value={formData.currency}
+          onChange={(currency) =>
+            setFormField(
+              'currency',
+              currency as CreateAccountFormData['currency']
+            )
+          }
+          error={errors.currency}
+        />
+      </div>
+
+      {/* Form Errors */}
+      {errors.submit && (
+        <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-xl">
+          <div className="flex items-center space-x-2">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <option value="">Select type</option>
-              <option value="DEBIT">Debit Card</option>
-              <option value="CREDIT">Credit Card</option>
-              <option value="CASH">Cash</option>
-              <option value="BANK">Bank Account</option>
-              <option value="INVESTMENT">Investment Account</option>
-              <option value="DEPOSIT">Deposit Account</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Initial Balance
-            </label>
-            <input
-              type="number"
-              step="100.00"
-              value={formData.balance}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  balance: parseFloat(e.target.value),
-                })
-              }
-              placeholder="0.00"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Currency
-            </label>
-            <select
-              value={formData.currency}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  currency: e.target.value as CreateAccountFormData['currency'],
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="UAH">UAH</option>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-            </select>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="font-medium">{errors.submit}</span>
           </div>
         </div>
+      )}
 
-        {/*Buttons*/}
-        <div className="flex gap-3">
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={createMutation.isPending}
-            text="Create account"
-          />
-          {/* Cancel */}
-          <Button
-            type="button"
-            disabled={createMutation.isPending}
-            text="Cancel"
-            variant="cancel"
-            onClick={onCancel}
-          />
-        </div>
+      {/* Form Actions */}
+      <FormActions
+        submitLabel={
+          createMutation.isPending ? 'Creating...' : 'Create Account'
+        }
+        isLoading={createMutation.isPending}
+        onCancel={onCancel}
+      />
 
-        {/* Form Errors */}
-        {Object.keys(errors).length > 0 && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            <ul className="list-disc list-inside space-y-1">
-              {Object.entries(errors).map(([field, message]) => (
-                <li key={field}>{message}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </form>
-    </>
+      {/* Account Preview */}
+      <AccountPreview
+        name={formData.name}
+        accountType={formData.type}
+        balance={formData.balance}
+        currency={formData.currency}
+      />
+    </form>
   );
 }

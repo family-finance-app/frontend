@@ -1,4 +1,4 @@
-// centralized API client for all backend requests taht handles authentication, error handling and request configuration
+// centralized API client for all backend requests that handles authentication, error handling and request configuration
 
 import { ApiError } from '@/types/auth';
 
@@ -11,7 +11,7 @@ export interface RequestConfig extends RequestInit {
 class APIClient {
   private baseURL: string;
 
-  constructor(baseURL: string = BACKEND_URL || '') {
+  constructor(baseURL: string = BACKEND_URL || 'http://localhost') {
     this.baseURL = baseURL;
   }
 

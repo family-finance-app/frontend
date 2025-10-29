@@ -1,27 +1,33 @@
-/**
- * Transaction queries
- * Handles fetching transaction data
- */
+'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { queryKeys } from '@/lib/query-client';
+import { Transaction } from '@/types/transaction';
+import { getAuthToken } from '@/utils/token';
 
-interface Transaction {
-  id: number;
-  accountId: number;
-  type: string;
-  amount: number;
-  category: string;
-  description?: string;
-  date: string;
-  createdAt: string;
-}
+const queryKeys = {
+  transactions: {
+    all: ['transactions'],
+    lists: () => [...queryKeys.transactions.all, 'list'],
+    list: (filters: Record<string, any>) => [
+      ...queryKeys.transactions.lists(),
+      filters,
+    ],
+    details: () => [...queryKeys.transactions.all, 'detail'],
+    detail: (id: string) => [...queryKeys.transactions.details(), id],
+    byAccount: (accountId: string) => [
+      ...queryKeys.transactions.lists(),
+      'byAccount',
+      accountId,
+    ],
+    my: ['transactions', 'my'],
+    family: ['transactions', 'family'],
+  },
+};
 
 // get all transactions
 export const useTransactions = () => {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const token = getAuthToken();
 
   return useQuery({
     queryKey: queryKeys.transactions.all,
@@ -35,9 +41,8 @@ export const useTransactions = () => {
 };
 
 // get a transaction by id
-export const useTransaction = (id: number) => {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+export const useTransaction = (id: string) => {
+  const token = getAuthToken();
 
   return useQuery({
     queryKey: queryKeys.transactions.detail(id),
@@ -53,9 +58,8 @@ export const useTransaction = (id: number) => {
 /**
  * Get transactions by account ID
  */
-export const useTransactionsByAccount = (accountId: number) => {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+export const useTransactionsByAccount = (accountId: string) => {
+  const token = getAuthToken();
 
   return useQuery({
     queryKey: queryKeys.transactions.byAccount(accountId),
@@ -69,30 +73,24 @@ export const useTransactionsByAccount = (accountId: number) => {
   });
 };
 
-/**
- * Get user's transactions
- */
-export const useMyTransactions = (userId: number) => {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+// get the current user's transactions
+export const useMyTransactions = () => {
+  const token = getAuthToken();
 
   return useQuery({
-    queryKey: queryKeys.transactions.byUser(userId),
+    queryKey: queryKeys.transactions.my,
     queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>(`/api/transactions/user/${userId}`, {
+      return apiClient.get<Transaction[]>('/api/transactions/all', {
         token: token || undefined,
       });
     },
-    enabled: !!token && !!userId,
+    enabled: !!token,
   });
 };
 
-/**
- * Get family transactions
- */
+// get family transactions
 export const useFamilyTransactions = () => {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const token = getAuthToken();
 
   return useQuery({
     queryKey: queryKeys.transactions.family,
