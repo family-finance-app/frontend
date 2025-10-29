@@ -95,6 +95,7 @@ export const useCreateTransaction = () => {
     onSuccess: () => {
       // invalidate transactions and accounts (balance changed)
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
     },
   });
@@ -136,6 +137,7 @@ export const useUpdateTransaction = () => {
         queryKey: queryKeys.transactions.detail(variables.id),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
     },
   });
@@ -161,6 +163,7 @@ export const useDeleteTransaction = () => {
         queryKey: queryKeys.transactions.detail(id),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     },
   });

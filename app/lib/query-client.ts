@@ -40,10 +40,11 @@ export const queryKeys = {
   },
   transactions: {
     all: ['transactions'] as const,
+    my: ['transactions', 'my'] as const,
     detail: (id: number) => ['transactions', id] as const,
     byAccount: (accountId: number) =>
       ['transactions', 'account', accountId] as const,
-    byUser: (userId: number) => ['transactions', 'user', userId] as const,
+    // byUser: (userId: number) => ['transactions', 'user', userId] as const,
     family: ['transactions', 'family'] as const,
   },
   categories: {

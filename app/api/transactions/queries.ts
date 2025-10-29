@@ -12,7 +12,7 @@ interface Transaction {
   accountId: number;
   type: string;
   amount: number;
-  category: string;
+  categoryId: string;
   description?: string;
   date: string;
   createdAt: string;
@@ -72,18 +72,18 @@ export const useTransactionsByAccount = (accountId: number) => {
 /**
  * Get user's transactions
  */
-export const useMyTransactions = (userId: number) => {
+export const useMyTransactions = () => {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
   return useQuery({
-    queryKey: queryKeys.transactions.byUser(userId),
+    queryKey: queryKeys.transactions.my,
     queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>(`/api/transactions/user/${userId}`, {
+      return apiClient.get<Transaction[]>('/api/transactions/all', {
         token: token || undefined,
       });
     },
-    enabled: !!token && !!userId,
+    enabled: !!token,
   });
 };
 
