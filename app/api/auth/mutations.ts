@@ -1,11 +1,12 @@
-// sign up, sign in, and sign out operations
+// Sign up, sign in, and sign out operations
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import { SignUpFormData, SignInFormData, AuthResponse } from '@/types/auth';
+import { getAuthToken } from '@/utils/token';
 
-// sign-up hook
+// sign up, returns AuthResponse type with token
 export const useSignUp = () => {
   const queryClient = useQueryClient();
 
@@ -14,14 +15,13 @@ export const useSignUp = () => {
       return apiClient.post<AuthResponse>('/api/auth/signup', {
         email: formData.email,
         password: formData.password,
-        role: 'MEMBER',
+        role: 'MEMBER', // TODO: change to user/family user
       });
     },
     onSuccess: (data) => {
       if (data.accessToken) {
         localStorage.setItem('authToken', data.accessToken);
       }
-      // invalidate and refetch current user query
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
     },
     onError: (error) => {
@@ -30,12 +30,13 @@ export const useSignUp = () => {
   });
 };
 
-// sign-in hook
+// login
 export const useSignIn = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (formData: SignInFormData): Promise<AuthResponse> => {
+      // API клиент автоматически типизирует ответ
       return apiClient.post<AuthResponse>('/api/auth/login', {
         email: formData.email,
         password: formData.password,
@@ -45,7 +46,6 @@ export const useSignIn = () => {
       if (data.accessToken) {
         localStorage.setItem('authToken', data.accessToken);
       }
-      // invalidate and refetch current user query
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
     },
     onError: (error) => {
@@ -54,13 +54,20 @@ export const useSignIn = () => {
   });
 };
 
-// sign-out
+// log out
 export const useSignOut = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (): Promise<void> => {
-      await apiClient.post('/api/auth/logout');
+      const token = getAuthToken();
+      await apiClient.post<void>(
+        '/api/auth/logout',
+        {},
+        {
+          token: token || undefined,
+        }
+      );
       localStorage.removeItem('authToken');
     },
     onSuccess: () => {

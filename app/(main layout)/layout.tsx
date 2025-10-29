@@ -4,7 +4,7 @@ import Navigation from '../components/Navigation';
 
 export const metadata: Metadata = {
   title: 'Dashboard - FamilyFinance',
-  description: 'Manage your family finances',
+  description: 'Professional family financial management',
 };
 
 export default function DashboardLayout({
@@ -13,7 +13,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-background-50 via-background-100 to-background-200">
       {/* Navigation Header - Fixed */}
       <Navigation />
 
@@ -23,9 +23,9 @@ export default function DashboardLayout({
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
-            {children}
+        <main className="flex-1 lg:ml-72 min-h-[calc(100vh-64px)]">
+          <div className="w-full max-w-8xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+            <div className="animate-fade-in">{children}</div>
           </div>
         </main>
       </div>

@@ -31,6 +31,11 @@ export interface AuthResponse {
   accessToken: string;
 }
 
+export interface CurrentUserResponse {
+  message: string;
+  user: User;
+}
+
 export interface ApiError {
   error: string;
   message: string;

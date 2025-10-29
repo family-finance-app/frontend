@@ -1,18 +1,32 @@
-import { Poppins } from 'next/font/google';
+import { Inter, JetBrains_Mono, Roboto } from 'next/font/google';
 
-export const poppins = Poppins({
-  weight: ['200', '400', '500', '600', '700'],
+// Primary font for UI elements - clean and professional
+export const inter = Inter({
+  weight: ['300', '400', '500', '600', '700', '800'],
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-inter',
 });
 
-// here it is possible to add other fonts and use it on separate elemets, for example:
-// import { Poppins, Lusitana } from 'next/font/google';
-// export const lusitana = Lusitana({
-//   weight: ['400', '700'],
-//   subsets: ['latin'],
-// });
+// Monospace font for numbers and financial data
+export const jetbrainsMono = JetBrains_Mono({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono',
+});
 
-// pass it to any element, and use this way:
-// import {lusitana} from '@app/ui/fonts.ts'
-// <p className={lusitana.className} text-xl>Some text</p>
+// Secondary font for headers and important text
+export const roboto = Roboto({
+  weight: ['300', '400', '500', '700', '900'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+});
+
+// Export all fonts for easy access
+export const fonts = {
+  inter,
+  jetbrainsMono,
+  roboto,
+};

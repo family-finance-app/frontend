@@ -1,54 +1,36 @@
-// Creating, updating, and deleting transactions
+// create, update, and delete transactions
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import type { Transaction, TransactionResponse } from '@/types/transaction';
+import type {
+  CreateTransactionFormData,
+  Transaction,
+} from '@/types/transaction';
 import type { Account } from '@/types/account';
-
-export interface CreateTransactionData {
-  accountId: number;
-  type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
-  amount: number;
-  categoryId: number;
-  currency: 'UAH' | 'USD' | 'EUR';
-  date: string;
-  description?: string;
-  groupId?: number;
-}
+import { getAuthToken } from '@/utils/token';
 
 // create new transaction
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (data: CreateTransactionData): Promise<Transaction> => {
-      const token = localStorage.getItem('authToken');
+    mutationFn: async (
+      data: CreateTransactionFormData
+    ): Promise<Transaction> => {
+      const token = getAuthToken();
 
-      const response = await apiClient.post<TransactionResponse | Transaction>(
-        '/api/transactions/create',
-        data,
-        {
-          token: token || undefined,
-        }
-      );
-      if (
-        response &&
-        typeof response === 'object' &&
-        'transaction' in response
-      ) {
-        return (response as TransactionResponse).transaction;
-      }
-      return response as Transaction;
+      return apiClient.post<Transaction>('/api/transactions/create', data, {
+        token: token || undefined,
+      });
     },
     onMutate: async (newTx) => {
-      // Optimistic update: adjust account balance in cache based on transaction type
       await queryClient.cancelQueries({ queryKey: queryKeys.accounts.my });
       const prevAccounts = queryClient.getQueryData<Account[]>(
         queryKeys.accounts.my
       );
+      const accountId = String(newTx.accountId);
       const prevDetail = queryClient.getQueryData<Account>(
-        queryKeys.accounts.detail(newTx.accountId)
+        queryKeys.accounts.detail(accountId)
       );
 
       const sign =
@@ -57,20 +39,20 @@ export const useCreateTransaction = () => {
 
       if (prevAccounts) {
         const updatedAccounts = prevAccounts.map((acc) =>
-          acc.id === newTx.accountId
+          String(acc.id) === accountId
             ? { ...acc, balance: Number(acc.balance) + delta }
             : acc
         );
         queryClient.setQueryData(queryKeys.accounts.my, updatedAccounts);
       }
 
-      if (prevDetail && prevDetail.id === newTx.accountId) {
+      if (prevDetail && String(prevDetail.id) === accountId) {
         const updatedDetail = {
           ...prevDetail,
           balance: Number(prevDetail.balance) + delta,
         } as Account;
         queryClient.setQueryData(
-          queryKeys.accounts.detail(newTx.accountId),
+          queryKeys.accounts.detail(accountId),
           updatedDetail
         );
       }
@@ -81,19 +63,17 @@ export const useCreateTransaction = () => {
       };
     },
     onError: (_err, _newTx, ctx) => {
-      // Rollback optimistic update on error
       if (ctx?.prevAccounts) {
         queryClient.setQueryData(queryKeys.accounts.my, ctx.prevAccounts);
       }
       if (ctx?.prevDetail) {
         queryClient.setQueryData(
-          queryKeys.accounts.detail(ctx.prevDetail.id),
+          queryKeys.accounts.detail(String(ctx.prevDetail.id)),
           ctx.prevDetail
         );
       }
     },
     onSuccess: () => {
-      // invalidate transactions and accounts (balance changed)
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
@@ -101,9 +81,7 @@ export const useCreateTransaction = () => {
   });
 };
 
-/**
- * Update existing transaction
- */
+// update existing transaction
 export const useUpdateTransaction = () => {
   const queryClient = useQueryClient();
 
@@ -113,28 +91,24 @@ export const useUpdateTransaction = () => {
       data,
     }: {
       id: number;
-      data: Partial<CreateTransactionData>;
+      data: Partial<CreateTransactionFormData>;
     }): Promise<Transaction> => {
-      const token = localStorage.getItem('authToken');
+      const token = getAuthToken();
 
-      const response = await apiClient.put<TransactionResponse | Transaction>(
-        `/api/transactions/${id}`,
-        data,
-        { token: token || undefined }
+      return apiClient.put<Transaction>(
+        `/api/transactions/update`,
+        {
+          id,
+          ...data,
+        },
+        {
+          token: token || undefined,
+        }
       );
-      if (
-        response &&
-        typeof response === 'object' &&
-        'transaction' in response
-      ) {
-        return (response as TransactionResponse).transaction;
-      }
-      return response as Transaction;
     },
     onSuccess: (data, variables) => {
-      // Invalidate specific transaction, all transactions, and accounts
       queryClient.invalidateQueries({
-        queryKey: queryKeys.transactions.detail(variables.id),
+        queryKey: queryKeys.transactions.detail(String(variables.id)),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
@@ -143,28 +117,38 @@ export const useUpdateTransaction = () => {
   });
 };
 
-/**
- * Delete transaction
- */
+// delete transaction
 export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: number): Promise<void> => {
-      const token = localStorage.getItem('authToken');
+      const token = getAuthToken();
 
-      return apiClient.delete<void>(`/api/transactions/${id}`, {
-        token: token || undefined,
-      });
+      try {
+        await apiClient.delete<void>(`/api/transactions/delete/${id}`, {
+          token: token || undefined,
+        });
+      } catch (error) {
+        const err = error as any;
+        console.error('Delete error details:', err);
+        throw new Error(
+          err?.message ||
+            err?.error ||
+            'Failed to delete transaction. Please try again.'
+        );
+      }
     },
     onSuccess: (_, id) => {
-      // Remove transaction from cache and invalidate related queries
       queryClient.removeQueries({
-        queryKey: queryKeys.transactions.detail(id),
+        queryKey: queryKeys.transactions.detail(String(id)),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    },
+    onError: (error: any) => {
+      console.error('Delete transaction error:', error);
     },
   });
 };

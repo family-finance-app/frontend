@@ -1,16 +1,11 @@
-// fetching current user data
+// fetch current authenticated user
 
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import { User } from '@/types/auth';
 
-interface CurrentUserResponse {
-  message: string;
-  user: User;
-}
-
-// GET current authenticated user
+// get current user based on token sent to server with query parameters
 export const useCurrentUser = () => {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
@@ -18,18 +13,11 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: queryKeys.auth.currentUser,
     queryFn: async (): Promise<User> => {
-      const response = await apiClient.get<CurrentUserResponse>(
-        '/api/auth/me',
-        {
-          token: token || undefined,
-        }
-      );
-      if (response && typeof response === 'object' && 'user' in response) {
-        return response.user;
-      }
-      return response as unknown as User;
+      return apiClient.get<User>('/api/auth/me', {
+        token: token || undefined,
+      });
     },
-    enabled: !!token, // only run query if token exists
-    staleTime: 1000 * 60 * 10,
+    enabled: !!token, // endpoint responses with user data only if token exists
+    staleTime: 1000 * 60 * 10, // 10min
   });
 };

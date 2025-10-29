@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import { useRouter } from 'next/navigation';
 import { useMyAccounts } from '@/api/accounts/queries';
+import { AccountCard } from './AccountCard';
+import type { Account } from '@/types/account';
 
 export default function AccountsDashboard() {
   const router = useRouter();
@@ -14,18 +16,7 @@ export default function AccountsDashboard() {
     setMounted(true);
   }, []);
 
-  type Account = {
-    id?: string | number;
-    name?: string;
-    balance?: number | string;
-    currency?: string;
-    type?: string;
-    [key: string]: any;
-  };
-
-  const accountsArray = Array.isArray(accountsData)
-    ? (accountsData as Account[])
-    : [];
+  const accountsArray = Array.isArray(accountsData) ? accountsData : [];
 
   const accounts: Account[] = accountsArray
     .map((item) => {
@@ -43,16 +34,6 @@ export default function AccountsDashboard() {
         total + (Number(account.balance) || 0),
       0
     );
-  };
-
-  const getCurrencySymbol = (currency?: string) => {
-    if (!currency) return '';
-    const symbols: Record<string, string> = {
-      USD: '$',
-      EUR: '€',
-      UAH: '₴',
-    };
-    return symbols[currency] || currency;
   };
 
   if (!mounted || isLoading) {
@@ -114,48 +95,11 @@ export default function AccountsDashboard() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {accounts.map((account, index) => (
-                  <div
+                  <AccountCard
                     key={account.id || `account-${index}`}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white">
-                          {account.name}
-                        </h4>
-                        {account.type && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {account.type}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                        {account.currency}
-                      </span>
-                    </div>
-                    <div className="mb-4">
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {getCurrencySymbol(account.currency)}
-                        {Number(account.balance).toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => router.push(`/settings/accounts`)}
-                        className="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-2 rounded text-sm transition-colors"
-                      >
-                        View Details
-                      </button>
-                      <button
-                        onClick={() => router.push(`/settings/accounts`)}
-                        className="flex-1 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 px-3 py-2 rounded text-sm transition-colors"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  </div>
+                    account={account}
+                    index={index}
+                  />
                 ))}
               </div>
             </div>

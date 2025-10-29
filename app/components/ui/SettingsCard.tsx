@@ -37,8 +37,10 @@ export default function SettingsCard({
   const CardWrapper = variant === 'link' ? 'div' : 'div';
 
   const baseClasses =
-    'bg-white dark:bg-gray-800 rounded-lg shadow-md transition-shadow';
-  const hoverClasses = hoverable ? 'hover:shadow-lg' : '';
+    'bg-background-50 border border-background-200 rounded-2xl shadow-sm transition-all duration-200';
+  const hoverClasses = hoverable
+    ? 'hover:shadow-lg hover:scale-102 hover:bg-background-100'
+    : '';
   const linkClasses = variant === 'link' ? 'cursor-pointer group' : '';
 
   return (
@@ -48,17 +50,15 @@ export default function SettingsCard({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3
-              className={`text-lg font-semibold text-gray-900 dark:text-white mb-1 ${
+              className={`text-lg font-semibold text-background-900 mb-1 ${
                 variant === 'link'
-                  ? 'group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors'
+                  ? 'group-hover:text-primary-600 transition-colors'
                   : ''
               }`}
             >
               {header}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {description}
-            </p>
+            <p className="text-sm text-background-600">{description}</p>
           </div>
           {icon && <div className="text-2xl ml-3">{icon}</div>}
         </div>

@@ -1,286 +1,175 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateTransactionFormData } from '@/types/transaction';
+import {
+  CreateTransactionFormData,
+  TransactionType,
+  CurrencyType,
+} from '@/types/transaction';
 import { useCategories } from '@/api/categories/queries';
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useCreateTransaction } from '@/api/transactions/mutations';
-import Button from '../ui/Button';
+import { roboto } from '@/assets/fonts/fonts';
+import { FormInput, FormSelect, FormActions } from '@/components/shared/forms';
+import type { SelectOption } from '@/components/shared/forms/FormSelect';
 
 interface CreateTransactionFormProps {
-  onSuccess?: (transactionId: number) => void;
+  onSuccess: (transactionId: number) => void;
   onCancel?: () => void;
+  onError?: () => void;
 }
 
 export default function CreateTransactionForm({
   onSuccess,
   onCancel,
+  onError,
 }: CreateTransactionFormProps) {
-  const { data: categories } = useCategories();
-  const { data: accounts } = useMyAccounts();
-  const createMutation = useCreateTransaction();
-
-  const today = new Date();
-  const pad = (n: number) => n.toString().padStart(2, '0');
-
-  const [formData, setFormData] = useState<CreateTransactionFormData>({
-    type: 'EXPENSE',
-    amount: 0,
-    date: `${pad(today.getDate())}.${pad(
-      today.getMonth() + 1
-    )}.${today.getFullYear()}`,
-    categoryId: '',
-    accountId: '',
-  });
-
+  const [type, setType] = useState<'INCOME' | 'EXPENSE' | 'TRANSFER'>(
+    'EXPENSE'
+  );
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [accountId, setAccountId] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const categoriesArray = Array.isArray(categories) ? categories : [];
-  const accountsArray = Array.isArray(accounts) ? accounts : [];
+  const { data: categories = [] } = useCategories();
+  const { data: accounts = [] } = useMyAccounts();
+  const createMutation = useCreateTransaction();
 
-  const filteredCategories = categoriesArray.filter((cat) => {
-    if (formData.type === 'TRANSFER') return true;
-    return cat.type.toUpperCase() === formData.type;
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
 
-    try {
-      const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
-      if (!datePattern.test(formData.date)) {
-        setErrors({ date: 'Please enter date in format DD.MM.YYYY' });
-        return;
-      }
+    // Простая валидация
+    const newErrors: Record<string, string> = {};
+    if (!amount) newErrors.amount = 'Amount is required';
+    if (!accountId) newErrors.accountId = 'Account is required';
+    if (type !== 'TRANSFER' && !categoryId)
+      newErrors.categoryId = 'Category is required';
 
-      const selectedAccount = accountsArray.find(
-        (a) => a.id === Number(formData.accountId)
-      );
-
-      const transactionData = {
-        accountId: Number(formData.accountId),
-        type: formData.type as 'INCOME' | 'EXPENSE' | 'TRANSFER',
-        amount: Number(formData.amount),
-        categoryId: Number(formData.categoryId),
-        currency: (selectedAccount?.currency || 'UAH') as 'UAH' | 'USD' | 'EUR',
-        date: formData.date,
-      };
-
-      if (!transactionData.accountId) {
-        setErrors({ accountId: 'Please select an account' });
-        return;
-      }
-      if (!transactionData.categoryId) {
-        setErrors({ categoryId: 'Please select a category' });
-        return;
-      }
-      if (!transactionData.amount || transactionData.amount < 0.01) {
-        setErrors({ amount: 'Amount must be at least 0.01' });
-        return;
-      }
-
-      const result = await createMutation.mutateAsync(transactionData);
-
-      setFormData({
-        type: 'EXPENSE',
-        amount: 0,
-        date: `${pad(today.getDate())}.${pad(
-          today.getMonth() + 1
-        )}.${today.getFullYear()}`,
-        categoryId: '',
-        accountId: '',
-      });
-
-      onSuccess?.(result.id);
-    } catch (error) {
-      if (error && typeof error === 'object' && 'details' in error) {
-        const backendErrors: Record<string, string> = {};
-        const details = error.details as Array<{
-          path: string[];
-          message: string;
-        }>;
-        details.forEach((err) => {
-          backendErrors[err.path[0]] = err.message;
-        });
-        setErrors(backendErrors);
-      } else {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'Failed to create transaction';
-        setErrors({ general: message });
-      }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
+
+    const formData: CreateTransactionFormData = {
+      type: type as TransactionType,
+      amount: parseFloat(amount),
+      date: new Date().toISOString().split('T')[0],
+      currency: CurrencyType.UAH,
+      description,
+      accountId,
+      categoryId,
+    };
+
+    createMutation.mutate(formData, {
+      onSuccess: (data: any) => {
+        onSuccess(data.id || 0);
+      },
+      onError: () => {
+        onError?.();
+      },
+    });
   };
 
+  // Convert accounts to options
+  const accountOptions: SelectOption[] = (accounts || []).map((account) => ({
+    value: account.id,
+    label: account.name,
+  }));
+
+  // Convert categories to options
+  const categoryOptions: SelectOption[] = (categories || [])
+    .filter((cat) => {
+      if (type === 'TRANSFER') return false;
+      return cat.type.toUpperCase() === type;
+    })
+    .map((cat) => ({
+      value: cat.id,
+      label: cat.name,
+    }));
+
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Error message*/}
-        {errors.general && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            {errors.general}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Transaction type selection logics*/}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Transaction Type
-            </label>
-            <select
-              value={formData.type}
-              onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  type: e.target.value,
-                  categoryId: '',
-                });
-              }}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            >
-              <option value="EXPENSE">Expense</option>
-              <option value="INCOME">Income</option>
-              <option value="TRANSFER">Transfer</option>
-            </select>
-          </div>
-
-          {/* Account selection logics*/}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Account
-            </label>
-            <select
-              value={formData.accountId}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  accountId: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            >
-              <option value="">Choose account</option>
-              {accountsArray.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name} ({account.type}) - {account.currency}
-                </option>
-              ))}
-            </select>
-            {errors.accountId && (
-              <p className="text-sm text-red-600 mt-1">{errors.accountId}</p>
-            )}
-          </div>
-
-          {/* Category selection logics*/}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Category
-            </label>
-            <select
-              value={formData.categoryId}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  categoryId: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            >
-              <option value="">Select category</option>
-              {filteredCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            {errors.categoryId && (
-              <p className="text-sm text-red-600 mt-1">{errors.categoryId}</p>
-            )}
-          </div>
-
-          {/* Enter transaction amount*/}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Amount
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.amount}
-              onChange={(e) =>
-                setFormData({ ...formData, amount: Number(e.target.value) })
-              }
-              placeholder="0.00"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            />
-            {errors.amount && (
-              <p className="text-sm text-red-600 mt-1">{errors.amount}</p>
-            )}
-          </div>
-
-          {/* Enter date of transaction (DD.MM.YYYY) */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Date (DD.MM.YYYY)
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="DD.MM.YYYY"
-              value={formData.date}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  date: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              required
-            />
-            {errors.date && (
-              <p className="text-sm text-red-600 mt-1">{errors.date}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Buttons*/}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Transaction Type */}
+      <div>
+        <label
+          className={`${roboto.className} block text-sm font-medium text-background-900 mb-2`}
+        >
+          Type
+        </label>
         <div className="flex gap-3">
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={createMutation.isPending}
-            className="submit"
-            text="Create Transaction"
-          />
-
-          {/* Close form */}
-          <Button
-            type="button"
-            onClick={onCancel}
-            disabled={createMutation.isPending}
-            variant={'cancel'}
-            text="Cancel"
-          />
+          {(['INCOME', 'EXPENSE', 'TRANSFER'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setType(t)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                type === t
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-background-100 text-background-700 hover:bg-background-200'
+              }`}
+            >
+              {t}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {Object.keys(errors).length > 0 && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-            <ul className="list-disc list-inside space-y-1">
-              {Object.entries(errors).map(([field, message]) => (
-                <li key={field}>{message}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </form>
-    </>
+      {/* Amount */}
+      <FormInput
+        label="Amount"
+        name="amount"
+        type="number"
+        placeholder="0.00"
+        value={amount}
+        onChange={setAmount}
+        error={errors.amount}
+      />
+
+      {/* Account */}
+      <FormSelect
+        label="Account"
+        name="accountId"
+        value={accountId}
+        onChange={setAccountId}
+        options={accountOptions}
+        placeholder="Select an account"
+        error={errors.accountId}
+      />
+
+      {/* Category */}
+      {type !== 'TRANSFER' && (
+        <FormSelect
+          label="Category"
+          name="categoryId"
+          value={categoryId}
+          onChange={setCategoryId}
+          options={categoryOptions}
+          placeholder="Select a category"
+          error={errors.categoryId}
+        />
+      )}
+
+      {/* Description */}
+      <FormInput
+        label="Description"
+        name="description"
+        type="text"
+        placeholder="Add a note..."
+        value={description}
+        onChange={setDescription}
+      />
+
+      {/* Actions */}
+      <FormActions
+        onCancel={onCancel}
+        submitLabel={
+          createMutation.isPending ? 'Creating...' : 'Create Transaction'
+        }
+        cancelLabel="Cancel"
+        isLoading={createMutation.isPending}
+      />
+    </form>
   );
 }
