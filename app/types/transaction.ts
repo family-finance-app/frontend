@@ -1,6 +1,6 @@
 export interface CreateTransactionFormData {
   type: string;
-  amount: string;
+  amount: number;
   date: string;
   categoryId: string;
   accountId?: string;
