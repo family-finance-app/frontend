@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { CreateTransactionFormData } from '@/types/transaction';
 import { useCategories } from '@/api/categories/queries';
-import { useAccounts } from '@/api/accounts/queries';
+import { useMyAccounts } from '@/api/accounts/queries';
 import { useCreateTransaction } from '@/api/transactions/mutations';
 import Button from '../ui/Button';
 
@@ -17,13 +17,18 @@ export default function CreateTransactionForm({
   onCancel,
 }: CreateTransactionFormProps) {
   const { data: categories } = useCategories();
-  const { data: accounts } = useAccounts();
+  const { data: accounts } = useMyAccounts();
   const createMutation = useCreateTransaction();
+
+  const today = new Date();
+  const pad = (n: number) => n.toString().padStart(2, '0');
 
   const [formData, setFormData] = useState<CreateTransactionFormData>({
     type: 'EXPENSE',
-    amount: '',
-    date: new Date().toISOString().split('T')[0],
+    amount: 0,
+    date: `${pad(today.getDate())}.${pad(
+      today.getMonth() + 1
+    )}.${today.getFullYear()}`,
     categoryId: '',
     accountId: '',
   });
@@ -43,20 +48,46 @@ export default function CreateTransactionForm({
     setErrors({});
 
     try {
+      const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
+      if (!datePattern.test(formData.date)) {
+        setErrors({ date: 'Please enter date in format DD.MM.YYYY' });
+        return;
+      }
+
+      const selectedAccount = accountsArray.find(
+        (a) => a.id === Number(formData.accountId)
+      );
+
       const transactionData = {
         accountId: Number(formData.accountId),
         type: formData.type as 'INCOME' | 'EXPENSE' | 'TRANSFER',
         amount: Number(formData.amount),
-        category: formData.categoryId,
+        categoryId: Number(formData.categoryId),
+        currency: (selectedAccount?.currency || 'UAH') as 'UAH' | 'USD' | 'EUR',
         date: formData.date,
       };
+
+      if (!transactionData.accountId) {
+        setErrors({ accountId: 'Please select an account' });
+        return;
+      }
+      if (!transactionData.categoryId) {
+        setErrors({ categoryId: 'Please select a category' });
+        return;
+      }
+      if (!transactionData.amount || transactionData.amount < 0.01) {
+        setErrors({ amount: 'Amount must be at least 0.01' });
+        return;
+      }
 
       const result = await createMutation.mutateAsync(transactionData);
 
       setFormData({
         type: 'EXPENSE',
-        amount: '',
-        date: new Date().toISOString().split('T')[0],
+        amount: 0,
+        date: `${pad(today.getDate())}.${pad(
+          today.getMonth() + 1
+        )}.${today.getFullYear()}`,
         categoryId: '',
         accountId: '',
       });
@@ -135,9 +166,8 @@ export default function CreateTransactionForm({
             >
               <option value="">Choose account</option>
               {accountsArray.map((account) => (
-                <option key={account.account.id} value={account.account.id}>
-                  {account.account.name} ({account.account.type}) -{' '}
-                  {account.account.currency}
+                <option key={account.id} value={account.id}>
+                  {account.name} ({account.type}) - {account.currency}
                 </option>
               ))}
             </select>
@@ -165,7 +195,6 @@ export default function CreateTransactionForm({
               <option value="">Select category</option>
               {filteredCategories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.icon ? `${category.icon} ` : ''}
                   {category.name}
                 </option>
               ))}
@@ -186,10 +215,7 @@ export default function CreateTransactionForm({
               min="0"
               value={formData.amount}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  amount: e.target.value,
-                })
+                setFormData({ ...formData, amount: Number(e.target.value) })
               }
               placeholder="0.00"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
@@ -200,13 +226,15 @@ export default function CreateTransactionForm({
             )}
           </div>
 
-          {/* Enter date of transaction */}
+          {/* Enter date of transaction (DD.MM.YYYY) */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Date
+              Date (DD.MM.YYYY)
             </label>
             <input
-              type="date"
+              type="text"
+              inputMode="numeric"
+              placeholder="DD.MM.YYYY"
               value={formData.date}
               onChange={(e) =>
                 setFormData({
@@ -217,6 +245,9 @@ export default function CreateTransactionForm({
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               required
             />
+            {errors.date && (
+              <p className="text-sm text-red-600 mt-1">{errors.date}</p>
+            )}
           </div>
         </div>
 
