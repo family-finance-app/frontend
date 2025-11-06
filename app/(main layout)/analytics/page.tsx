@@ -1,4 +1,4 @@
-export default function FamilyGroup() {
+export default function Reports() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-background-50 to-background-100">
       <div className="w-full max-w-md mx-auto px-6">
@@ -8,19 +8,26 @@ export default function FamilyGroup() {
             <div className="w-16 h-16 bg-linear-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center">
               <svg
                 className="w-8 h-8 text-white"
-                fill="currentColor"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
               </svg>
             </div>
           </div>
 
           {/* Heading */}
           <h2 className="text-2xl font-bold text-center text-background-900 mb-3">
-            Family Groups Coming Soon
+            Analytics Coming Soon
           </h2>
 
+          {/* Features list */}
           <div className="space-y-3 mb-8">
             <div className="flex items-start gap-3">
               <div className="w-5 h-5 rounded-full bg-primary-100 flex items-center justify-center shrink-0 mt-0.5">
@@ -37,7 +44,7 @@ export default function FamilyGroup() {
                 </svg>
               </div>
               <span className="text-sm text-background-700">
-                Create and manage family groups
+                Spending trends and visualizations
               </span>
             </div>
 
@@ -56,7 +63,7 @@ export default function FamilyGroup() {
                 </svg>
               </div>
               <span className="text-sm text-background-700">
-                Invite and manage family members
+                Category breakdowns and comparisons
               </span>
             </div>
 
@@ -75,7 +82,7 @@ export default function FamilyGroup() {
                 </svg>
               </div>
               <span className="text-sm text-background-700">
-                Share and track shared expenses
+                Budget performance and forecasts
               </span>
             </div>
           </div>

@@ -29,15 +29,12 @@ export default function EditTransactionModal({
 
   useEffect(() => {
     if (transaction && isOpen) {
-      // Handle date parsing - transaction.date might be string in YYYY-MM-DD format
       let dateString = '';
       try {
         if (typeof transaction.date === 'string') {
-          // If already in YYYY-MM-DD format, use as-is
           if (transaction.date.match(/^\d{4}-\d{2}-\d{2}/)) {
             dateString = transaction.date.split('T')[0];
           } else {
-            // Otherwise try to parse and format
             dateString = new Date(transaction.date).toISOString().split('T')[0];
           }
         }
@@ -64,7 +61,6 @@ export default function EditTransactionModal({
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-      // Reset categoryId when type changes
       ...(name === 'type' && { categoryId: '' }),
     }));
     if (errors[name]) {

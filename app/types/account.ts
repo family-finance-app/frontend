@@ -1,6 +1,14 @@
 export interface CreateAccountFormData {
   name: string;
-  type: 'DEBIT' | 'CREDIT' | 'CASH' | 'BANK' | 'INVESTMENT' | 'DEPOSIT';
+  type:
+    | 'DEBIT'
+    | 'CREDIT'
+    | 'CASH'
+    | 'BANK'
+    | 'INVESTMENT'
+    | 'DEPOSIT'
+    | 'DIGITAL'
+    | 'SAVINGS';
   balance: number;
   currency: 'UAH' | 'USD' | 'EUR';
 }
@@ -8,9 +16,18 @@ export interface CreateAccountFormData {
 export interface Account {
   id: number;
   name: string;
-  type: 'DEBIT' | 'CREDIT' | 'CASH' | 'BANK' | 'INVESTMENT' | 'DEPOSIT';
+  type:
+    | 'DEBIT'
+    | 'CREDIT'
+    | 'CASH'
+    | 'BANK'
+    | 'INVESTMENT'
+    | 'DEPOSIT'
+    | 'DIGITAL'
+    | 'SAVINGS';
   balance: number;
   currency: 'UAH' | 'USD' | 'EUR';
+  description?: string;
   groupId?: number;
   userId: number;
   createdBy: number;

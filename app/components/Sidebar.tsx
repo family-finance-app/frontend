@@ -1,9 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { roboto } from '../assets/fonts/fonts';
+import {
+  SidebarMenu,
+  SidebarBalanceWidget,
+  SidebarExchangeRatesWidget,
+} from './sidebar/index';
 
 interface MenuItem {
   id: string;
@@ -23,18 +25,6 @@ const menuItems: MenuItem[] = [
     id: 'transactions',
     label: 'Transactions',
     href: '/transactions',
-    children: [
-      {
-        id: 'my-transactions',
-        label: 'My Transactions',
-        href: '/my-transactions',
-      },
-      {
-        id: 'family-transactions',
-        label: 'Family Transactions',
-        href: '/family-transactions',
-      },
-    ],
   },
   {
     id: 'accounts',
@@ -42,9 +32,9 @@ const menuItems: MenuItem[] = [
     href: '/accounts',
   },
   {
-    id: 'reports',
+    id: 'analytics',
     label: 'Analytics',
-    href: '/reports',
+    href: '/analytics',
   },
   {
     id: 'family-group',
@@ -63,7 +53,6 @@ export default function Sidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>([
     'transactions',
   ]);
-  const pathname = usePathname();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -92,78 +81,6 @@ export default function Sidebar() {
       prev.includes(itemId)
         ? prev.filter((id) => id !== itemId)
         : [...prev, itemId]
-    );
-  };
-
-  const isActive = (href: string) => {
-    return pathname === href || pathname.startsWith(href + '/');
-  };
-
-  const renderMenuItem = (item: MenuItem, level = 0) => {
-    const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedItems.includes(item.id);
-    const active = isActive(item.href);
-
-    return (
-      <li key={item.id} className={level === 0 ? 'mb-1' : 'mb-0'}>
-        {hasChildren ? (
-          <button
-            type="button"
-            className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 group ${
-              active
-                ? 'bg-primary-100 text-primary-800 shadow-sm'
-                : 'text-background-700 hover:bg-background-100 hover:text-background-900'
-            } ${level > 0 ? 'ml-4 text-sm' : 'text-base font-medium'}`}
-            onClick={() => toggleExpanded(item.id)}
-          >
-            <span className="flex items-center space-x-3">
-              <span>{item.label}</span>
-              {item.badge && (
-                <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-primary-500 rounded-full">
-                  {item.badge}
-                </span>
-              )}
-            </span>
-            <svg
-              className={`w-4 h-4 transition-transform duration-200 ${
-                isExpanded ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        ) : (
-          <Link
-            href={item.href}
-            className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 group ${
-              active
-                ? 'bg-primary-100 text-primary-800 shadow-sm border-l-4 border-primary-500'
-                : 'text-background-700 hover:bg-background-100 hover:text-background-900'
-            } ${level > 0 ? 'ml-4 text-sm' : 'text-base font-medium'}`}
-          >
-            <span>{item.label}</span>
-            {item.badge && (
-              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-primary-500 rounded-full">
-                {item.badge}
-              </span>
-            )}
-          </Link>
-        )}
-
-        {hasChildren && isExpanded && (
-          <ul className="mt-2 space-y-1 animate-fade-in">
-            {item.children!.map((child) => renderMenuItem(child, level + 1))}
-          </ul>
-        )}
-      </li>
     );
   };
 
@@ -200,37 +117,21 @@ export default function Sidebar() {
         <div className="h-full px-4 py-6 overflow-y-auto">
           {/* Navigation Menu */}
           <div className="mb-8">
-            <nav>
-              <ul className="space-y-1">
-                {menuItems.map((item) => renderMenuItem(item))}
-              </ul>
-            </nav>
+            <SidebarMenu
+              items={menuItems}
+              expandedItems={expandedItems}
+              onToggleExpanded={toggleExpanded}
+            />
+          </div>
+
+          {/* Exchange Rates Widget */}
+          <div className="mb-6">
+            <SidebarExchangeRatesWidget compact={true} />
           </div>
 
           {/* Account Summary */}
           <div className="mb-6">
-            <div className="bg-background-50 rounded-lg p-4 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-background-600">
-                  Total Balance
-                </span>
-                <span className="font-mono font-semibold text-background-900">
-                  $12,450.00
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-background-600">This Month</span>
-                <span className="font-mono font-semibold text-success-600">
-                  +$342.50
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-background-600">Budget Left</span>
-                <span className="font-mono font-semibold text-warning-600">
-                  $1,205.30
-                </span>
-              </div>
-            </div>
+            <SidebarBalanceWidget />
           </div>
         </div>
       </aside>

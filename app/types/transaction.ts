@@ -43,6 +43,7 @@ export interface Transaction {
   date: string;
   createdAt: string;
   updatedAt: string;
+  description?: string;
   user?: {
     id: number;
     name: string;
@@ -50,7 +51,7 @@ export interface Transaction {
   };
   account?: {
     id: number;
-    title: string;
+    name: string;
     type: string;
     currency: string;
   };
