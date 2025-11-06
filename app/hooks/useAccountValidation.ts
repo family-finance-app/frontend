@@ -9,14 +9,12 @@ export function useAccountValidation() {
   ): Record<string, string> => {
     const errors: Record<string, string> = {};
 
-    // Валидация имени
     if (!formData.name.trim()) {
       errors.name = 'Account name is required';
     } else if (formData.name.length > 50) {
       errors.name = 'Account name must be less than 50 characters';
     }
 
-    // Валидация баланса
     if (isNaN(Number(formData.balance))) {
       errors.balance = 'Balance must be a valid number';
     } else if (Number(formData.balance) < 0) {

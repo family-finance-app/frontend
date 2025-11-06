@@ -10,14 +10,17 @@ import {
   DashboardStatsSection,
   DashboardTransactionsSection,
   DashboardExpensesSection,
-  // QuickActionsSection,
 } from '@/components/dashboard';
 import {
   formatTransactionsForList,
+  enrichTransactionsWithData,
   formatAccountsForWidget,
-  calculateMonthlyStats,
+  calculatePeriodStats,
   calculateExpensesByCategory,
-} from '@/utils/dashboard';
+  calculateIncomeChange,
+  calculateExpensesChange,
+} from '@/utils/financial';
+import { useTotalBalanceInUAH } from '@/hooks/useTotalBalanceInUAH';
 
 export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>(
@@ -30,33 +33,38 @@ export default function Dashboard() {
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategories();
 
-  // preventing hydration mismatch
+  const { totalBalance } = useTotalBalanceInUAH(accounts);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // Calculate total balance - ensure all values are numbers
-  const totalBalance =
-    accounts?.reduce((sum, account) => {
-      const balance = Number(account.balance) || 0;
-      return sum + balance;
-    }, 0) || 0;
 
   const formattedAccounts = formatAccountsForWidget(accounts || []);
 
   const formattedTransactions = formatTransactionsForList(transactions || []);
 
-  const monthlyStats = calculateMonthlyStats(formattedTransactions);
-
-  const expensesByCategory = calculateExpensesByCategory(
+  const enrichedTransactions = enrichTransactionsWithData(
     formattedTransactions,
+    accounts || [],
     categories
   );
 
-  // const handleQuickAction = (actionId: string) => {
-  //   console.log(`Quick action clicked: ${actionId}`);
-  //   // maybe implement navigation or modal opening
-  // };
+  const periodStats = calculatePeriodStats(enrichedTransactions, timeframe);
+  const incomeChange = calculateIncomeChange(
+    periodStats.income,
+    enrichedTransactions,
+    timeframe
+  );
+  const expensesChange = calculateExpensesChange(
+    periodStats.expenses,
+    enrichedTransactions,
+    timeframe
+  );
+
+  const expensesByCategory = calculateExpensesByCategory(
+    enrichedTransactions,
+    categories
+  );
 
   if (!isClient) {
     return null;
@@ -77,9 +85,13 @@ export default function Dashboard() {
 
         <div className="xl:col-span-2">
           <DashboardStatsSection
-            monthlyIncome={monthlyStats.income}
-            monthlyExpenses={monthlyStats.expenses}
-            savingsPercentage={monthlyStats.savingsPercentage}
+            monthlyIncome={periodStats.income}
+            monthlyExpenses={periodStats.expenses}
+            savings={periodStats.savings}
+            savingsRate={periodStats.savingsRate}
+            period={timeframe}
+            incomeChange={incomeChange}
+            expensesChange={expensesChange}
           />
         </div>
       </div>
@@ -87,7 +99,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <DashboardTransactionsSection
-            transactions={formattedTransactions}
+            transactions={enrichedTransactions}
+            accounts={accounts || []}
+            categories={categories}
             isLoading={transactionsLoading}
           />
         </div>
@@ -99,8 +113,6 @@ export default function Dashboard() {
           />
         </div>
       </div>
-
-      {/* <QuickActionsSection onActionClick={handleQuickAction} /> */}
     </div>
   );
 }

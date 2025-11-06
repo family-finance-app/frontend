@@ -4,16 +4,10 @@ interface ButtonProps {
   disabled?: boolean;
   className?: string;
   type: 'button' | 'submit' | 'reset';
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'danger'
-    | 'brown'
-    | 'outline'
-    | 'ghost';
+  variant?: 'primary' | 'background' | 'warning' | 'danger' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
+  icon?: 'search' | 'edit' | 'delete';
 }
 
 export default function Button({
@@ -24,6 +18,7 @@ export default function Button({
   variant = 'primary',
   size = 'md',
   fullWidth = false,
+  icon,
   className = '',
 }: ButtonProps) {
   const baseStyles =
@@ -39,19 +34,63 @@ export default function Button({
   // Color variants
   const colorStyles = {
     primary:
-      'bg-primary-600 hover:bg-primary-700 disabled:bg-primary-300 text-white focus:ring-primary-500 shadow-lg hover:shadow-xl border-primary-600',
-    secondary:
-      'bg-background-600 hover:bg-background-700 disabled:bg-background-300 text-white focus:ring-background-500 shadow-lg hover:shadow-xl border-background-600',
-    success:
-      'bg-success-600 hover:bg-success-700 disabled:bg-success-300 text-white focus:ring-success-500 shadow-lg hover:shadow-xl border-success-600',
+      'bg-primary-600 hover:bg-primary-700 disabled:bg-primary-300 text-white focus:ring-primary-500 shadow-lg hover:shadow-xl',
+    background:
+      'hover:bg-background-300 disabled:bg-background-300 text-primary-800 focus:ring-background-300',
+    warning:
+      'bg-warning-600 hover:bg-brown-700 disabled:bg-brown-300 text-white focus:ring-brown-500 shadow-lg hover:shadow-xl',
     danger:
-      'bg-danger-600 hover:bg-danger-700 disabled:bg-danger-300 text-white focus:ring-danger-500 shadow-lg hover:shadow-xl border-danger-600',
-    brown:
-      'bg-brown-600 hover:bg-brown-700 disabled:bg-brown-300 text-white focus:ring-brown-500 shadow-lg hover:shadow-xl border-brown-600',
+      'hover:bg-danger-600 disabled:bg-danger-300 text-primary-800 hover:text-white focus:ring-danger-600',
     outline:
-      'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500 disabled:border-primary-300 disabled:text-primary-300',
-    ghost:
-      'text-primary-600 hover:bg-primary-50 focus:ring-primary-500 disabled:text-primary-300',
+      'hover:bg-brown-700 disabled:bg-brown-300 text-primary-800 focus:ring-brown-500 shadow-lg hover:shadow-xl border-2 border-primary-700',
+  };
+
+  const iconVariants = {
+    search: (
+      <svg
+        className="w-4 h-4 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+    ),
+    edit: (
+      <svg
+        className="w-4 h-4 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        />
+      </svg>
+    ),
+    delete: (
+      <svg
+        className="w-4 h-4 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+      </svg>
+    ),
   };
 
   const widthStyle = fullWidth ? 'w-full' : '';
@@ -89,7 +128,10 @@ export default function Button({
           Processing...
         </>
       ) : (
-        text
+        <>
+          {icon && iconVariants[icon]}
+          {text}
+        </>
       )}
     </button>
   );

@@ -1,46 +1,44 @@
-/**
- * ХУК ДЛЯ РАБОТЫ С ТОКЕНОМ АУТЕНТИФИКАЦИИ
- *
- * Выносим логику работы с токеном в отдельную утилиту
- * вместо дублирования во всех хуках.
- */
+// token utilities for api client
 
-/**
- * Получить токен из localStorage
- * @returns токен или null
- */
+// check if we're in browser (for local development, nodejs25 issues)
+const isBrowser = (): boolean => {
+  return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+};
+
 export const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') {
+  if (!isBrowser()) {
     return null;
   }
-  return localStorage.getItem('authToken');
+  try {
+    return localStorage.getItem('authToken');
+  } catch (e) {
+    console.warn('Failed to access localStorage:', e);
+    return null;
+  }
 };
 
-/**
- * Сохранить токен в localStorage
- * @param token - токен для сохранения
- */
 export const setAuthToken = (token: string): void => {
-  if (typeof window === 'undefined') {
+  if (!isBrowser()) {
     return;
   }
-  localStorage.setItem('authToken', token);
+  try {
+    localStorage.setItem('authToken', token);
+  } catch (e) {
+    console.warn('Failed to set token in localStorage:', e);
+  }
 };
 
-/**
- * Удалить токен из localStorage
- */
 export const clearAuthToken = (): void => {
-  if (typeof window === 'undefined') {
+  if (!isBrowser()) {
     return;
   }
-  localStorage.removeItem('authToken');
+  try {
+    localStorage.removeItem('authToken');
+  } catch (e) {
+    console.warn('Failed to clear token from localStorage:', e);
+  }
 };
 
-/**
- * Проверить есть ли токен
- * @returns true если токен есть
- */
 export const hasAuthToken = (): boolean => {
   return !!getAuthToken();
 };

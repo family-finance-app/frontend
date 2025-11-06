@@ -70,6 +70,47 @@ class APIClient {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
   }
 
+  // external GET for absolute URLs (bypass baseURL) for third-party APIs (NBU, etc.)
+  async externalGet<T>(
+    absoluteUrl: string,
+    config?: RequestConfig
+  ): Promise<T> {
+    const { token, headers, ...restConfig } = config || {};
+
+    // For external APIs, don't set Content-Type by default (some APIs reject it due to CORS)
+    // Only add headers if explicitly provided
+    const defaultHeaders: HeadersInit = {};
+
+    if (token) {
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(absoluteUrl, {
+      ...restConfig,
+      method: 'GET',
+      headers: {
+        ...defaultHeaders,
+        ...headers,
+      },
+    });
+
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    // Check status before trying to parse JSON
+    if (!response.ok) {
+      console.error(
+        `External request failed: ${response.status} ${response.statusText}`
+      );
+      throw new Error(`External request failed: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+
+    return responseData as T;
+  }
+
   // POST
   async post<T>(
     endpoint: string,

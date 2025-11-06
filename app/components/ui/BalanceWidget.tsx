@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
 import { roboto, jetbrainsMono } from '../../assets/fonts/fonts';
+import Link from 'next/link';
 
 interface BalanceWidgetProps {
-  totalBalance: number;
+  totalBalance: string;
   accounts: Array<{
     id: string;
     name: string;
@@ -20,11 +21,12 @@ export default function BalanceWidget({
   className = '',
 }: BalanceWidgetProps) {
   const formatCurrency = (amount: number) => {
-    // Ensure amount is a valid number, default to 0 if NaN
-    const validAmount = isNaN(amount) ? 0 : amount;
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
-    }).format(validAmount);
+      maximumFractionDigits: 2,
+    })
+      .format(amount)
+      .replace(/,/g, ' ');
   };
 
   const formatPercentage = (percentage: number) => {
@@ -64,17 +66,28 @@ export default function BalanceWidget({
 
       {/* Main Balance Section */}
       <div className="relative z-10">
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <p
-              className={`${roboto.className} text-primary-100 text-sm uppercase tracking-wider font-medium mb-2`}
-            >
-              Total Balance
-            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <p
+                className={`${roboto.className} text-primary-100 text-sm uppercase tracking-wider font-medium`}
+              >
+                Total Balance
+              </p>
+              <div className="relative group">
+                <button className="text-primary-200 hover:text-white transition-colors text-sm leading-none">
+                  ⓘ
+                </button>
+                <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-primary-900/95 border border-primary-700 text-primary-50 text-sm rounded-lg px-4 py-3 whitespace-normal z-50 w-72 backdrop-blur-sm shadow-lg">
+                  Total balance of all accounts in UAH equivalent, calculated at
+                  current exchange rates
+                </div>
+              </div>
+            </div>
             <h2
               className={`${jetbrainsMono.className} text-4xl lg:text-5xl font-bold mb-3`}
             >
-              {formatCurrency(totalBalance)}
+              {totalBalance}
             </h2>
           </div>
 
@@ -103,8 +116,21 @@ export default function BalanceWidget({
                   <p className="text-xs text-primary-100">{account.type}</p>
                 </div>
               </div>
+              <div className="flex items-center space-x-3">
+                <div>
+                  <p className="font-medium text-white">
+                    {account.balance} {account.currency}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
+          <Link
+            href="/accounts"
+            className="bg-white/10 rounded-xl backdrop-blur-sm py-1 px-3 text-xs"
+          >
+            ... view all accounts
+          </Link>
         </div>
       </div>
 

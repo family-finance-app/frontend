@@ -3,8 +3,8 @@
 import { ReactNode, useState } from 'react';
 import { jetbrainsMono } from '../../assets/fonts/fonts';
 import { Transaction } from '@/types/transaction';
-import { useCategories } from '@/api/categories/queries';
 import TransactionActionModal from './TransactionActionModal';
+import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -16,6 +16,12 @@ interface TransactionItemProps {
     type: string;
     icon?: string;
     color?: string;
+  }>;
+  accounts?: Array<{
+    id: number;
+    name: string;
+    type: string;
+    currency: string;
   }>;
   onEdit?: (transaction: Transaction) => void;
 }
@@ -29,6 +35,19 @@ interface TransactionListProps {
   showAccount?: boolean;
   compact?: boolean;
   actions?: ReactNode;
+  accounts?: Array<{
+    id: number;
+    name: string;
+    type: string;
+    currency: string;
+  }>;
+  categories?: Array<{
+    id: number;
+    name: string;
+    type: string;
+    icon?: string;
+    color?: string;
+  }>;
   onEditTransaction?: (transaction: Transaction) => void;
 }
 
@@ -37,6 +56,7 @@ function TransactionItem({
   showAccount = false,
   compact = false,
   categories = [],
+  accounts = [],
   onEdit,
 }: TransactionItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,6 +90,17 @@ function TransactionItem({
   const category = categories.find((cat) => cat.id === transaction.categoryId);
   const categoryName = transaction.category?.name || category?.name || 'Other';
 
+  // Use description as title if available, otherwise use category name
+  const transactionTitle = transaction.description || categoryName;
+
+  // Find account by ID
+  const accountData =
+    transaction.account ||
+    accounts.find((acc) => acc.id === transaction.accountId);
+  // Handle both 'title' (from transaction.account) and 'name' (from accounts array)
+  const accountTitle =
+    (accountData as any)?.title || (accountData as any)?.name || 'Account';
+
   return (
     <div
       className={`flex items-center justify-between ${
@@ -92,8 +123,8 @@ function TransactionItem({
                 compact ? 'text-sm' : 'text-base'
               } text-background-900`}
             >
-              {categoryName !== 'Other'
-                ? categoryName
+              {transactionTitle !== 'Other'
+                ? transactionTitle
                 : transaction.type === 'INCOME'
                 ? 'Income'
                 : transaction.type === 'EXPENSE'
@@ -104,6 +135,19 @@ function TransactionItem({
             </p>
           </div>
           <div className="flex items-center space-x-3 mt-1">
+            {/* Show account first if available */}
+            {accountData && (
+              <>
+                <p
+                  className={`text-background-500 font-medium ${
+                    compact ? 'text-xs' : 'text-sm'
+                  }`}
+                >
+                  {accountTitle}
+                </p>
+                <span className="text-background-300">•</span>
+              </>
+            )}
             {/* Show category info */}
             <p
               className={`text-background-500 ${
@@ -112,18 +156,6 @@ function TransactionItem({
             >
               {categoryName}
             </p>
-            {showAccount && transaction.account && (
-              <>
-                <span className="text-background-300">•</span>
-                <p
-                  className={`text-background-500 ${
-                    compact ? 'text-xs' : 'text-sm'
-                  }`}
-                >
-                  {transaction.account.title || 'Account'}
-                </p>
-              </>
-            )}
             <span className="text-background-300">•</span>
             <p
               className={`text-background-500 ${
@@ -148,7 +180,7 @@ function TransactionItem({
           } ${config.color} whitespace-nowrap`}
         >
           {config.prefix}
-          {Math.abs(transaction.amount).toLocaleString()}{' '}
+          {`${formatCurrencyAmount(transaction.amount)} `}
           {transaction.account?.currency || 'UAH'}
         </div>
 
@@ -182,14 +214,21 @@ export default function TransactionList({
   showAccount = false,
   compact = false,
   actions,
+  accounts = [],
+  categories = [],
   onEditTransaction,
 }: TransactionListProps) {
-  const { data: categories = [] } = useCategories();
-
   const sortedTransactions = [...transactions].sort((a, b) => {
-    const dateA = (a.date || a.createdAt || '').toString();
-    const dateB = (b.date || b.createdAt || '').toString();
-    return dateB.localeCompare(dateA);
+    // Sort by createdAt (date added) - newest first (descending order)
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+
+    // If dates are equal, sort by ID (descending) to ensure consistent order
+    if (dateA === dateB) {
+      return b.id - a.id;
+    }
+
+    return dateB - dateA;
   });
 
   const displayTransactions = maxItems
@@ -220,17 +259,10 @@ export default function TransactionList({
                 showAccount={showAccount}
                 compact={compact}
                 categories={categories}
+                accounts={accounts}
                 onEdit={onEditTransaction}
               />
             ))}
-          </div>
-        )}
-
-        {maxItems && transactions.length > maxItems && (
-          <div className="mt-4 pt-4 border-t border-background-100">
-            <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-              View all {transactions.length} transactions
-            </button>
           </div>
         )}
       </div>

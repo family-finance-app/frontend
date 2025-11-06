@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { jetbrainsMono, roboto } from '../../assets/fonts/fonts';
+import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface ChartData {
   label: string;
@@ -30,7 +31,7 @@ function ProgressBar({
   value,
   max,
   color = 'primary',
-  showPercentage = true,
+  showPercentage = false,
 }: ProgressBarProps) {
   const percentage = Math.min((value / max) * 100, 100);
 
@@ -45,18 +46,6 @@ function ProgressBar({
     <div className="mb-4 last:mb-0">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-background-700">{label}</span>
-        <div className="flex items-center space-x-2">
-          <span
-            className={`${jetbrainsMono.className} text-sm font-semibold text-background-900`}
-          >
-            ${value.toLocaleString()}
-          </span>
-          {showPercentage && (
-            <span className="text-xs text-background-500">
-              {percentage.toFixed(0)}%
-            </span>
-          )}
-        </div>
       </div>
       <div className="w-full bg-background-200 rounded-full h-2">
         <div
@@ -198,7 +187,7 @@ export default function StatsCard({
                       <p
                         className={`${jetbrainsMono.className} text-sm text-background-600`}
                       >
-                        ${item.value.toLocaleString()}
+                        {formatCurrencyAmount(item.value)}
                       </p>
                       <span className="text-xs text-background-500">
                         ({percentage}%)

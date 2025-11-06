@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 
 @theme {
+  /* primary green colors, monte-carlo palette */
   --color-primary-50: #d5f8f1;
   --color-primary-100: #a0e9db;
-  --color-primary-200: #88c7bb;
+  --color-primary-200: #88c7bb; /* success button */
   --color-primary-300: #7cb7ac;
   --color-primary-400: #6da097;
   --color-primary-500: #5b887f;
@@ -13,6 +14,7 @@
   --color-primary-900: #12201d;
   --color-primary-950: #091311;
 
+  /* background green-gray-brown colors, kangaroo palette*/
   --color-background-50: #edf2ec;
   --color-background-100: #d8e2d5;
   --color-background-200: #bec7bb;
@@ -25,11 +27,135 @@
   --color-background-900: #1c1e1c;
   --color-background-950: #10110f;
 
-  --animate-fade-in: fade-in 0.3s ease-in-out;
-  --animate-slide-in: slide-in 0.3s ease-out;
-  --animate-scale-in: scale-in 0.2s ease-out;
+  /* warning orange-brown colors, apricot palette*/
+  --color-warning-50: #faeeec;
+  --color-warning-100: #f3d5cf;
+  --color-warning-200: #eaae9f;
+  --color-warning-300: #e4886b;
+  --color-warning-400: #d57757;
+  --color-warning-500: #b7664a;
+  --color-warning-600: #96533b;
+  --color-warning-700: #743e2c;
+  --color-warning-800: #512a1d;
+  --color-warning-900: #30160e;
+  --color-warning-950: #1e0c06;
+
+  /* danger warm red colors, crail palette*/
+  --color-danger-50: #f9eeee;
+  --color-danger-100: #f2d7d6;
+  --color-danger-200: #e8b4af;
+  --color-danger-300: #e1928b;
+  --color-danger-400: #db6e61;
+  --color-danger-500: #bb5447;
+  --color-danger-600: #9c4338;
+  --color-danger-700: #79322a;
+  --color-danger-800: #56211b;
+  --color-danger-900: #32110d;
+  --color-danger-950: #1e0805;
+
+  /* success green colors */
+  --color-success-50: #ecfef3;
+  --color-success-100: #d1fce4;
+  --color-success-200: #a3f8c9;
+  --color-success-300: #6eefaa;
+  --color-success-400: #3dd88e;
+  --color-success-500: #22d373;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #166534;
+  --color-success-900: #145231;
+  --color-success-950: #0a3622;
+
+  /* accent colors */
+  --color-marzipan-200: #ffcb3a; /* yellow */
+
+  --color-hazel-50: #f5f5b3;
+  --color-hazel-100: #dedea2;
+  --color-hazel-200: #cece96;
+  --color-hazel-300: #b8b886;
+  --color-hazel-400: #a0a074; /* light green to yellow */
+
+  --color-moss-100: #b9e0a2;
+  --color-moss-200: #acd096;
+  --color-moss-300: #99ba86;
+  --color-moss-400: #85a274; /* green grass */
+
+  --color-salmon-200: #f1ad9a;
+  --color-salmon-300: #ed865f;
+  --color-salmon-400: #dd754a; /* warm red */
+
+  --color-smalt-50: #e6f3f8;
+  --color-smalt-100: #c3e4f0;
+  --color-smalt-200: #8dcce1;
+  --color-smalt-300: #7bb3c5;
+  --color-smalt-400: #6a9cac;
+  --color-kashmir-50: #eef1f7;
+  --color-kashmir-100: #d4dceb;
+  --color-kashmir-200: #acbdda;
+  --color-kashmir-300: #87a3ca;
+  --color-kashmir-400: #6e8aaf;
+  --color-kashmir-500: #5b7292; /* light blue to purple */
+
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  --spacing-100: 25rem;
+  --spacing-128: 32rem;
+
+  --border-radius-4xl: 2rem;
+  --border-radius-5xl: 2.5rem;
+
+  --shadow-financial: 0 4px 6px -1px rgba(91, 136, 127, 0.1),
+    0 2px 4px -1px rgba(91, 136, 127, 0.06);
+  --shadow-financial-lg: 0 10px 15px -3px rgba(91, 136, 127, 0.1),
+    0 4px 6px -2px rgba(91, 136, 127, 0.05);
+  --shadow-inset-financial: inset 0 2px 4px 0 rgba(91, 136, 127, 0.06);
+
+  --animate-fade-in: fadeIn 0.3s ease-in-out;
+  --animate-slide-in: slideIn 0.3s ease-out;
+  --animate-scale-in: scaleIn 0.2s ease-out;
 
   --transition-duration-400: 400ms;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceGentle {
+  0%,
+  100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 
 body {
@@ -37,7 +163,6 @@ body {
   padding: 0;
   min-height: 100vh;
   overscroll-behavior: none;
-  font-smoothing: antialiased;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
