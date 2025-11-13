@@ -1,3 +1,5 @@
+'use client';
+
 // get categories list for different purposes
 
 import { useQuery } from '@tanstack/react-query';
@@ -5,10 +7,17 @@ import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import { Category } from '@/types/transaction';
 import { getAuthToken } from '@/utils/token';
+import { useEffect, useState } from 'react';
 
 // get all categories
 export const useCategories = () => {
-  const token = getAuthToken();
+  const [token, setToken] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    setToken(getAuthToken());
+  }, []);
 
   return useQuery({
     queryKey: queryKeys.categories.all,
@@ -17,7 +26,7 @@ export const useCategories = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token,
+    enabled: !!token && isClient,
     staleTime: 1000 * 60 * 5, // 5min
   });
 };

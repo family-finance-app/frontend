@@ -1,10 +1,3 @@
-/**
- * ХУК ДЛЯ ФОРМЫ СОЗДАНИЯ ТРАНЗАКЦИИ
- *
- * Вынесли всю бизнес-логику из компонента в отдельный хук.
- * Теперь компонент отвечает только за рендер.
- */
-
 import { useState, useCallback } from 'react';
 import type { CreateTransactionFormData } from '@/types/transaction';
 import type { Transaction, Category } from '@/types/transaction';
@@ -21,18 +14,12 @@ interface UseCreateTransactionFormReturn {
   resetForm: () => void;
 }
 
-/**
- * Хук для управления формой создания транзакции
- * @param onSuccess - callback при успешном создании
- * @returns объект с состоянием и методами формы
- */
 export const useCreateTransactionForm = (
   onSuccess?: (transaction: Transaction) => void
 ): UseCreateTransactionFormReturn => {
   const createMutation = useCreateTransaction();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Начальные данные формы с сегодняшней датой
   const initialFormData: CreateTransactionFormData = {
     accountId: '',
     type: 'EXPENSE' as any,
@@ -45,7 +32,6 @@ export const useCreateTransactionForm = (
   const [formData, setFormData] =
     useState<CreateTransactionFormData>(initialFormData);
 
-  // Валидация формы
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
 
@@ -69,7 +55,6 @@ export const useCreateTransactionForm = (
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  // Обработка отправки формы
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -81,14 +66,9 @@ export const useCreateTransactionForm = (
 
       try {
         const result = await createMutation.mutateAsync(formData);
-
-        // Вызываем callback при успехе
         onSuccess?.(result);
-
-        // Очищаем форму
         setFormData(initialFormData);
       } catch (error) {
-        // Обработка ошибок с backend
         if (error && typeof error === 'object' && 'details' in error) {
           const backendErrors: Record<string, string> = {};
           const details = error.details as Array<{
@@ -111,7 +91,6 @@ export const useCreateTransactionForm = (
     [formData, validateForm, onSuccess, createMutation, initialFormData]
   );
 
-  // Сброс формы
   const resetForm = useCallback(() => {
     setFormData(initialFormData);
     setErrors({});

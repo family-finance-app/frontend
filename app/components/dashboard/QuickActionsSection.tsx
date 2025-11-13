@@ -1,7 +1,6 @@
 'use client';
 
 import { roboto } from '@/assets/fonts/fonts';
-import { QUICK_ACTIONS_CONFIG } from '@/utils/dashboard';
 
 interface QuickActionButtonProps {
   id: string;
@@ -122,7 +121,7 @@ export function QuickActionsSection({
   return (
     <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {QUICK_ACTIONS_CONFIG.map((action) => (
+        {/* {QUICK_ACTIONS_CONFIG.map((action) => (
           <QuickActionButton
             key={action.id}
             id={action.id}
@@ -132,7 +131,7 @@ export function QuickActionsSection({
             href={action.href}
             onAction={onActionClick}
           />
-        ))}
+        ))} */}
       </div>
     </div>
   );

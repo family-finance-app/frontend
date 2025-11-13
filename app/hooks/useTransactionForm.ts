@@ -1,8 +1,3 @@
-/**
- * useTransactionForm - хук для управления состоянием формы
- * Инкапсулирует логику инициализации и обновления
- */
-
 import { useState, useCallback } from 'react';
 import {
   CreateTransactionFormData,

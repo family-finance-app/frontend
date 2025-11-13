@@ -1,6 +1,7 @@
 'use client';
 
 import BalanceWidget from '@/components/ui/BalanceWidget';
+import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface DashboardBalanceSectionProps {
   totalBalance: number;
@@ -26,7 +27,7 @@ export function DashboardBalanceSection({
 
   return (
     <BalanceWidget
-      totalBalance={totalBalance}
+      totalBalance={formatCurrencyAmount(totalBalance)}
       accounts={formattedAccounts}
       className="h-full"
     />

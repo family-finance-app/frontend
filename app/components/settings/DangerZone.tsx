@@ -37,7 +37,7 @@ export default function DangerZone({ onDeleteAccount }: DangerZoneProps) {
           <Button
             text="Delete Account"
             type="button"
-            variant="brown"
+            variant="danger"
             size="sm"
             onClick={onDeleteAccount}
           />

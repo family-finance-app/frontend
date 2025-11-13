@@ -122,7 +122,7 @@ export function AccountNameInput({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="e.g., Main Checking Account"
+        placeholder="e.g., Revolut Debit Card"
         className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
           error
             ? 'border-danger-300 bg-danger-50'

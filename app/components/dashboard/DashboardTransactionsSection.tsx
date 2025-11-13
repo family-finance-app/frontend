@@ -5,14 +5,28 @@ import Button from '@/components/ui/Button_financial';
 import TransactionList from '@/components/ui/TransactionList';
 import EditTransactionModal from '@/components/ui/EditTransactionModal';
 import { Transaction } from '@/types/transaction';
+import { Account } from '@/types/account';
+import { useRouter } from 'next/navigation';
+
+interface Category {
+  id: number;
+  name: string;
+  type: string;
+  icon?: string;
+  color?: string;
+}
 
 interface DashboardTransactionsSectionProps {
   transactions: Transaction[];
+  accounts: Account[];
+  categories: Category[];
   isLoading: boolean;
 }
 
 export function DashboardTransactionsSection({
   transactions,
+  accounts,
+  categories,
   isLoading,
 }: DashboardTransactionsSectionProps) {
   const [editingTransaction, setEditingTransaction] =
@@ -23,6 +37,8 @@ export function DashboardTransactionsSection({
     setEditingTransaction(transaction);
     setIsEditModalOpen(true);
   };
+
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -53,6 +69,8 @@ export function DashboardTransactionsSection({
         title="Recent Transactions"
         maxItems={5}
         showAccount={true}
+        accounts={accounts}
+        categories={categories}
         onEditTransaction={handleEditTransaction}
         actions={
           <Button
@@ -60,7 +78,7 @@ export function DashboardTransactionsSection({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => console.log('View all transactions')}
+            onClick={() => router.push('/transactions')}
           />
         }
       />

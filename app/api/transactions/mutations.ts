@@ -1,3 +1,5 @@
+'use client';
+
 // create, update, and delete transactions
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,65 +15,15 @@ import { getAuthToken } from '@/utils/token';
 // create new transaction
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (
       data: CreateTransactionFormData
     ): Promise<Transaction> => {
       const token = getAuthToken();
-
       return apiClient.post<Transaction>('/api/transactions/create', data, {
         token: token || undefined,
       });
-    },
-    onMutate: async (newTx) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.accounts.my });
-      const prevAccounts = queryClient.getQueryData<Account[]>(
-        queryKeys.accounts.my
-      );
-      const accountId = String(newTx.accountId);
-      const prevDetail = queryClient.getQueryData<Account>(
-        queryKeys.accounts.detail(accountId)
-      );
-
-      const sign =
-        newTx.type === 'INCOME' ? 1 : newTx.type === 'EXPENSE' ? -1 : 0;
-      const delta = sign * Number(newTx.amount || 0);
-
-      if (prevAccounts) {
-        const updatedAccounts = prevAccounts.map((acc) =>
-          String(acc.id) === accountId
-            ? { ...acc, balance: Number(acc.balance) + delta }
-            : acc
-        );
-        queryClient.setQueryData(queryKeys.accounts.my, updatedAccounts);
-      }
-
-      if (prevDetail && String(prevDetail.id) === accountId) {
-        const updatedDetail = {
-          ...prevDetail,
-          balance: Number(prevDetail.balance) + delta,
-        } as Account;
-        queryClient.setQueryData(
-          queryKeys.accounts.detail(accountId),
-          updatedDetail
-        );
-      }
-
-      return { prevAccounts, prevDetail } as {
-        prevAccounts?: Account[];
-        prevDetail?: Account;
-      };
-    },
-    onError: (_err, _newTx, ctx) => {
-      if (ctx?.prevAccounts) {
-        queryClient.setQueryData(queryKeys.accounts.my, ctx.prevAccounts);
-      }
-      if (ctx?.prevDetail) {
-        queryClient.setQueryData(
-          queryKeys.accounts.detail(String(ctx.prevDetail.id)),
-          ctx.prevDetail
-        );
-      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
