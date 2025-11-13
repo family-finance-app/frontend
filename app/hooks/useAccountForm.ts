@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { CreateAccountFormData } from '@/types/account';
 
-/**
- * useAccountForm - управление состоянием формы для создания счета
- */
 export function useAccountForm() {
   const getInitialFormData = (): CreateAccountFormData => ({
     name: '',

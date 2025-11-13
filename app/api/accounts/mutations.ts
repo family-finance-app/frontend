@@ -1,4 +1,6 @@
-// create, edit, or delete FINANCIAL accounts
+'use client';
+
+// create, update, or delete FINANCIAL accounts
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
@@ -31,7 +33,7 @@ export const useCreateAccount = () => {
   });
 };
 
-// update existing account
+// update account
 export const useUpdateAccount = () => {
   const queryClient = useQueryClient();
 
@@ -40,7 +42,7 @@ export const useUpdateAccount = () => {
       id,
       data,
     }: {
-      id: string;
+      id: number;
       data: Partial<CreateAccountFormData>;
     }): Promise<Account> => {
       const token = getAuthToken();
@@ -63,7 +65,7 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string): Promise<void> => {
+    mutationFn: async (id: number): Promise<void> => {
       const token = getAuthToken();
       return apiClient.delete<void>(`/api/accounts/${id}`, {
         token: token || undefined,

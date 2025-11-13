@@ -38,7 +38,6 @@ export default function CreateAccountForm({
     e.preventDefault();
     setErrors({});
 
-    // Валидируем форму
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -72,7 +71,6 @@ export default function CreateAccountForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Account Name */}
       <AccountNameInput
         value={formData.name}
         onChange={(name) => setFormField('name', name)}

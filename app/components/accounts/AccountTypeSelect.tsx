@@ -12,16 +12,22 @@ interface AccountTypeSelectProps {
 
 const ACCOUNT_TYPES = [
   {
+    value: 'CREDIT',
+    label: 'Credit Card',
+    icon: '💳',
+    description: 'Credit bank card',
+  },
+  {
+    value: 'DEBIT',
+    label: 'Debit Card',
+    icon: '💳',
+    description: 'Debit bank card',
+  },
+  {
     value: 'BANK',
     label: 'Bank Account',
     icon: '🏦',
     description: 'Checking or savings account',
-  },
-  {
-    value: 'CREDIT',
-    label: 'Credit Card',
-    icon: '💳',
-    description: 'Credit card account',
   },
   {
     value: 'CASH',
@@ -33,13 +39,25 @@ const ACCOUNT_TYPES = [
     value: 'INVESTMENT',
     label: 'Investment',
     icon: '📈',
-    description: 'Stock, bonds, or other investments',
+    description: 'Stocks, bonds, or other investments',
   },
   {
     value: 'DEPOSIT',
     label: 'Deposit Account',
     icon: '💰',
     description: 'High-yield savings or term deposit',
+  },
+  {
+    value: 'DIGITAL',
+    label: 'Digital Account',
+    icon: '📱',
+    description: 'PayPal, Bitcoin, or other digital wallets',
+  },
+  {
+    value: 'SAVINGS',
+    label: 'Savings',
+    icon: '💰',
+    description: 'All types of savings for specific goals',
   },
 ];
 

@@ -39,8 +39,6 @@ export default function CreateTransactionForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Простая валидация
     const newErrors: Record<string, string> = {};
     if (!amount) newErrors.amount = 'Amount is required';
     if (!accountId) newErrors.accountId = 'Account is required';

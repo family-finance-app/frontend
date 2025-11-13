@@ -47,7 +47,7 @@ export function DashboardExpensesSection({
 
   return (
     <StatsCard
-      title="Spending by Category"
+      title="Monthly Spending by Category"
       data={expensesByCategory}
       type="bar"
       height="h-80"

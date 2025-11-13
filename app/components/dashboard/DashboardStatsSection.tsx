@@ -1,11 +1,24 @@
 'use client';
 
 import FinancialCard from '@/components/ui/FinancialCard';
+import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface DashboardStatsSectionProps {
   monthlyIncome: number;
   monthlyExpenses: number;
-  savingsPercentage: number;
+  savings: number;
+  savingsRate: number;
+  period: 'week' | 'month' | 'year';
+  incomeChange?: {
+    value: number;
+    type: 'positive' | 'negative' | 'neutral';
+    displayValue: string;
+  };
+  expensesChange?: {
+    value: number;
+    type: 'positive' | 'negative' | 'neutral';
+    displayValue: string;
+  };
 }
 
 const INCOME_ICON = (
@@ -59,45 +72,88 @@ const SAVINGS_ICON = (
 export function DashboardStatsSection({
   monthlyIncome,
   monthlyExpenses,
-  savingsPercentage,
+  savings,
+  savingsRate,
+  period,
+  incomeChange,
+  expensesChange,
 }: DashboardStatsSectionProps) {
+  const getPeriodLabels = () => {
+    switch (period) {
+      case 'week':
+        return {
+          income: 'Weekly Income',
+          expenses: 'Weekly Expenses',
+          savings: 'Weekly Savings',
+          description: 'this week',
+          comparison: 'last week',
+        };
+      case 'year':
+        return {
+          income: 'Yearly Income',
+          expenses: 'Yearly Expenses',
+          savings: 'Yearly Savings',
+          description: 'this year',
+          comparison: 'last year',
+        };
+      default:
+        return {
+          income: 'Monthly Income',
+          expenses: 'Monthly Expenses',
+          savings: 'Monthly Savings',
+          description: 'this month',
+          comparison: 'last month',
+        };
+    }
+  };
+
+  const labels = getPeriodLabels();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
       <FinancialCard
-        title="Monthly Income"
-        value={monthlyIncome}
-        change={{
-          value: 450.0,
-          type: 'positive',
-          period: 'vs last month',
-        }}
-        description="All income sources"
+        title={labels.income}
+        value={formatCurrencyAmount(monthlyIncome)}
+        change={
+          incomeChange
+            ? {
+                value: incomeChange.displayValue,
+                type: incomeChange.type,
+                period: ` vs ${labels.comparison}`,
+              }
+            : undefined
+        }
+        description={`All income sources ${labels.description}`}
         size="md"
         icon={INCOME_ICON}
       />
 
       <FinancialCard
-        title="Monthly Expenses"
-        value={monthlyExpenses}
-        change={{
-          value: 125.3,
-          type: 'negative',
-          period: 'vs last month',
-        }}
-        description="All spending"
+        title={labels.expenses}
+        value={formatCurrencyAmount(monthlyExpenses)}
+        change={
+          expensesChange
+            ? {
+                value: expensesChange.displayValue,
+                type: expensesChange.type,
+                period: ` vs ${labels.comparison}`,
+              }
+            : undefined
+        }
+        description={`All spending ${labels.description}`}
         size="md"
         icon={EXPENSES_ICON}
       />
 
       <FinancialCard
-        title="Savings Rate"
-        value={`${savingsPercentage.toFixed(1)}%`}
+        title={labels.savings}
+        value={formatCurrencyAmount(savings)}
         change={{
-          value: '5%',
-          type: 'positive',
-          period: 'vs last month',
+          value: `${savingsRate.toFixed(1)}%`,
+          type: 'neutral',
+          period: ` of income ${labels.description}`,
         }}
-        description="Of total income"
+        description={`All savings ${labels.description}`}
         size="md"
         icon={SAVINGS_ICON}
       />
