@@ -1,3 +1,5 @@
+import { User } from './profile';
+
 export interface SignUpFormData {
   email: string;
   password: string;
@@ -13,16 +15,6 @@ export interface SignInFormData {
 
 export interface FormErrors {
   [key: string]: string;
-}
-
-export interface User {
-  id: number;
-  email: string;
-  role: string;
-  createdAt: string;
-  phone?: string;
-  firstName?: string;
-  lastName?: string;
 }
 
 export interface AuthResponse {

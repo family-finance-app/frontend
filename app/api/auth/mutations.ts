@@ -1,10 +1,12 @@
+'use client';
+
 // Sign up, sign in, and sign out operations
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import { SignUpFormData, SignInFormData, AuthResponse } from '@/types/auth';
-import { getAuthToken } from '@/utils/token';
+import { getAuthToken, setAuthToken, clearAuthToken } from '@/utils/token';
 
 // sign up, returns AuthResponse type with token
 export const useSignUp = () => {
@@ -20,7 +22,7 @@ export const useSignUp = () => {
     },
     onSuccess: (data) => {
       if (data.accessToken) {
-        localStorage.setItem('authToken', data.accessToken);
+        setAuthToken(data.accessToken);
       }
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
     },
@@ -36,7 +38,6 @@ export const useSignIn = () => {
 
   return useMutation({
     mutationFn: async (formData: SignInFormData): Promise<AuthResponse> => {
-      // API клиент автоматически типизирует ответ
       return apiClient.post<AuthResponse>('/api/auth/login', {
         email: formData.email,
         password: formData.password,
@@ -44,7 +45,7 @@ export const useSignIn = () => {
     },
     onSuccess: (data) => {
       if (data.accessToken) {
-        localStorage.setItem('authToken', data.accessToken);
+        setAuthToken(data.accessToken);
       }
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
     },
@@ -68,7 +69,7 @@ export const useSignOut = () => {
           token: token || undefined,
         }
       );
-      localStorage.removeItem('authToken');
+      clearAuthToken();
     },
     onSuccess: () => {
       queryClient.clear();
