@@ -7,7 +7,7 @@ import SignInForm from '@/components/authentication/SignInForm';
 
 export default function SignIn() {
   const router = useRouter();
-  const { handleSubmit, isLoading, isError, isSuccess, error, errorReason } =
+  const { handleSubmit, isLoading, isError, isSuccess, error, errorMessage } =
     useLogin();
 
   const handleSingIn = async (
@@ -27,7 +27,7 @@ export default function SignIn() {
         isLoading={isLoading}
         isSuccess={isSuccess}
         isError={isError}
-        errorMessage={errorReason?.message}
+        errorMessage={errorMessage}
       />
     </div>
   );
