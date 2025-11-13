@@ -13,11 +13,14 @@ export const useSignUp = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (formData: SignUpFormData): Promise<AuthResponse> => {
+    mutationFn: async (
+      formData: Partial<SignUpFormData>
+    ): Promise<AuthResponse> => {
       return apiClient.post<AuthResponse>('/api/auth/signup', {
         email: formData.email,
         password: formData.password,
-        role: 'MEMBER', // TODO: change to user/family user
+        terms: formData.terms,
+        role: 'MEMBER',
       });
     },
     onSuccess: (data) => {

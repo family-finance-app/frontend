@@ -102,7 +102,7 @@ export default function SignInForm({
           <div className="bg-red-50 border border-red-200 rounded-md p-4">
             <div className="flex items-center gap-3">
               <svg
-                className="h-5 w-5 text-red-600"
+                className="h-5 w-5 text-danger-600"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -113,10 +113,10 @@ export default function SignInForm({
                 />
               </svg>
               <div>
-                <p className="text-sm font-medium text-red-800">
+                <p className="text-sm font-medium text-danger-500">
                   Sign in failed
                 </p>
-                <p className="text-sm text-red-700 mt-1">{apiError}</p>
+                <p className="text-sm text-danger-500 mt-1">{apiError}</p>
               </div>
             </div>
           </div>

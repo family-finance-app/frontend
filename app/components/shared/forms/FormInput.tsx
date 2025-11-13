@@ -1,16 +1,15 @@
-/**
- * FormInput - переиспользуемый компонент для текстовых полей
- * Централизует стили и обработку ошибок
- */
-
 import React from 'react';
 
 interface FormInputProps {
-  label: string;
+  label?: {
+    type: string;
+    text: string;
+  };
   name: string;
   type?: string;
+  id?: string;
   value: string | number;
-  onChange: (value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   placeholder?: string;
   required?: boolean;
@@ -21,6 +20,7 @@ export function FormInput({
   label,
   name,
   type = 'text',
+  id,
   value,
   onChange,
   error,
@@ -30,15 +30,19 @@ export function FormInput({
 }: FormInputProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        {label}
+      <label
+        htmlFor={label?.type}
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
+        {label?.text}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <input
         type={type}
         name={name}
+        {...(id && { id })}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e)}
         placeholder={placeholder}
         required={required}
         disabled={disabled}

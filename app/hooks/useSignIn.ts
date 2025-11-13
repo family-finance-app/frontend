@@ -24,7 +24,7 @@ export const useLogin = () => {
     isError: signInMutation.isError,
     isSuccess: signInMutation.isSuccess,
     error: signInMutation.error,
-    errorReason: signInMutation.failureReason,
+    errorMessage: signInMutation.error?.message,
     handleSubmit,
   };
 };
