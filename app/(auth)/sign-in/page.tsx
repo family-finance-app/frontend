@@ -1,27 +1,23 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SignInFormData, FormErrors, AuthResponse } from '@/types/auth';
+import { SignInFormData, AuthResponse } from '@/types/auth';
 import { useLogin } from '@/hooks/useSignIn';
-import { validateSignInForm } from '@/utils/validation';
-import SignInForm from '@/components/authentication/SIgnInForm';
+import SignInForm from '@/components/authentication/SignInForm';
 
 export default function SignIn() {
   const router = useRouter();
-  const {
-    handleSubmit,
-    isLoading: isLoading,
-    isError: isError,
-    isSuccess: isSuccess,
-    error: error,
-    errorReason: errorReason,
-  } = useLogin();
+  const { handleSubmit, isLoading, isError, isSuccess, error, errorReason } =
+    useLogin();
 
   const handleSingIn = async (
     signInData: SignInFormData
   ): Promise<AuthResponse> => {
-    return await handleSubmit(signInData);
+    const result = await handleSubmit(signInData);
+    if (result) {
+      router.push('/dashboard');
+    }
+    return result;
   };
 
   return (
@@ -31,6 +27,7 @@ export default function SignIn() {
         isLoading={isLoading}
         isSuccess={isSuccess}
         isError={isError}
+        errorMessage={errorReason?.message}
       />
     </div>
   );
