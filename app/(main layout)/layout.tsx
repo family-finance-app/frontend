@@ -13,7 +13,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background-50 via-background-100 to-background-200">
+    <div className="min-h-screen bg-linear-to-br from-background-50 via-background-100 to-background-200">
       {/* Navigation Header - Fixed */}
       <Navigation />
 
