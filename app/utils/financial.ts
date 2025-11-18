@@ -287,3 +287,94 @@ export function calculateExpensesChange(
         : '0.00',
   };
 }
+
+export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
+  if (!transactions) {
+    // Return all 12 months of current year with 0 values
+    return Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(new Date().getFullYear(), i, 1);
+      return {
+        date: date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+        }),
+        Income: 0,
+        Expenses: 0,
+      };
+    });
+  }
+
+  if (transactions.length === 0) {
+    // Return all 12 months of current year with 0 values
+    return Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(new Date().getFullYear(), i, 1);
+      return {
+        date: date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+        }),
+        Income: 0,
+        Expenses: 0,
+      };
+    });
+  }
+
+  // Determine which year to use - prefer current year if it has transactions, otherwise use most recent year
+  const currentYear = new Date().getFullYear();
+  const sortedTransactions = [...transactions].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  const mostRecentTransaction = sortedTransactions[0];
+  const mostRecentYear = new Date(mostRecentTransaction.date).getFullYear();
+
+  // Use current year if we're in it and have transactions, otherwise use the year with most recent transactions
+  const year = currentYear === mostRecentYear ? currentYear : mostRecentYear;
+
+  // Generate all 12 months for the selected year
+  const months: Array<{ date: Date; income: number; expenses: number }> = [];
+
+  for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+    const monthStart = new Date(year, monthIndex, 1);
+    const monthEnd = new Date(year, monthIndex + 1, 0);
+
+    // Get transactions for this month
+    const monthTransactions = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.date);
+      return transactionDate >= monthStart && transactionDate <= monthEnd;
+    });
+
+    // Calculate income and expenses - ensure amount is converted to number
+    const income = monthTransactions
+      .filter((t) => t.type === 'INCOME')
+      .reduce((sum, t) => {
+        const amount =
+          typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+
+    const expenses = monthTransactions
+      .filter((t) => t.type === 'EXPENSE')
+      .reduce((sum, t) => {
+        const amount =
+          typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+
+    months.push({
+      date: monthStart,
+      income: Math.round(income * 100) / 100,
+      expenses: Math.round(expenses * 100) / 100,
+    });
+  }
+
+  // Format data for chart - use 'date' as index and 'Income', 'Expenses' as categories
+  return months.map((month) => ({
+    date: month.date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+    }),
+    Income: month.income,
+    Expenses: month.expenses,
+  }));
+}

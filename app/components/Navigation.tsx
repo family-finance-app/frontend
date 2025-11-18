@@ -23,7 +23,7 @@ export default function Navigation() {
 
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000); // Убираем через 4 секунды
+    setTimeout(() => setNotification(null), 4000);
   };
 
   const handleTransactionSuccess = (transactionId: number) => {

@@ -35,9 +35,9 @@ export default function AuthLayout({
         </div>
       </div>
 
-      <div className="hidden lg:block relative w-0 flex-1">
+      <div className="hidden lg:block relative w-0 flex-2">
         <Image
-          src="/auth-bg.svg"
+          src="/background.svg"
           alt="Authentication background"
           fill
           className="absolute inset-0 h-full w-full object-cover"

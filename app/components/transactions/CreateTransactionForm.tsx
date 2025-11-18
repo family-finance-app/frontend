@@ -28,6 +28,7 @@ export default function CreateTransactionForm({
     'EXPENSE'
   );
   const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [accountId, setAccountId] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -53,7 +54,7 @@ export default function CreateTransactionForm({
     const formData: CreateTransactionFormData = {
       type: type as TransactionType,
       amount: parseFloat(amount),
-      date: new Date().toISOString().split('T')[0],
+      date: date,
       currency: CurrencyType.UAH,
       description,
       accountId,
@@ -116,13 +117,23 @@ export default function CreateTransactionForm({
 
       {/* Amount */}
       <FormInput
-        label="Amount"
+        label={{ type: 'amount', text: 'Amount' }}
         name="amount"
         type="number"
         placeholder="0.00"
         value={amount}
-        onChange={setAmount}
+        onChange={(e) => setAmount(e.target.value)}
         error={errors.amount}
+      />
+
+      {/* Date */}
+      <FormInput
+        label={{ type: 'date', text: 'Date' }}
+        name="date"
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        error={errors.date}
       />
 
       {/* Account */}
@@ -151,12 +162,12 @@ export default function CreateTransactionForm({
 
       {/* Description */}
       <FormInput
-        label="Description"
+        label={{ type: 'description', text: 'Description' }}
         name="description"
         type="text"
         placeholder="Add a note..."
         value={description}
-        onChange={setDescription}
+        onChange={(e) => setDescription(e.target.value)}
       />
 
       {/* Actions */}
