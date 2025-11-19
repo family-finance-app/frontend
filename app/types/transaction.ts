@@ -1,3 +1,5 @@
+import { Category } from './category';
+
 export interface CreateTransactionFormData {
   type: TransactionType;
   amount: number;
@@ -19,17 +21,6 @@ export enum TransactionType {
   INCOME = 'INCOME',
   EXPENSE = 'EXPENSE',
   TRANSFER = 'TRANSFER',
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  type: string;
-  icon?: string;
-  color?: string;
-  isActive?: boolean;
-  createdAt?: string;
-  description?: string;
 }
 
 export interface Transaction {

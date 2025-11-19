@@ -1,110 +1,9 @@
 import { Transaction } from '@/types/transaction';
 import { Account } from '@/types/account';
 import { formatCurrencyAmount } from './formatters';
+import { Category } from '@/types/category';
 
-// enriches transactions with account and category data
-export function enrichTransactionsWithData(
-  transactions: Transaction[],
-  accounts: Account[],
-  categories: any[]
-): any[] {
-  return transactions.map((transaction) => {
-    const account = accounts.find((acc) => acc.id === transaction.accountId);
-    const category = categories.find(
-      (cat) => cat.id === transaction.categoryId
-    );
-
-    return {
-      ...transaction,
-      account:
-        transaction.account ||
-        (account
-          ? {
-              id: account.id,
-              name: account.name,
-              type: account.type,
-              currency: account.currency,
-            }
-          : undefined),
-      category:
-        transaction.category ||
-        (category
-          ? {
-              id: category.id,
-              name: category.name,
-              type: category.type,
-              icon: category.icon,
-              color: category.color,
-            }
-          : undefined),
-    };
-  });
-}
-
-// converts transaction amount to number, normalizes optional fields
-export function formatTransactionsForList(
-  apiTransactions: any[]
-): Transaction[] {
-  if (!apiTransactions) return [];
-
-  const formatted = apiTransactions.map((transaction) => ({
-    id: transaction.id,
-    userId: transaction.userId || 0,
-    groupId: transaction.groupId,
-    accountId: transaction.accountId,
-    type: transaction.type,
-    categoryId: transaction.categoryId || 0,
-    amount: Number(transaction.amount) || 0,
-    date: transaction.date,
-    createdAt: transaction.createdAt || new Date().toISOString(),
-    updatedAt: transaction.updatedAt || new Date().toISOString(),
-    description: transaction.description,
-    user: transaction.user,
-    account: transaction.account,
-    category: transaction.category,
-    group: transaction.group,
-  }));
-
-  // Don't sort here - let TransactionList component handle sorting
-  return formatted;
-}
-
-export function getAccountTypeName(type: string): string {
-  switch (type) {
-    case 'BANK':
-      return 'Bank Account';
-    case 'DEBIT':
-      return 'Debit Card';
-    case 'CREDIT':
-      return 'Credit Card';
-    case 'CASH':
-      return 'Cash';
-    case 'INVESTMENT':
-      return 'Investment';
-    case 'DEPOSIT':
-      return 'Deposit';
-    case 'DIGITAL':
-      return 'Digital';
-    case 'SAVINGS':
-      return 'Savings';
-    default:
-      return 'Account';
-  }
-}
-
-export function formatAccountsForWidget(accounts: Account[] | undefined) {
-  if (!accounts) return [];
-
-  return accounts.map((account) => ({
-    id: account.id.toString(),
-    name: account.name,
-    type: getAccountTypeName(account.type),
-    balance: formatCurrencyAmount(account.balance),
-    currency: account.currency,
-    change: 0,
-  }));
-}
-
+// universal utility for dashboard that calculates income/expenses/savings per chosen period
 export function calculatePeriodStats(
   transactions: Transaction[],
   period: 'week' | 'month' | 'year' = 'month'
@@ -113,7 +12,7 @@ export function calculatePeriodStats(
   let startDate = new Date();
 
   if (period === 'week') {
-    startDate.setDate(now.getDate() - now.getDay()); // start week from monday
+    startDate.setDate(now.getDate() - now.getDay());
   } else if (period === 'month') {
     startDate = new Date(now.getFullYear(), now.getMonth(), 1);
   } else if (period === 'year') {
@@ -154,7 +53,8 @@ export function calculateMonthlyStats(transactions: Transaction[]) {
   return calculatePeriodStats(transactions, 'month');
 }
 
-export function calculateExpensesByCategory(
+// calculates expenses per current month by category
+export function calculateMonthExpensesByCategory(
   transactions: Transaction[],
   categories: any[]
 ) {
@@ -191,6 +91,90 @@ export function calculateExpensesByCategory(
     .slice(0, 5);
 
   return expensesByCategory;
+}
+
+export function calculateExpensesByCategory(
+  transactions: Transaction[],
+  categories: Category[]
+) {
+  const expenseTransactions = transactions.filter(
+    (transaction) => transaction.type === 'EXPENSE'
+  );
+
+  if (expenseTransactions.length === 0) return [];
+
+  const expenseByCategory = expenseTransactions
+    .reduce((acc, transaction) => {
+      const category = categories.find(
+        (cat) => cat.id === transaction.categoryId
+      );
+      const categoryName = category?.name || 'Other';
+      const amount =
+        typeof transaction.amount === 'string'
+          ? parseFloat(transaction.amount)
+          : transaction.amount;
+      const existingCategory = acc.find((item) => item.name === categoryName);
+
+      if (existingCategory) existingCategory.amount += amount;
+      else acc.push({ name: categoryName, amount });
+
+      return acc;
+    }, [] as Array<{ name: string; amount: number }>)
+    .sort((a, b) => b.amount - a.amount);
+
+  const totalExpenses = expenseByCategory.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+
+  return expenseByCategory.map((item) => ({
+    name: item.name,
+    rate: Math.round((item.amount / totalExpenses) * 100 * 10) / 10,
+  }));
+}
+
+// calculates total income stats by category for analytics (donut chart)
+export function calculateIncomeByCategory(
+  transactions: Transaction[],
+  categories: Category[]
+) {
+  const incomeTransactions = transactions.filter(
+    (transaction) => transaction.type === 'INCOME'
+  );
+
+  if (incomeTransactions.length === 0) return [];
+
+  const incomeByCategory = incomeTransactions
+    .reduce((acc, transaction) => {
+      const category = categories.find(
+        (cat) => cat.id === transaction.categoryId
+      );
+      const categoryName = category?.name || 'Other';
+      const amount =
+        typeof transaction.amount === 'string'
+          ? parseFloat(transaction.amount)
+          : transaction.amount;
+      const existingCategory = acc.find((item) => item.name === categoryName);
+
+      if (existingCategory) {
+        existingCategory.amount += amount;
+      } else {
+        acc.push({ name: categoryName, amount });
+      }
+
+      return acc;
+    }, [] as Array<{ name: string; amount: number }>)
+    .sort((a, b) => b.amount - a.amount);
+
+  const totalIncome = incomeByCategory.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+
+  return incomeByCategory.map((item) => ({
+    name: item.name,
+    rate: Math.round((item.amount / totalIncome) * 100 * 10) / 10,
+  }));
 }
 
 export function getPreviousPeriodStats(
@@ -290,7 +274,6 @@ export function calculateExpensesChange(
 
 export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
   if (!transactions) {
-    // Return all 12 months of current year with 0 values
     return Array.from({ length: 12 }, (_, i) => {
       const date = new Date(new Date().getFullYear(), i, 1);
       return {
@@ -305,7 +288,6 @@ export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
   }
 
   if (transactions.length === 0) {
-    // Return all 12 months of current year with 0 values
     return Array.from({ length: 12 }, (_, i) => {
       const date = new Date(new Date().getFullYear(), i, 1);
       return {
@@ -319,32 +301,28 @@ export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
     });
   }
 
-  // Determine which year to use - prefer current year if it has transactions, otherwise use most recent year
   const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0-11
   const sortedTransactions = [...transactions].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   const mostRecentTransaction = sortedTransactions[0];
   const mostRecentYear = new Date(mostRecentTransaction.date).getFullYear();
-
-  // Use current year if we're in it and have transactions, otherwise use the year with most recent transactions
   const year = currentYear === mostRecentYear ? currentYear : mostRecentYear;
+  const maxMonthIndex = year === currentYear ? currentMonth : 11;
 
-  // Generate all 12 months for the selected year
   const months: Array<{ date: Date; income: number; expenses: number }> = [];
 
-  for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+  for (let monthIndex = 0; monthIndex <= maxMonthIndex; monthIndex++) {
     const monthStart = new Date(year, monthIndex, 1);
     const monthEnd = new Date(year, monthIndex + 1, 0);
 
-    // Get transactions for this month
     const monthTransactions = transactions.filter((transaction) => {
       const transactionDate = new Date(transaction.date);
       return transactionDate >= monthStart && transactionDate <= monthEnd;
     });
 
-    // Calculate income and expenses - ensure amount is converted to number
     const income = monthTransactions
       .filter((t) => t.type === 'INCOME')
       .reduce((sum, t) => {
@@ -368,7 +346,6 @@ export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
     });
   }
 
-  // Format data for chart - use 'date' as index and 'Income', 'Expenses' as categories
   return months.map((month) => ({
     date: month.date.toLocaleDateString('en-US', {
       year: 'numeric',

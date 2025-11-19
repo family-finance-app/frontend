@@ -1,5 +1,6 @@
-// Transaction utilities for filtering and data transformation
 import { Transaction } from '@/types/transaction';
+import { Account } from '@/types/account';
+
 export const filterTransactions = (
   transactions: Transaction[],
   filterType: 'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER',
@@ -33,9 +34,45 @@ export const filterTransactions = (
   });
 };
 
-/**
- * Calculate transaction statistics
- */
+// enriches transactions with account and category data
+export function enrichTransactionsWithData(
+  transactions: Transaction[],
+  accounts: Account[],
+  categories: any[]
+): any[] {
+  return transactions.map((transaction) => {
+    const account = accounts.find((acc) => acc.id === transaction.accountId);
+    const category = categories.find(
+      (cat) => cat.id === transaction.categoryId
+    );
+
+    return {
+      ...transaction,
+      account:
+        transaction.account ||
+        (account
+          ? {
+              id: account.id,
+              name: account.name,
+              type: account.type,
+              currency: account.currency,
+            }
+          : undefined),
+      category:
+        transaction.category ||
+        (category
+          ? {
+              id: category.id,
+              name: category.name,
+              type: category.type,
+              icon: category.icon,
+              color: category.color,
+            }
+          : undefined),
+    };
+  });
+}
+
 export const calculateTransactionStats = (transactions: Transaction[]) => {
   const totalIncome = transactions
     .filter((t) => t.type === 'INCOME')
@@ -54,9 +91,6 @@ export const calculateTransactionStats = (transactions: Transaction[]) => {
   };
 };
 
-/**
- * Get readable name for transaction type
- */
 export const getTransactionTypeName = (
   type: 'INCOME' | 'EXPENSE' | 'TRANSFER' | string
 ): string => {
@@ -72,9 +106,6 @@ export const getTransactionTypeName = (
   }
 };
 
-/**
- * Get color for transaction type
- */
 export const getTransactionTypeColor = (
   type: 'INCOME' | 'EXPENSE' | 'TRANSFER' | string
 ): string => {
@@ -90,9 +121,6 @@ export const getTransactionTypeColor = (
   }
 };
 
-/**
- * Format currency value with symbol
- */
 export const formatCurrency = (
   value: number,
   currency: string = 'USD'
@@ -104,9 +132,6 @@ export const formatCurrency = (
   return formatter.format(value);
 };
 
-/**
- * Time range options
- */
 export const TIME_RANGE_OPTIONS = [
   { value: 'all' as const, label: 'All time' },
   { value: 'week' as const, label: 'Week' },
@@ -115,12 +140,36 @@ export const TIME_RANGE_OPTIONS = [
   { value: 'year' as const, label: 'Year' },
 ];
 
-/**
- * Transaction type options
- */
 export const TRANSACTION_TYPE_OPTIONS = [
   { value: 'all' as const, label: 'All' },
   { value: 'INCOME' as const, label: 'Income' },
   { value: 'EXPENSE' as const, label: 'Expense' },
   { value: 'TRANSFER' as const, label: 'Transfer' },
 ];
+
+// converts transaction amount to number, normalizes optional fields
+export function formatTransactionsForList(
+  apiTransactions: any[]
+): Transaction[] {
+  if (!apiTransactions) return [];
+
+  const formatted = apiTransactions.map((transaction) => ({
+    id: transaction.id,
+    userId: transaction.userId || 0,
+    groupId: transaction.groupId,
+    accountId: transaction.accountId,
+    type: transaction.type,
+    categoryId: transaction.categoryId || 0,
+    amount: Number(transaction.amount) || 0,
+    date: transaction.date,
+    createdAt: transaction.createdAt || new Date().toISOString(),
+    updatedAt: transaction.updatedAt || new Date().toISOString(),
+    description: transaction.description,
+    user: transaction.user,
+    account: transaction.account,
+    category: transaction.category,
+    group: transaction.group,
+  }));
+
+  return formatted;
+}

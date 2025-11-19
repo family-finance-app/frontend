@@ -1,49 +1,32 @@
 import { Account } from '@/types/account';
-
-export type AccountType =
-  | 'DEBIT'
-  | 'CREDIT'
-  | 'CASH'
-  | 'BANK'
-  | 'INVESTMENT'
-  | 'DEPOSIT'
-  | 'DIGITAL'
-  | 'SAVINGS';
+import { formatCurrencyAmount } from './formatters';
 
 export interface AccountStatistics {
   totalCount: number;
   totalBalance: number;
-  byType: Record<AccountType, { count: number; balance: number }>;
+  byType: Record<Account['type'], { count: number; balance: number }>;
 }
 
-/**
- * Filter accounts by type
- */
+// filter account by type
 export function filterAccountsByType(
   accounts: Account[],
-  type: AccountType | 'all'
+  type: Account['type'] | 'all'
 ): Account[] {
   if (type === 'all') return accounts;
   return accounts.filter((account) => account.type === type);
 }
 
-/**
- * Filter personal accounts (non-group accounts)
- */
+// filter personal accounts (non-group accounts)
 export function getPersonalAccounts(accounts: Account[]): Account[] {
   return accounts.filter((account) => !account.groupId);
 }
 
-/**
- * Filter family accounts (group accounts)
- */
+// filter family accounts
 export function getFamilyAccounts(accounts: Account[]): Account[] {
   return accounts.filter((account) => !!account.groupId);
 }
 
-/**
- * Calculate account statistics
- */
+// account statistics
 export function calculateAccountStats(accounts: Account[]): AccountStatistics {
   const stats: AccountStatistics = {
     totalCount: accounts.length,
@@ -61,7 +44,7 @@ export function calculateAccountStats(accounts: Account[]): AccountStatistics {
   };
 
   accounts.forEach((account) => {
-    const type = account.type as AccountType;
+    const type = account.type as Account['type'];
     stats.totalBalance += account.balance;
     stats.byType[type].count++;
     stats.byType[type].balance += account.balance;
@@ -70,11 +53,9 @@ export function calculateAccountStats(accounts: Account[]): AccountStatistics {
   return stats;
 }
 
-/**
- * Get account type display name
- */
-export function getAccountTypeName(type: AccountType): string {
-  const names: Record<AccountType, string> = {
+// account type display name
+export function getAccountTypeName(type: Account['type']): string {
+  const names: Record<Account['type'], string> = {
     DEBIT: 'Debit Card',
     CREDIT: 'Credit Card',
     CASH: 'Cash',
@@ -87,8 +68,21 @@ export function getAccountTypeName(type: AccountType): string {
   return names[type] || type;
 }
 
-// Define available account types
-export const ACCOUNT_TYPES: AccountType[] = [
+export function formatAccountsForWidget(accounts: Account[] | undefined) {
+  if (!accounts) return [];
+
+  return accounts.map((account) => ({
+    id: account.id.toString(),
+    name: account.name,
+    type: getAccountTypeName(account.type),
+    balance: formatCurrencyAmount(account.balance),
+    currency: account.currency,
+    change: 0,
+  }));
+}
+
+// available account types
+export const ACCOUNT_TYPES: Account['type'][] = [
   'DEBIT',
   'CREDIT',
   'CASH',
@@ -99,5 +93,5 @@ export const ACCOUNT_TYPES: AccountType[] = [
   'SAVINGS',
 ];
 
-// Define available currencies
+// available currencies
 export const CURRENCY_OPTIONS = ['USD', 'EUR', 'UAH'] as const;
