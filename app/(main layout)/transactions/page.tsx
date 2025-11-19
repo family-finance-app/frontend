@@ -19,10 +19,8 @@ import {
   filterTransactions,
   calculateTransactionStats,
 } from '@/utils/transactions';
-import {
-  formatTransactionsForList,
-  enrichTransactionsWithData,
-} from '@/utils/financial';
+import { enrichTransactionsWithData } from '@/utils/transactions';
+import { formatTransactionsForList } from '@/utils/transactions';
 
 export default function MyTransactions() {
   const [showCreateForm, setShowCreateForm] = useState(false);

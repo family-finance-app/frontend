@@ -12,14 +12,14 @@ import {
   DashboardExpensesSection,
 } from '@/components/dashboard';
 import {
-  formatTransactionsForList,
-  enrichTransactionsWithData,
-  formatAccountsForWidget,
   calculatePeriodStats,
-  calculateExpensesByCategory,
+  calculateMonthExpensesByCategory,
   calculateIncomeChange,
   calculateExpensesChange,
 } from '@/utils/financial';
+import { enrichTransactionsWithData } from '@/utils/transactions';
+import { formatAccountsForWidget } from '@/utils/accounts';
+import { formatTransactionsForList } from '@/utils/transactions';
 import { useTotalBalanceInUAH } from '@/hooks/useTotalBalanceInUAH';
 
 export default function Dashboard() {
@@ -61,7 +61,7 @@ export default function Dashboard() {
     timeframe
   );
 
-  const expensesByCategory = calculateExpensesByCategory(
+  const expensesByCategory = calculateMonthExpensesByCategory(
     enrichedTransactions,
     categories
   );
