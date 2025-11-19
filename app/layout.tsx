@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './assets/css/globals.css';
 import { inter, jetbrainsMono, roboto } from './assets/fonts/fonts';
+import { GeistSans } from 'geist/font/sans';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${roboto.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${roboto.variable} ${GeistSans.className} antialised dark:`}
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
