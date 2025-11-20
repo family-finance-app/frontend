@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy:cloudflare": "npm run build && wrangler pages deploy .next/standalone/public",
-    "deploy:local": "npm run build && next start"
+    "install:build": "npm install && npm run build",
+    "install:start": "npm install && npm start",
+    "deploy:cloudflare": "npm install && npm run build && wrangler pages deploy .next/standalone/public",
+    "deploy:local": "npm install && npm run build && npm start"
   },
   "dependencies": {
     "@remixicon/react": "^4.7.0",
