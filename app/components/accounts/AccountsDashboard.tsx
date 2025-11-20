@@ -60,7 +60,6 @@ export default function AccountsDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Accounts
@@ -73,10 +72,9 @@ export default function AccountsDashboard() {
       </div>
 
       <div>
-        {/* Accounts Content */}
         {accounts.length > 0 && (
           <>
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
+            <div className="bg-linear-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
               <h2 className="text-lg font-semibold mb-2">Total Balance</h2>
               <p className="text-3xl font-bold">
                 {getTotalBalance().toLocaleString('en-US', {
@@ -98,7 +96,6 @@ export default function AccountsDashboard() {
                   <AccountCard
                     key={account.id || `account-${index}`}
                     account={account}
-                    index={index}
                   />
                 ))}
               </div>

@@ -49,7 +49,11 @@ export default function Dashboard() {
     categories
   );
 
-  const periodStats = calculatePeriodStats(enrichedTransactions, timeframe);
+  const periodStats = calculatePeriodStats(
+    enrichedTransactions,
+    timeframe,
+    accounts
+  );
   const incomeChange = calculateIncomeChange(
     periodStats.income,
     enrichedTransactions,

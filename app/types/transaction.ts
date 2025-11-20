@@ -11,6 +11,17 @@ export interface CreateTransactionFormData {
   groupId?: string;
 }
 
+export interface CreateTransferFormData {
+  accountId: number;
+  accountRecipientId: number;
+  groupId?: number;
+  categoryId: number;
+  amount: number;
+  currency: CurrencyType;
+  description?: string;
+  date: string;
+}
+
 export enum CurrencyType {
   UAH = 'UAH',
   USD = 'USD',
@@ -25,16 +36,18 @@ export enum TransactionType {
 
 export interface Transaction {
   id: number;
+  accountId: number;
   userId: number;
   groupId?: number;
-  accountId: number;
-  type: string;
   categoryId: number;
   amount: number;
+  currency: CurrencyType;
+  description?: string;
   date: string;
   createdAt: string;
   updatedAt: string;
-  description?: string;
+  type: string;
+  accountRecipientId?: number;
   user?: {
     id: number;
     name: string;

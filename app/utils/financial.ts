@@ -6,7 +6,8 @@ import { Category } from '@/types/category';
 // universal utility for dashboard that calculates income/expenses/savings per chosen period
 export function calculatePeriodStats(
   transactions: Transaction[],
-  period: 'week' | 'month' | 'year' = 'month'
+  period: 'week' | 'month' | 'year' = 'month',
+  accounts?: Account[]
 ) {
   const now = new Date();
   let startDate = new Date();
@@ -26,23 +27,37 @@ export function calculatePeriodStats(
 
   const income = periodTransactions
     .filter((t) => t.type === 'INCOME')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => {
+      const amount =
+        typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
 
   const expenses = periodTransactions
     .filter((t) => t.type === 'EXPENSE')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => {
+      const amount =
+        typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
 
   const savingsAmount = periodTransactions
-    .filter((t) => t.type === 'TRANSFER' && t.account?.type === 'SAVINGS')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((t) => t.type === 'TRANSFER')
+    .reduce((sum, t) => {
+      const amount =
+        typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
+
+  const savingsRate = income > 0 ? (savingsAmount / income) * 100 : 0;
 
   return {
     income,
     expenses,
     netAmount: income - expenses,
     savings: savingsAmount,
-    savingsRate: income > 0 ? (savingsAmount / income) * 100 : 0,
-    savingsPercentage: income > 0 ? (savingsAmount / income) * 100 : 0,
+    savingsRate: savingsRate,
+    savingsPercentage: savingsRate,
     changeType:
       income - expenses >= 0 ? ('positive' as const) : ('negative' as const),
     transactionsCount: periodTransactions.length,
@@ -354,4 +369,63 @@ export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
     Income: month.income,
     Expenses: month.expenses,
   }));
+}
+
+export function calculateSavingsStats(transactions: Transaction[]) {
+  const getTotalSavingsAmount = (): number => {
+    return (
+      Math.round(
+        transactions
+          .filter((t) => t.type === 'TRANSFER')
+          .reduce((sum, t) => {
+            const amount =
+              typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+            return sum + (isNaN(amount) ? 0 : amount);
+          }, 0) * 100
+      ) / 100
+    );
+  };
+
+  const getSavingsStatsPerYear = (): Array<{ name: string; value: number }> => {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+
+    const savingsStatsPerYear: Array<{ name: string; value: number }> = [];
+
+    for (let monthIndex = 0; monthIndex <= currentMonth; monthIndex++) {
+      const monthStart = new Date(currentYear, monthIndex, 1);
+      const monthEnd = new Date(currentYear, monthIndex + 1, 0);
+
+      const monthSavings = transactions
+        .filter((transaction) => {
+          const transactionDate = new Date(transaction.date);
+          return (
+            transaction.type === 'TRANSFER' &&
+            transactionDate >= monthStart &&
+            transactionDate <= monthEnd
+          );
+        })
+        .reduce((sum, t) => {
+          const amount =
+            typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+          return sum + (isNaN(amount) ? 0 : amount);
+        }, 0);
+
+      const monthName = monthStart.toLocaleDateString('en-US', {
+        month: 'short',
+      });
+
+      savingsStatsPerYear.push({
+        name: monthName,
+        value: Math.round(monthSavings * 100) / 100,
+      });
+    }
+
+    return savingsStatsPerYear;
+  };
+
+  return {
+    getTotalSavingsAmount,
+    getSavingsStatsPerYear,
+  };
 }

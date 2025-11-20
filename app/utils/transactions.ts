@@ -42,6 +42,9 @@ export function enrichTransactionsWithData(
 ): any[] {
   return transactions.map((transaction) => {
     const account = accounts.find((acc) => acc.id === transaction.accountId);
+    const recipientAccount = transaction.accountRecipientId
+      ? accounts.find((acc) => acc.id === transaction.accountRecipientId)
+      : undefined;
     const category = categories.find(
       (cat) => cat.id === transaction.categoryId
     );
@@ -58,6 +61,14 @@ export function enrichTransactionsWithData(
               currency: account.currency,
             }
           : undefined),
+      recipientAccount: recipientAccount
+        ? {
+            id: recipientAccount.id,
+            name: recipientAccount.name,
+            type: recipientAccount.type,
+            currency: recipientAccount.currency,
+          }
+        : undefined,
       category:
         transaction.category ||
         (category
@@ -161,6 +172,7 @@ export function formatTransactionsForList(
     type: transaction.type,
     categoryId: transaction.categoryId || 0,
     amount: Number(transaction.amount) || 0,
+    currency: transaction.currency || 'USD',
     date: transaction.date,
     createdAt: transaction.createdAt || new Date().toISOString(),
     updatedAt: transaction.updatedAt || new Date().toISOString(),

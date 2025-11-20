@@ -85,7 +85,7 @@ export default function Notifications() {
                   >
                     <div className="flex items-start space-x-3">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                           notification.type === 'success'
                             ? 'bg-success-100 dark:bg-success-900/30'
                             : notification.type === 'warning'
@@ -154,7 +154,7 @@ export default function Notifications() {
                             {notification.title}
                           </h4>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0"></div>
+                            <div className="w-2 h-2 bg-primary-500 rounded-full shrink-0"></div>
                           )}
                         </div>
                         <p className="text-sm text-background-600 dark:text-background-300 mt-1">

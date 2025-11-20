@@ -3,59 +3,63 @@
 export type ColorUtility = 'bg' | 'stroke' | 'fill' | 'text';
 
 export const chartColors = {
-  blue: {
-    bg: 'bg-blue-500',
-    stroke: 'stroke-blue-500',
-    fill: 'fill-blue-500',
-    text: 'text-blue-500',
+  moss: {
+    // green
+    bg: 'bg-moss-400',
+    stroke: 'stroke-moss-400',
+    fill: 'fill-moss-400',
+    text: 'text-primary-500',
   },
-  emerald: {
-    bg: 'bg-emerald-500',
-    stroke: 'stroke-emerald-500',
-    fill: 'fill-emerald-500',
-    text: 'text-emerald-500',
+  hazel: {
+    // light green to yellow
+    bg: 'bg-hazel-200',
+    stroke: 'stroke-hazel-200',
+    fill: 'fill-hazel-200',
+    text: 'text-hazel-200',
   },
-  violet: {
-    bg: 'bg-violet-500',
-    stroke: 'stroke-violet-500',
-    fill: 'fill-violet-500',
-    text: 'text-violet-500',
+  salmon: {
+    // light orange
+    bg: 'bg-salmon-300',
+    stroke: 'stroke-salmon-400',
+    fill: 'fill-salmon-200',
+    text: 'text-salmon-300',
   },
-  amber: {
-    bg: 'bg-amber-500',
-    stroke: 'stroke-amber-500',
-    fill: 'fill-amber-500',
-    text: 'text-amber-500',
+  kashmir_light: {
+    // grey-blue
+    bg: 'bg-kashmir-500',
+    stroke: 'stroke-kashmir-500',
+    fill: 'fill-kashmir-300',
+    text: 'text-kashmir-500',
   },
-  gray: {
-    bg: 'bg-gray-500',
-    stroke: 'stroke-gray-500',
-    fill: 'fill-gray-500',
-    text: 'text-gray-500',
+  kashmir: {
+    bg: 'bg-kashmir-500',
+    stroke: 'stroke-kashmir-500',
+    fill: 'fill-kashmir-500',
+    text: 'text-kashmir-500',
   },
-  cyan: {
-    bg: 'bg-cyan-500',
-    stroke: 'stroke-cyan-500',
-    fill: 'fill-cyan-500',
-    text: 'text-cyan-500',
+  primary: {
+    bg: 'bg-primary-300',
+    stroke: 'stroke-primary-300',
+    fill: 'fill-primary-300',
+    text: 'text-primary-300',
   },
   pink: {
-    bg: 'bg-pink-500',
-    stroke: 'stroke-pink-500',
-    fill: 'fill-pink-500',
-    text: 'text-pink-500',
+    bg: 'bg-marzipan-200',
+    stroke: 'stroke-marzipan-200',
+    fill: 'fill-marzipan-200',
+    text: 'text-marzipan-200',
   },
-  lime: {
-    bg: 'bg-lime-500',
-    stroke: 'stroke-lime-500',
-    fill: 'fill-lime-500',
-    text: 'text-lime-500',
+  moss_light: {
+    bg: 'bg-moss-100',
+    stroke: 'stroke-moss-100',
+    fill: 'fill-moss-100',
+    text: 'text-moss-100',
   },
-  fuchsia: {
-    bg: 'bg-fuchsia-500',
-    stroke: 'stroke-fuchsia-500',
-    fill: 'fill-fuchsia-500',
-    text: 'text-fuchsia-500',
+  fuchsia_pink: {
+    bg: 'bg-pink-300',
+    stroke: 'stroke-pink-300pink-300',
+    fill: 'fill-pink-300',
+    text: 'text-pink-300',
   },
 } as const satisfies {
   [color: string]: {

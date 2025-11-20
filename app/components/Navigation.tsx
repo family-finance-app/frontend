@@ -50,10 +50,9 @@ export default function Navigation() {
     <nav className="fixed z-30 w-full bg-primary-700/95 backdrop-blur-md border-b border-primary-600">
       <div className="px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Left side - Logo and Brand */}
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-300 to-primary-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-br from-primary-300 to-primary-500 rounded-lg flex items-center justify-center">
                 <span
                   className={`${roboto.className} text-white font-bold text-lg`}
                 >
@@ -68,9 +67,7 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* Right side - Actions */}
           <div className="flex items-center space-x-4">
-            {/* Quick Add Transaction Button */}
             <button
               onClick={() => setShowTransactionModal(true)}
               className="hidden md:flex items-center space-x-2 px-4 py-2 bg-primary-500 hover:bg-primary-400 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
@@ -91,31 +88,26 @@ export default function Navigation() {
               <span className="font-medium">Add Transaction</span>
             </button>
 
-            {/* Notifications */}
             <Notifications />
 
             <ColorModeSwitcher />
-
-            {/* Profile Avatar */}
             <ProfileAvatar />
           </div>
         </div>
       </div>
 
-      {/* Transaction Modal Portal */}
       {mounted &&
         showTransactionModal &&
         createPortal(
           <div
-            className="fixed inset-0 backdrop-blur-sm bg-background-900/10 z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 backdrop-blur-sm bg-background-900/10 z-100 flex items-center justify-center p-4"
             onClick={(e) => {
-              // Закрываем модальное окно при клике на фон
               if (e.target === e.currentTarget) {
                 handleTransactionCancel();
               }
             }}
           >
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto animate-scale-in relative z-[101]">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto animate-scale-in relative z-101">
               <div className="sticky top-0 bg-white border-b border-background-100 px-6 py-4 rounded-t-2xl">
                 <div className="flex items-center justify-between">
                   <h2
@@ -155,11 +147,10 @@ export default function Navigation() {
           document.body
         )}
 
-      {/* Notification Portal */}
       {mounted &&
         notification &&
         createPortal(
-          <div className="fixed top-20 right-4 z-[200] animate-slide-in">
+          <div className="fixed top-20 right-4 z-200 animate-slide-in">
             <div
               className={`px-6 py-4 rounded-xl shadow-lg border ${
                 notification.type === 'success'
@@ -168,7 +159,7 @@ export default function Navigation() {
               }`}
             >
               <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {notification.type === 'success' ? (
                     <svg
                       className="w-5 h-5"
@@ -202,7 +193,7 @@ export default function Navigation() {
                 <p className="text-sm font-medium">{notification.message}</p>
                 <button
                   onClick={() => setNotification(null)}
-                  className="flex-shrink-0 p-1 rounded-lg hover:bg-black/5 transition-colors"
+                  className="shrink-0 p-1 rounded-lg hover:bg-black/5 transition-colors"
                 >
                   <svg
                     className="w-4 h-4"

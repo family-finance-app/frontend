@@ -75,8 +75,7 @@ export default function NotificationsCard({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-3xl">🔔</div>
@@ -97,9 +96,7 @@ export default function NotificationsCard({
         </div>
       </div>
 
-      {/* Form Content */}
       <div className="p-6">
-        {/* Save Message */}
         {saveMessage && (
           <div
             className={`mb-4 p-3 rounded-md ${
@@ -117,9 +114,7 @@ export default function NotificationsCard({
           </div>
         )}
 
-        {/* Notification Options */}
         <div className="space-y-4">
-          {/* Email Notifications */}
           <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <div className="flex-1">
               <label
@@ -145,7 +140,6 @@ export default function NotificationsCard({
             </label>
           </div>
 
-          {/* Transaction Alerts */}
           <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <div className="flex-1">
               <label
@@ -171,7 +165,6 @@ export default function NotificationsCard({
             </label>
           </div>
 
-          {/* Monthly Reports */}
           <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <div className="flex-1">
               <label
@@ -197,7 +190,6 @@ export default function NotificationsCard({
             </label>
           </div>
 
-          {/* Budget Alerts (Optional) */}
           {settings.budgetAlerts !== undefined && (
             <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <div className="flex-1">
@@ -225,7 +217,6 @@ export default function NotificationsCard({
             </div>
           )}
 
-          {/* Weekly Digest (Optional) */}
           {settings.weeklyDigest !== undefined && (
             <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <div className="flex-1">
@@ -254,7 +245,6 @@ export default function NotificationsCard({
           )}
         </div>
 
-        {/* Action Buttons */}
         {showSaveButton && (
           <div className="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button

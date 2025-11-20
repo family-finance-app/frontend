@@ -4,17 +4,11 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
 import { useTotalBalanceInUAH } from '@/hooks/useTotalBalanceInUAH';
-import {
-  formatTransactionsForList,
-  enrichTransactionsWithData,
-  calculatePeriodStats,
-} from '@/utils/financial';
+import { calculatePeriodStats } from '@/utils/financial';
+import { enrichTransactionsWithData } from '@/utils/transactions';
+import { formatTransactionsForList } from '@/utils/transactions';
 import { formatCurrencyAmount } from '@/utils/formatters';
 
-/**
- * Sidebar Balance Widget
- * Displays total account balance in UAH, monthly income, and monthly expenses
- */
 export function SidebarBalanceWidget() {
   const { data: accounts, isLoading: accountsLoading } = useMyAccounts();
   const { data: transactions, isLoading: transactionsLoading } =
@@ -55,7 +49,6 @@ export function SidebarBalanceWidget() {
           Balance
         </span>
       </div>
-      {/* Total Balance */}
       <div className="flex justify-between items-center text-sm">
         <span className=" text-background-600">Total Balance</span>
         <span className="font-mono font-semibold text-background-900">
@@ -63,7 +56,6 @@ export function SidebarBalanceWidget() {
         </span>
       </div>
 
-      {/* Monthly Income */}
       <div className="flex justify-between items-center text-sm">
         <span className=" text-background-600">Monthly income</span>
         <span className="font-mono font-semibold text-success-600">
@@ -71,7 +63,6 @@ export function SidebarBalanceWidget() {
         </span>
       </div>
 
-      {/* Monthly Expenses */}
       <div className="flex justify-between items-center text-sm">
         <span className=" text-background-600">Monthly expenses</span>
         <span className="font-mono font-semibold text-danger-600">

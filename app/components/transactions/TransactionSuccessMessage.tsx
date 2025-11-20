@@ -10,7 +10,7 @@ export default function TransactionSuccessMessage({
   return (
     <div className="bg-success-50 border border-success-200 rounded-xl p-4 animate-scale-in">
       <div className="flex items-center">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <svg
             className="h-5 w-5 text-success-600"
             fill="currentColor"

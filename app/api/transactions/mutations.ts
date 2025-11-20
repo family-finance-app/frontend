@@ -1,18 +1,17 @@
 'use client';
 
-// create, update, and delete transactions
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
 import type {
   CreateTransactionFormData,
+  CreateTransferFormData,
   Transaction,
+  TransactionResponse,
 } from '@/types/transaction';
 import type { Account } from '@/types/account';
 import { getAuthToken } from '@/utils/token';
 
-// create new transaction
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
 
@@ -33,7 +32,6 @@ export const useCreateTransaction = () => {
   });
 };
 
-// update existing transaction
 export const useUpdateTransaction = () => {
   const queryClient = useQueryClient();
 
@@ -69,7 +67,6 @@ export const useUpdateTransaction = () => {
   });
 };
 
-// delete transaction
 export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
 
@@ -101,6 +98,30 @@ export const useDeleteTransaction = () => {
     },
     onError: (error: any) => {
       console.error('Delete transaction error:', error);
+    },
+  });
+};
+
+export const useCreateTransfer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (
+      data: CreateTransferFormData
+    ): Promise<TransactionResponse> => {
+      const token = getAuthToken();
+      return apiClient.post<TransactionResponse>(
+        '/api/transactions/transfer',
+        { ...data, categoryId: 68 },
+        {
+          token: token || undefined,
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
     },
   });
 };
