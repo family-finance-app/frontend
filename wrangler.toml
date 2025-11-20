@@ -6,5 +6,5 @@ pages_build_output_dir = ".next/standalone/public"
 name = "family-finance-prod"
 vars = { ENVIRONMENT = "production" }
 
-[env.staging]
+[env.preview]
 name = "family-finance-staging"
