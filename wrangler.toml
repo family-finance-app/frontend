@@ -1,22 +1,9 @@
 name = "family-finance"
 type = "javascript"
-account_id = ""
-workers_dev = true
-routes = []
-zone_id = ""
-main = "server.js"
-site = { bucket = ".next/standalone/public" }
-
-[build]
-command = "npm run build"
-cwd = "./"
-watch_paths = ["src/**/*.ts", "src/**/*.tsx"]
+pages_build_output_dir = ".next/standalone/public"
 
 [env.production]
 name = "family-finance-prod"
-routes = [
-  { pattern = "family-finance.pages.dev/*", zone_id = "" }
-]
 vars = { ENVIRONMENT = "production" }
 
 [env.staging]
