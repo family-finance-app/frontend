@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "deploy:cloudflare": "npm run build && wrangler pages deploy .next/standalone/public",
-    "deploy:local": "npm run build && NODE_OPTIONS='--no-webstorage' next start"
+    "deploy:local": "npm run build && next start"
   },
   "dependencies": {
     "@remixicon/react": "^4.7.0",
