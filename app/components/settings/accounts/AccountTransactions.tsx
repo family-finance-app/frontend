@@ -1,7 +1,7 @@
 'use client';
 
 import { Transaction } from '@/types/transaction';
-import { Category } from '@/types/transaction';
+import { Category } from '@/types/category';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import {
   formatCurrencyAmount,

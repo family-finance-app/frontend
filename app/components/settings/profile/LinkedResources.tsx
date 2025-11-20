@@ -2,7 +2,7 @@
 
 import { Account } from '@/types/account';
 import { roboto } from '@/assets/fonts/fonts';
-import { getAccountTypeName, type AccountType } from '@/utils/accounts';
+import { getAccountTypeName } from '@/utils/accounts';
 
 interface LinkedResourcesProps {
   familyGroups?: Array<{
@@ -51,7 +51,6 @@ export function LinkedResources({
         </div>
       )}
 
-      {/* Accounts - Hidden */}
       {false && accounts && accounts.length > 0 && (
         <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
           <h2
@@ -71,7 +70,7 @@ export function LinkedResources({
                     {account.name}
                   </p>
                   <p className="text-xs text-background-500 mt-1">
-                    {getAccountTypeName(account.type as AccountType)}
+                    {getAccountTypeName(account.type as Account['type'])}
                   </p>
                 </div>
                 <div className="text-right shrink-0 ml-2">
@@ -91,7 +90,6 @@ export function LinkedResources({
         </div>
       )}
 
-      {/* Empty State */}
       {(!familyGroups || familyGroups.length === 0) &&
         (!accounts || accounts.length === 0) && (
           <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">

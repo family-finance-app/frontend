@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 3500",
+    "dev": "NODE_OPTIONS='--no-webstorage' next dev --turbopack -p 3500",
     "build": "next build",
-    "start": "next start",
+    "build_local": "NODE_OPTIONS='--no-webstorage' next build",
+    "start": "NODE_OPTIONS='--no-webstorage' next start",
     "lint": "next lint",
     "install:build": "npm install && npm run build",
     "install:start": "npm install && npm start",

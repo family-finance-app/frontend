@@ -5,7 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import { Category } from '@/types/transaction';
+import { Category } from '@/types/category';
 import { getAuthToken } from '@/utils/token';
 import { useEffect, useState } from 'react';
 

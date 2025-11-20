@@ -31,7 +31,7 @@ export const useAccounts = () => {
 };
 
 // get account by id
-export const useAccount = (id: string) => {
+export const useAccount = (id: number) => {
   const [token, setToken] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
 

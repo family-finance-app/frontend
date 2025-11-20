@@ -1,7 +1,7 @@
 export { useAuth } from './useAuth';
 export { useLogin } from './useSignIn';
 export { useSignup } from './useSignUp';
-export { useUpdateProfile } from './useUpdateProfile';
+export { useUpdateProfileForm } from './useUpdateProfile';
 export { useAccountForm } from './useAccountForm';
 export { useAccountValidation } from './useAccountValidation';
 export { useCreateTransactionForm } from './useCreateTransactionForm';

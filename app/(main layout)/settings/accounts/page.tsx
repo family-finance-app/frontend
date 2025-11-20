@@ -7,7 +7,7 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useUpdateAccount, useDeleteAccount } from '@/api/accounts/mutations';
 import { useCategories } from '@/api/categories/queries';
-import { getAccountTypeName, type AccountType } from '@/utils/accounts';
+import { getAccountTypeName } from '@/utils/accounts';
 import {
   AccountsList,
   AccountDetails,
@@ -15,6 +15,7 @@ import {
   DeleteAccountModal,
   type EditAccountFormData,
 } from '@/components/settings/accounts';
+import { Account } from '@/types/account';
 
 export default function AccountSettings() {
   const { data: accounts = [] } = useMyAccounts();
@@ -44,7 +45,7 @@ export default function AccountSettings() {
         id: accountId,
         data: {
           name: formData.name,
-          type: formData.type,
+          type: formData.type as Account['type'],
           currency: formData.currency as 'UAH' | 'USD' | 'EUR',
         },
       });
@@ -130,7 +131,7 @@ export default function AccountSettings() {
                   {account.name}
                 </p>
                 <p className="text-xs text-background-500 truncate mt-0.5">
-                  {getAccountTypeName(account.type as AccountType)}
+                  {getAccountTypeName(account.type)}
                 </p>
               </button>
             ))}

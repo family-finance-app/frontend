@@ -1,13 +1,24 @@
 import { Account } from '@/types/account';
 import { formatCurrencyAmount } from './formatters';
 
+export type AccountType = Account['type'] | 'all';
+export const ACCOUNT_TYPES: Account['type'][] = [
+  'DEBIT',
+  'CREDIT',
+  'CASH',
+  'BANK',
+  'INVESTMENT',
+  'DEPOSIT',
+  'DIGITAL',
+  'SAVINGS',
+];
+
 export interface AccountStatistics {
   totalCount: number;
   totalBalance: number;
   byType: Record<Account['type'], { count: number; balance: number }>;
 }
 
-// filter account by type
 export function filterAccountsByType(
   accounts: Account[],
   type: Account['type'] | 'all'
@@ -16,17 +27,14 @@ export function filterAccountsByType(
   return accounts.filter((account) => account.type === type);
 }
 
-// filter personal accounts (non-group accounts)
 export function getPersonalAccounts(accounts: Account[]): Account[] {
   return accounts.filter((account) => !account.groupId);
 }
 
-// filter family accounts
 export function getFamilyAccounts(accounts: Account[]): Account[] {
   return accounts.filter((account) => !!account.groupId);
 }
 
-// account statistics
 export function calculateAccountStats(accounts: Account[]): AccountStatistics {
   const stats: AccountStatistics = {
     totalCount: accounts.length,
@@ -81,17 +89,4 @@ export function formatAccountsForWidget(accounts: Account[] | undefined) {
   }));
 }
 
-// available account types
-export const ACCOUNT_TYPES: Account['type'][] = [
-  'DEBIT',
-  'CREDIT',
-  'CASH',
-  'BANK',
-  'INVESTMENT',
-  'DEPOSIT',
-  'DIGITAL',
-  'SAVINGS',
-];
-
-// available currencies
 export const CURRENCY_OPTIONS = ['USD', 'EUR', 'UAH'] as const;

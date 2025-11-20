@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { Account } from '@/types/account';
 import { Transaction } from '@/types/transaction';
-import { Category } from '@/types/transaction';
+import { Category } from '@/types/category';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
-import { getAccountTypeName, type AccountType } from '@/utils/accounts';
+import { getAccountTypeName } from '@/utils/accounts';
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { AccountTransactions } from './AccountTransactions';
 import { EditAccountForm, type EditAccountFormData } from './EditAccountForm';
@@ -56,7 +56,7 @@ export function AccountDetails({
             </h3>
             <div className="flex items-center gap-4 mt-2 text-sm">
               <span className="text-background-600">
-                {getAccountTypeName(account.type as AccountType)}
+                {getAccountTypeName(account.type as Account['type'])}
               </span>
               <span
                 className={`${jetbrainsMono.className} font-semibold ${

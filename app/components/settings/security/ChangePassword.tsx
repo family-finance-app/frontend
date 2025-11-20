@@ -5,7 +5,7 @@ import { roboto } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
 import { PasswordChangeFormData } from '@/types/security';
 
-interface ChangePasswordProps {
+export interface ChangePasswordProps {
   onSubmit?: (data: PasswordChangeFormData) => Promise<void>;
   isLoading?: boolean;
 }

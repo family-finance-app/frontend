@@ -26,7 +26,7 @@ export default function AccountsList() {
 
     try {
       setDeletingId(id);
-      await deleteAccount.mutateAsync(String(id));
+      await deleteAccount.mutateAsync(id);
     } catch (error) {
       console.error('Failed to delete account:', error);
       alert('Failed to delete account. Please try again.');
@@ -36,7 +36,6 @@ export default function AccountsList() {
   };
 
   const handleEdit = (account: Account) => {
-    // TODO: Open edit modal or navigate to edit page
     alert(`Edit functionality for "${account.name}" coming soon!`);
   };
 

@@ -2,15 +2,15 @@
 
 import { Account } from '@/types/account';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
-import { getAccountTypeName, type AccountType } from '@/utils/accounts';
+import { getAccountTypeName } from '@/utils/accounts';
 import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface AccountCardProps {
   account: Account;
 }
 
-const getCardColorStyles = (accountType: AccountType) => {
-  const colorMap: Record<AccountType, { accent: string }> = {
+const getCardColorStyles = (accountType: Account['type']) => {
+  const colorMap: Record<Account['type'], { accent: string }> = {
     BANK: {
       accent: 'text-background-100',
     },
@@ -41,13 +41,12 @@ const getCardColorStyles = (accountType: AccountType) => {
 };
 
 export function AccountCard({ account }: AccountCardProps) {
-  const colors = getCardColorStyles(account.type as AccountType);
+  const colors = getCardColorStyles(account.type);
 
   return (
     <div
       className={`rounded-2xl shadow-financial bg-background-700 border-background-500 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105 group`}
     >
-      {/* Account Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div>
@@ -57,13 +56,12 @@ export function AccountCard({ account }: AccountCardProps) {
               {account.name}
             </h4>
             <p className={`text-sm font-medium ${colors.accent}`}>
-              {getAccountTypeName(account.type as AccountType)}
+              {getAccountTypeName(account.type)}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Balance */}
       <div className="mb-4">
         <div className="flex items-baseline space-x-2">
           <span

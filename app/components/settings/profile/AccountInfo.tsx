@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from '@/types/auth';
+import { User } from '@/types/profile';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 
 interface AccountInfoProps {

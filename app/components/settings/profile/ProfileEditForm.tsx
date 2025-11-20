@@ -5,7 +5,7 @@ import { User } from '@/types/profile';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
 
-interface ProfileFormData extends Partial<User> {
+export interface ProfileFormData extends Partial<User> {
   name: string;
   birthdate: string;
 }

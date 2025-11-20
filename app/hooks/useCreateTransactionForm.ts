@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { CreateTransactionFormData } from '@/types/transaction';
-import type { Transaction, Category } from '@/types/transaction';
+import type { Transaction } from '@/types/transaction';
+import { Category } from '@/types/category';
 import type { Account } from '@/types/account';
 import { useCreateTransaction } from '@/api/transactions/mutations';
 import { dateFormatters } from '@/utils/formatters';
