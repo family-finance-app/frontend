@@ -1,8 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: 'export',
   images: {
+    unoptimized: true,
     domains: ['cdn2.iconfinder.com'],
   },
 };

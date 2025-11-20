@@ -1,6 +1,5 @@
 name = "family-finance"
-type = "javascript"
-pages_build_output_dir = ".next/standalone/public"
+pages_build_output_dir = "out"
 
 [env.production]
 name = "family-finance-prod"
