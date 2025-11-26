@@ -13,7 +13,7 @@ export function DashboardExpensesSection({
 }: DashboardExpensesSectionProps) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border border-background-200 p-6 h-80">
+      <div className="bg-whiterounded-2xl border border-background-200 p-6 h-80">
         <div className="animate-pulse">
           <div className="h-6 bg-background-200 rounded w-1/2 mb-6"></div>
           <div className="space-y-3">
@@ -31,13 +31,12 @@ export function DashboardExpensesSection({
 
   if (expensesByCategory.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-background-200 p-6 h-80 flex items-center justify-center">
+      <div className="bg-white dark:bg-background-200 rounded-2xl border border-background-200 p-6 h-80 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">📊</div>
-          <h3 className="text-lg font-semibold text-background-900 mb-2">
+          <h3 className="text-lg font-semibold text-background-900 dark:text-primary-800 mb-2">
             No expenses this month
           </h3>
-          <p className="text-background-600 text-sm">
+          <p className="text-background-600 dark:text-stack-700 text-sm">
             Start tracking your expenses to see spending patterns
           </p>
         </div>

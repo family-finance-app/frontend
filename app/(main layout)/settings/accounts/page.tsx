@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { roboto } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
 import { useMyAccounts } from '@/api/accounts/queries';
@@ -8,6 +8,7 @@ import { useMyTransactions } from '@/api/transactions/queries';
 import { useUpdateAccount, useDeleteAccount } from '@/api/accounts/mutations';
 import { useCategories } from '@/api/categories/queries';
 import { getAccountTypeName } from '@/utils/accounts';
+import { useSearchParams } from 'next/navigation';
 import {
   AccountsList,
   AccountDetails,
@@ -21,6 +22,8 @@ export default function AccountSettings() {
   const { data: accounts = [] } = useMyAccounts();
   const { data: transactions = [] } = useMyTransactions();
   const { data: categories = [] } = useCategories();
+  const searchParams = useSearchParams();
+  const accountIdParam = searchParams.get('accountId');
 
   const createMutation = useUpdateAccount();
   const deleteAccount = useDeleteAccount();
@@ -34,6 +37,15 @@ export default function AccountSettings() {
   const [isLoading, setIsLoading] = useState(false);
 
   const selectedAccount = accounts.find((a) => a.id === selectedAccountId);
+
+  useEffect(() => {
+    if (!accountIdParam) return;
+
+    const parsedId = Number(accountIdParam);
+    if (!Number.isNaN(parsedId) && parsedId !== selectedAccountId) {
+      setSelectedAccountId(parsedId);
+    }
+  }, [accountIdParam, selectedAccountId]);
 
   const handleEditAccount = async (
     accountId: number,

@@ -47,7 +47,7 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="fixed z-30 w-full bg-primary-700/95 backdrop-blur-md border-b border-primary-600">
+    <nav className="fixed z-30 w-full bg-primary-700/95 dark:bg-primary-800 backdrop-blur-md border-b border-primary-600">
       <div className="px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
@@ -107,11 +107,11 @@ export default function Navigation() {
               }
             }}
           >
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto animate-scale-in relative z-101">
-              <div className="sticky top-0 bg-white border-b border-background-100 px-6 py-4 rounded-t-2xl">
+            <div className="bg-white dark:bg-stack-200 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto animate-scale-in relative z-101">
+              <div className="sticky top-0 bg-white dark:bg-stack-200 border-b border-background-100 px-6 py-4 rounded-t-2xl">
                 <div className="flex items-center justify-between">
                   <h2
-                    className={`${roboto.className} text-xl font-semibold text-background-900`}
+                    className={`${roboto.className} text-xl font-semibold text-background-900 dark:text-primary-800`}
                   >
                     Add New Transaction
                   </h2>

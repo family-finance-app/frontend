@@ -71,7 +71,6 @@ export default function EditTransactionModal({
     }
   };
 
-  // Filter categories based on transaction type
   const filteredCategories = categories.filter((category) => {
     if (!formData.type) return true;
     return category.type === formData.type;
@@ -122,23 +121,23 @@ export default function EditTransactionModal({
       />
 
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-lg max-w-md w-full">
-          <div className="p-6 border-b border-background-100">
-            <h2 className="text-xl font-semibold text-background-900">
+        <div className="bg-background-50 dark:bg-stack-200 rounded-2xl shadow-lg max-w-md w-full">
+          <div className="p-6 border-b border-background-100 dark:border-background-50">
+            <h2 className="text-xl font-semibold text-primary-800">
               Edit Transaction
             </h2>
           </div>
 
           <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-background-900 mb-2">
+              <label className="block text-sm font-medium text-primary-800 mb-2">
                 Type
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                className="w-full px-3 py-2 border border-background-200 dark:border-background-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
               >
                 <option value="">Select type</option>
                 <option value="INCOME">Income</option>
@@ -159,8 +158,8 @@ export default function EditTransactionModal({
                 name="amount"
                 value={formData.amount}
                 onChange={handleChange}
-                step="0.01"
-                className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                step="1.00"
+                className="w-full px-3 py-2 border border-background-200 dark:border-background-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
               />
               {errors.amount && (
                 <p className="text-danger-600 text-sm mt-1">{errors.amount}</p>
@@ -176,7 +175,7 @@ export default function EditTransactionModal({
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                className="w-full px-3 py-2 border border-background-200 dark:border-background-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
               />
               {errors.date && (
                 <p className="text-danger-600 text-sm mt-1">{errors.date}</p>
@@ -192,7 +191,7 @@ export default function EditTransactionModal({
                 value={formData.categoryId}
                 onChange={handleChange}
                 disabled={!formData.type}
-                className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 disabled:bg-background-50 disabled:text-background-400 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 border border-background-200 dark:border-background-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 disabled:bg-background-50 disabled:text-background-400 disabled:cursor-not-allowed"
               >
                 <option value="">
                   {!formData.type ? 'Select type first' : 'Select a category'}
@@ -224,7 +223,7 @@ export default function EditTransactionModal({
                 onChange={handleChange}
                 placeholder="Add notes about this transaction..."
                 rows={3}
-                className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 resize-none"
+                className="w-full px-3 py-2 border border-background-200 dark:border-background-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 resize-none"
               />
             </div>
 
@@ -238,7 +237,7 @@ export default function EditTransactionModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-background-200 rounded-lg text-background-900 font-medium hover:bg-background-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-background-200 dark:border-background-400 rounded-lg text-background-900 font-medium hover:bg-background-100 dark:hover:bg-background-400 transition-colors"
               >
                 Cancel
               </button>

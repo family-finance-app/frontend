@@ -64,11 +64,11 @@ export default function Accounts() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1
-            className={`${roboto.className} text-3xl font-bold text-background-900 mb-2`}
+            className={`${roboto.className} text-3xl font-bold text-primary-800 mb-2`}
           >
             Financial Accounts
           </h1>
-          <p className="text-background-600">
+          <p className="text-primary-800">
             Update or delete your accounts from Manage Accounts page
           </p>
         </div>
@@ -91,7 +91,6 @@ export default function Accounts() {
         </div>
       </div>
 
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FinancialCard
           title="Personal Accounts"
@@ -140,12 +139,15 @@ export default function Accounts() {
 
       {/* Create Account Form */}
       {showCreateForm && (
-        <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6 animate-scale-in">
-          <h3
-            className={`${roboto.className} text-lg font-semibold mb-6 text-background-900`}
-          >
-            Create New Account
-          </h3>
+        <div className="bg-white dark:bg-background-100 rounded-2xl shadow-financial border border-background-100 p-6 animate-scale-in">
+          <div className="flex justify-between">
+            <h3
+              className={`${roboto.className} text-lg font-semibold mb-6 text-primary-800`}
+            >
+              Create New Account
+            </h3>
+            <p className="text-sm dark:text-stack-600">* required fields</p>
+          </div>
           <CreateAccountForm
             onSuccess={showSuccessMessage}
             onCancel={() => setShowCreateForm(false)}

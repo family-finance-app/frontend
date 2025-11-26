@@ -18,7 +18,7 @@ export function AccountsFilter({
   totalCount,
 }: AccountsFilterProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
+    <div className="bg-white dark:bg-stack-100 rounded-2xl shadow-financial border border-background-100 p-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div>
           <h3
@@ -35,13 +35,13 @@ export function AccountsFilter({
           <span className="text-sm font-medium text-background-700 whitespace-nowrap">
             Filter by type:
           </span>
-          <div className="flex bg-background-100 rounded-xl p-1 gap-1">
+          <div className="flex bg-background-100 dark:bg-background-300 rounded-xl p-1 gap-1">
             <button
               onClick={() => onFilterChange('all')}
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
                 filterType === 'all'
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-background-600 hover:text-background-900'
+                  ? 'bg-white text-primary-800 dark:bg-background-50 shadow-sm'
+                  : 'text-background-600 hover:text-stack-700'
               }`}
             >
               All
@@ -53,7 +53,7 @@ export function AccountsFilter({
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
                   filterType === type
                     ? 'bg-white text-primary-700 shadow-sm'
-                    : 'text-background-600 hover:text-background-900'
+                    : 'text-background-600 dark:text-stack-600 hover:text-background-900'
                 }`}
               >
                 {getAccountTypeName(type)}

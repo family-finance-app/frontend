@@ -1,20 +1,8 @@
-import { ReactNode } from 'react';
+import React from 'react';
 import { roboto, jetbrainsMono } from '../../assets/fonts/fonts';
-
-interface FinancialCardProps {
-  title: string;
-  value: number | string;
-  change?: {
-    value: string | number;
-    type: 'positive' | 'negative' | 'neutral';
-    period?: string;
-  };
-  description?: string;
-  icon?: ReactNode;
-  trend?: ReactNode;
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
+import { AreaChart } from '@/components/charts/AreaChart';
+import { FinancialCardProps } from '@/interfaces/financialCardProps';
+import { formatCurrencyAmount } from '@/utils/formatters';
 
 export default function FinancialCard({
   title,
@@ -25,6 +13,8 @@ export default function FinancialCard({
   trend,
   className = '',
   size = 'md',
+  chartData,
+  chartColor = 'salmon',
 }: FinancialCardProps) {
   const sizeClasses = {
     sm: 'p-4',
@@ -39,19 +29,19 @@ export default function FinancialCard({
   };
 
   const changeColor = {
-    positive: 'text-success-600',
-    negative: 'text-danger-600',
-    neutral: 'text-background-600',
+    positive: 'text-success-700',
+    negative: 'text-danger-700',
+    neutral: 'text-kashmir-500',
   };
 
   return (
     <div
-      className={`bg-white rounded-2xl shadow-financial hover:shadow-financial-lg transition-all duration-300 border border-background-100 ${sizeClasses[size]} ${className}`}
+      className={`bg-white dark:bg-background-100 rounded-2xl shadow-financial hover:shadow-financial-lg transition-all duration-300 border border-background-100 ${sizeClasses[size]} ${className}`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3
-            className={`${roboto.className} text-background-600 font-medium text-sm uppercase tracking-wider`}
+            className={`${roboto.className} text-background-600 dark:text-background-800 font-medium text-sm uppercase tracking-wider`}
           >
             {title}
           </h3>
@@ -82,20 +72,34 @@ export default function FinancialCard({
                 ? `${change.value.toLocaleString()}`
                 : `${change.value}`}
               {change.period && (
-                <span className="text-background-500 font-normal ml-1">
+                <span className="text-background-500 dark:text-primary-800 font-normal ml-1">
                   {change.period}
                 </span>
               )}
             </div>
           )}
           {description && (
-            <div className="text-xs text-background-500 mt-1">
+            <div className="text-xs text-background-500 dark:text-stack-600 mt-1">
               {description}
             </div>
           )}
         </div>
         {trend && <div className="ml-4">{trend}</div>}
       </div>
+
+      {chartData && chartData.length > 0 && (
+        <AreaChart
+          data={chartData}
+          index="date"
+          categories={['amount']}
+          showLegend={false}
+          showYAxis={false}
+          startEndOnly={true}
+          valueFormatter={(value) => formatCurrencyAmount(value)}
+          className="-mb-2 mt-8 h-48"
+          colors={[chartColor]}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
 import {
@@ -16,8 +16,22 @@ import { BarList } from '@/components/charts/BarList';
 import { roboto } from '@/assets/fonts/fonts';
 
 export default function Analytics() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { data: transactions = [], isLoading } = useMyTransactions();
   const { data: categories = [] } = useCategories();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+    const update = () => setIsDarkMode(root.classList.contains('dark'));
+
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
 
   const chartData = useMemo(() => {
     if (!transactions || transactions.length === 0) {
@@ -40,14 +54,14 @@ export default function Analytics() {
   }, [transactions, categories]);
 
   return (
-    <div className="w-full min-h-screen bg-linear-to-br from-background-50 to-background-100 dark:from-background-900 dark:to-background-800 p-6 md:p-8">
+    <div className="w-full min-h-screen bg-linear-to-br from-background-50 to-background-100 dark:from-primary-700 dark:to-background-800 rounded-4xl p-6 md:p-8">
       <div className="mb-12">
         <h1
-          className={`${roboto.variable} text-4xl md:text-5xl font-bold text-background-700 dark:text-background-50 mb-2 font-roboto`}
+          className={`${roboto.variable} text-4xl md:text-5xl font-bold text-background-700 dark:text-background-100 mb-2 font-roboto`}
         >
           Explore Analytics
         </h1>
-        <p className="text-background-600 dark:text-background-300 text-lg">
+        <p className="text-background-600 dark:text-background-200 text-lg">
           With clear visual insights
         </p>
       </div>
@@ -57,13 +71,13 @@ export default function Analytics() {
           <div className="">
             <div className="mb-6">
               <h3
-                className={`${roboto.variable} text-2xl font-bold text-center text-background-600 dark:text-background-50 mb-2 font-roboto`}
+                className={`${roboto.variable} text-2xl font-bold text-center text-background-600 dark:text-background-100 mb-2 font-roboto`}
               >
                 Income Distribution
               </h3>
               <div className="pt-2">
                 <p className="text-sm text-center text-background-700 dark:text-background-300 leading-relaxed">
-                  <span className="font-semibold text-background-700 dark:text-emerald-300">
+                  <span className="font-semibold text-background-700 dark:text-background-200">
                     Breakdown of your total income of all time by source
                     categories by percentage
                   </span>{' '}
@@ -90,13 +104,13 @@ export default function Analytics() {
           <div className="">
             <div className="mb-6">
               <h3
-                className={`${roboto.variable} text-2xl text-center font-bold text-background-600 dark:text-background-50 mb-2 font-roboto`}
+                className={`${roboto.variable} text-2xl text-center font-bold text-background-600 dark:text-background-100 mb-2 font-roboto`}
               >
                 Expenses Distribution
               </h3>
               <div className="pt-2">
                 <p className="text-sm text-center text-background-700 dark:text-background-300 leading-relaxed">
-                  <span className="font-semibold text-background-700 dark:text-amber-300">
+                  <span className="font-semibold text-background-700 dark:text-background-200">
                     This donut chart displays how your spending is distributed
                     across different expense categories by percentage
                   </span>{' '}
@@ -122,7 +136,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className=" dark:bg-background-800 rounded-2xl  p-8 mb-12  border-background-100 dark:border-background-700">
+      <div className=" rounded-2xl  p-8 mb-12  border-background-100 dark:border-background-700">
         <div className="mb-6">
           <h3
             className={`${roboto.variable} text-2xl font-bold text-background-600 dark:text-background-50 mb-2 font-roboto`}
@@ -132,7 +146,7 @@ export default function Analytics() {
         </div>
         {chartData.montlyStats.length > 0 ? (
           <AreaChart
-            className="h-150 w-full text-sm"
+            className="h-150 w-full text-sm  dark:bg-primary-700 p-3 dark:border dark:border-background-300 rounded-3xl"
             data={chartData.montlyStats}
             index="date"
             categories={['Income', 'Expenses']}
@@ -144,7 +158,8 @@ export default function Analytics() {
             intervalType="preserveStartEnd"
             yAxisLabel="UAH"
             fill="gradient"
-            colors={['moss', 'salmon']}
+            colors={['moss', 'salmon', 'pink']}
+            isDarkMode={isDarkMode}
           />
         ) : (
           <div className="text-center py-20 text-background-500 dark:text-background-400">
@@ -159,19 +174,19 @@ export default function Analytics() {
           <div className="relative z-10 flex flex-col md:flex-row items-end justify-center gap-8 md:gap-16 min-h-48">
             <div className="flex-1">
               <h3
-                className={`${roboto.variable} text-2xl font-medium text-background-600 mb-2 font-roboto`}
+                className={`${roboto.variable} text-2xl font-medium text-background-600 dark:text-background-100 mb-2 font-roboto`}
               >
                 Total Savings
               </h3>
               <h2
-                className={`${roboto.variable} text-6xl md:text-7xl font-bold font-roboto text-kashmir-500 leading-none`}
+                className={`${roboto.variable} text-6xl md:text-7xl font-bold font-roboto text-kashmir-500 dark:text-moss-100 leading-none`}
               >
                 {formatCurrencyAmount(chartData.totalSavingsAmount)} UAH
               </h2>
             </div>
 
             <div className="flex-1 pb-4">
-              <p className="text-background-600 text-center font-medium text-2xl">
+              <p className="text-background-600 dark:text-background-200 text-center font-medium text-2xl">
                 All time savings across all accounts
               </p>
             </div>

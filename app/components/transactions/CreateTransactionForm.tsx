@@ -132,7 +132,7 @@ export default function CreateTransactionForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label
-          className={`${roboto.className} block text-sm font-medium text-background-900 mb-2`}
+          className={`${roboto.className} block text-sm font-medium text-background-900 dark:text-primary-800 mb-2`}
         >
           Type
         </label>
@@ -144,8 +144,8 @@ export default function CreateTransactionForm({
               onClick={() => setType(t)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 type === t
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-background-100 text-background-700 hover:bg-background-200'
+                  ? 'bg-primary-600 text-background-50'
+                  : 'bg-background-100 text-background-700 hover:bg-background-200 dark:hover:bg-primary-600 dark:hover:text-background-100'
               }`}
             >
               {t}

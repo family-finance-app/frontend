@@ -53,7 +53,9 @@ export default function CreateAccountForm({
           | 'CASH'
           | 'BANK'
           | 'INVESTMENT'
-          | 'DEPOSIT',
+          | 'DEPOSIT'
+          | 'DIGITAL'
+          | 'SAVINGS',
         balance: Number(formData.balance),
         currency: formData.currency as 'UAH' | 'USD' | 'EUR',
       };
@@ -77,7 +79,6 @@ export default function CreateAccountForm({
         error={errors.name}
       />
 
-      {/* Account Type */}
       <AccountTypeSelect
         value={formData.type}
         onChange={(type) =>
@@ -86,13 +87,11 @@ export default function CreateAccountForm({
         error={errors.type}
       />
 
-      {/* Balance and Currency */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Initial Balance */}
         <AccountBalanceInput
           value={formData.balance}
           onChange={(balance) => setFormField('balance', balance)}
-          symbol={selectedCurrency?.symbol || '$'}
+          symbol={selectedCurrency?.symbol || '₴'}
           error={errors.balance}
         />
 

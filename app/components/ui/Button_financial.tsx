@@ -42,7 +42,7 @@ export default function Button({
     danger:
       'hover:bg-danger-600 disabled:bg-danger-300 text-primary-800 hover:text-white focus:ring-danger-600',
     outline:
-      'hover:bg-brown-700 disabled:bg-brown-300 text-primary-800 focus:ring-brown-500 shadow-lg hover:shadow-xl border-2 border-primary-700',
+      'hover:bg-brown-700 disabled:bg-brown-300 text-primary-800 shadow-lg hover:shadow-xl border-2 border-primary-700 dark:bg-background-100 hover:bg-background-200',
   };
 
   const iconVariants = {

@@ -1,8 +1,6 @@
 @import 'tailwindcss';
-/* @plugin "tailwindcss/forms";
 
-@custom-variant dark (&:where(.dark, .dark *)); */
-
+@custom-variant dark (&:where(.dark, .dark *));
 @theme {
   /* primary green colors, monte-carlo palette */
   --color-primary-50: #d5f8f1;
@@ -98,6 +96,17 @@
   --color-kashmir-300: #87a3ca;
   --color-kashmir-400: #6e8aaf;
   --color-kashmir-500: #5b7292; /* light blue to purple */
+
+  --color-stack-100: #dadfd3;
+  --color-stack-200: #bdc1b7;
+  --color-stack-300: #a3a79d;
+  --color-stack-400: #8b8e86;
+  --color-stack-500: #73756e;
+  --color-stack-600: #575953;
+  --color-stack-700: #40413d;
+  --color-stack-800: #2c2c2a;
+  --color-stack-900: #181917;
+  --color-stack-950: #0c0c0b; /* dark mode */
 
   --spacing-18: 4.5rem;
   --spacing-88: 22rem;

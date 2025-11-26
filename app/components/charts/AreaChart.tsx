@@ -53,7 +53,7 @@ const LegendItem = ({
         // base
         'group inline-flex flex-nowrap items-center gap-1.5 rounded-sm px-2 py-1 whitespace-nowrap transition',
         hasOnValueChange
-          ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'
+          ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-background-100'
           : 'cursor-default'
       )}
       onClick={(e) => {
@@ -72,11 +72,11 @@ const LegendItem = ({
       <p
         className={cx(
           // base
-          'truncate text-xs whitespace-nowrap',
+          'truncate text-sm whitespace-nowrap',
           // text color
-          'text-gray-700 dark:text-gray-300',
+          'text-gray-700 dark:text-background-50',
           hasOnValueChange &&
-            'group-hover:text-gray-900 dark:group-hover:text-gray-50',
+            'group-hover:text-gray-900 dark:group-hover:text-background-200',
           activeLegend && activeLegend !== name ? 'opacity-40' : 'opacity-100'
         )}
       >
@@ -287,7 +287,7 @@ const Legend = React.forwardRef<HTMLOListElement, LegendProps>((props, ref) => {
               // base
               'absolute top-0 right-0 bottom-0 flex h-full items-center justify-center pr-1',
               // background color
-              'bg-white dark:bg-gray-950'
+              'bg-white dark:bg-gray-200'
             )}
           >
             <ScrollButton
@@ -395,9 +395,9 @@ const ChartTooltip = ({
           // base
           'rounded-md border text-sm shadow-md',
           // border color
-          'border-gray-200 dark:border-gray-800',
+          'border-gray-200 dark:border-stack-200',
           // background color
-          'bg-white dark:bg-gray-950'
+          'bg-white dark:bg-stack-600'
         )}
       >
         <div className={cx('border-b border-inherit px-4 py-2')}>
@@ -500,6 +500,7 @@ interface AreaChartProps extends React.HTMLAttributes<HTMLDivElement> {
   fill?: 'gradient' | 'solid' | 'none';
   tooltipCallback?: (tooltipCallbackContent: TooltipProps) => void;
   customTooltip?: React.ComponentType<TooltipProps>;
+  isDarkMode?: boolean;
 }
 
 const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
@@ -534,6 +535,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
       fill = 'gradient',
       tooltipCallback,
       customTooltip,
+      isDarkMode,
       ...other
     } = props;
     const CustomTooltip = customTooltip;
@@ -555,6 +557,29 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
 
     const prevActiveRef = React.useRef<boolean | undefined>(undefined);
     const prevLabelRef = React.useRef<string | undefined>(undefined);
+    const [detectedDarkMode, setDetectedDarkMode] = React.useState(false);
+
+    React.useEffect(() => {
+      if (typeof window === 'undefined') return;
+      if (typeof isDarkMode === 'boolean') return;
+
+      const root = document.documentElement;
+      const update = () => {
+        setDetectedDarkMode(root.classList.contains('dark'));
+      };
+
+      update();
+
+      const observer = new MutationObserver(update);
+      observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+      return () => observer.disconnect();
+    }, [isDarkMode]);
+
+    const resolvedIsDarkMode =
+      typeof isDarkMode === 'boolean' ? isDarkMode : detectedDarkMode;
+    const axisTickColor = resolvedIsDarkMode ? '#E2E8F0' : '#475569';
+    const axisLabelColor = resolvedIsDarkMode ? '#CBD5F5' : '#1E293B';
 
     const getFillContent = ({
       fillType,
@@ -671,7 +696,9 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
           >
             {showGridLines ? (
               <CartesianGrid
-                className={cx('stroke-gray-200 stroke-1 dark:stroke-gray-800')}
+                className={cx(
+                  'stroke-stack-200 stroke-1 dark:stroke-stack-400'
+                )}
                 horizontal={true}
                 vertical={false}
               />
@@ -681,9 +708,12 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
               hide={!showXAxis}
               dataKey={index}
               interval={startEndOnly ? 'preserveStartEnd' : intervalType}
-              tick={{ transform: 'translate(0, 6)' }}
+              tick={{
+                transform: 'translate(0, 6)',
+                fill: axisTickColor,
+              }}
               ticks={
-                startEndOnly
+                startEndOnly && data.length > 0
                   ? [data[0][index], data[data.length - 1][index]]
                   : undefined
               }
@@ -703,7 +733,8 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
                 <Label
                   position="insideBottom"
                   offset={-20}
-                  className="fill-gray-800 text-sm font-medium dark:fill-gray-200"
+                  className="text-sm font-medium"
+                  style={{ fill: axisLabelColor }}
                 >
                   {xAxisLabel}
                 </Label>
@@ -716,7 +747,10 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
               tickLine={false}
               type="number"
               domain={yAxisDomain as AxisDomain}
-              tick={{ transform: 'translate(-3, 0)' }}
+              tick={{
+                transform: 'translate(-3, 0)',
+                fill: axisTickColor,
+              }}
               fill=""
               stroke=""
               className={cx(
@@ -733,10 +767,10 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
               {yAxisLabel && (
                 <Label
                   position="insideLeft"
-                  style={{ textAnchor: 'middle' }}
+                  style={{ textAnchor: 'middle', fill: axisLabelColor }}
                   angle={-90}
                   offset={-15}
-                  className="fill-gray-800 text-sm font-medium dark:fill-gray-200"
+                  className="text-sm font-medium"
                 >
                   {yAxisLabel}
                 </Label>
@@ -889,7 +923,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
                       return (
                         <Dot
                           className={cx(
-                            'stroke-white dark:stroke-gray-950',
+                            'stroke-white dark:stroke-gray-100',
                             onValueChange ? 'cursor-pointer' : '',
                             getColorClassName(
                               categoryColors.get(
@@ -943,7 +977,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
                             strokeLinejoin={strokeLinejoin}
                             strokeWidth={strokeWidth}
                             className={cx(
-                              'stroke-white dark:stroke-gray-950',
+                              'stroke-white dark:stroke-gray-100',
                               onValueChange ? 'cursor-pointer' : '',
                               getColorClassName(
                                 categoryColors.get(

@@ -42,7 +42,7 @@ export function DashboardTransactionsSection({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border border-background-200 p-6">
+      <div className="bg-white  rounded-2xl border border-background-200 p-6">
         <div className="animate-pulse">
           <div className="h-6 bg-background-200 rounded w-1/3 mb-4"></div>
           <div className="space-y-3">
@@ -67,7 +67,7 @@ export function DashboardTransactionsSection({
       <TransactionList
         transactions={transactions}
         title="Recent Transactions"
-        maxItems={5}
+        maxItems={6}
         showAccount={true}
         accounts={accounts}
         categories={categories}

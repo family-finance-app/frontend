@@ -4,6 +4,7 @@ import { Account } from '@/types/account';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import { getAccountTypeName } from '@/utils/accounts';
 import { formatCurrencyAmount } from '@/utils/formatters';
+import Link from 'next/link';
 
 interface AccountCardProps {
   account: Account;
@@ -44,36 +45,39 @@ export function AccountCard({ account }: AccountCardProps) {
   const colors = getCardColorStyles(account.type);
 
   return (
-    <div
-      className={`rounded-2xl shadow-financial bg-background-700 border-background-500 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105 group`}
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div>
-            <h4
-              className={`${roboto.className} font-semibold text-background-100`}
+    <Link href={`/settings/accounts?accountId=${account.id}`}>
+      <div
+        className={`rounded-2xl shadow-financial bg-primary-700 dark:bg-primary-800 border-background-500 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105 group`}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h4
+                className={`${roboto.className} font-semibold text-background-100 underline-offset-2 hover:underline`}
+              >
+                {account.name}
+              </h4>
+
+              <p className={`text-sm font-medium ${colors.accent}`}>
+                {getAccountTypeName(account.type)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <div className="flex items-baseline space-x-2">
+            <span
+              className={`${jetbrainsMono.className} text-2xl font-bold text-background-100`}
             >
-              {account.name}
-            </h4>
-            <p className={`text-sm font-medium ${colors.accent}`}>
-              {getAccountTypeName(account.type)}
-            </p>
+              {formatCurrencyAmount(account.balance)}
+            </span>
+            <span className="text-sm text-background-100">
+              {account.currency}
+            </span>
           </div>
         </div>
       </div>
-
-      <div className="mb-4">
-        <div className="flex items-baseline space-x-2">
-          <span
-            className={`${jetbrainsMono.className} text-2xl font-bold text-background-100`}
-          >
-            {formatCurrencyAmount(account.balance)}
-          </span>
-          <span className="text-sm text-background-100">
-            {account.currency}
-          </span>
-        </div>
-      </div>
-    </div>
+    </Link>
   );
 }

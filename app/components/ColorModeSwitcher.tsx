@@ -45,7 +45,6 @@ export default function ColorModeSwitcher() {
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {isDark ? (
-        // Sun icon for switching to light mode
         <svg
           className="w-5 h-5"
           fill="none"
@@ -60,7 +59,6 @@ export default function ColorModeSwitcher() {
           />
         </svg>
       ) : (
-        // Moon icon for switching to dark mode
         <svg
           className="w-5 h-5"
           fill="none"

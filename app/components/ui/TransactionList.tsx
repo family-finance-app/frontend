@@ -63,19 +63,19 @@ function TransactionItem({
 
   const typeConfig = {
     INCOME: {
-      color: 'text-success-600',
+      color: 'text-success-700 dark:text-primary-200',
       bgColor: 'bg-success-50',
       icon: '↗',
       prefix: '+',
     },
     EXPENSE: {
-      color: 'text-danger-600',
+      color: 'text-danger-700 dark:text-danger-300',
       bgColor: 'bg-danger-50',
       icon: '↙',
       prefix: '-',
     },
     TRANSFER: {
-      color: 'text-primary-600',
+      color: 'text-kashmir-500 dark:text-stack-200',
       bgColor: 'bg-primary-50',
       icon: '⇄',
       prefix: '',
@@ -86,18 +86,14 @@ function TransactionItem({
     typeConfig[transaction.type as keyof typeof typeConfig] ||
     typeConfig.EXPENSE;
 
-  // Find category by ID
   const category = categories.find((cat) => cat.id === transaction.categoryId);
   const categoryName = transaction.category?.name || category?.name || 'Other';
 
-  // Use description as title if available, otherwise use category name
   const transactionTitle = transaction.description || categoryName;
 
-  // Find account by ID
   const accountData =
     transaction.account ||
     accounts.find((acc) => acc.id === transaction.accountId);
-  // Handle both 'title' (from transaction.account) and 'name' (from accounts array)
   const accountTitle =
     (accountData as any)?.title || (accountData as any)?.name || 'Account';
 
@@ -105,23 +101,21 @@ function TransactionItem({
     <div
       className={`flex items-center justify-between ${
         compact ? 'py-2' : 'py-3'
-      } border-b border-background-100 last:border-b-0 hover:bg-background-50 transition-colors duration-200`}
+      } border-b border-background-100 last:border-b-0  transition-colors duration-200`}
     >
       <div className="flex items-center space-x-3 flex-1">
-        {/* Type Icon */}
         <div
           className={`w-8 h-8 rounded-lg ${config.bgColor} flex items-center justify-center text-sm`}
         >
           {config.icon}
         </div>
 
-        {/* Transaction Details */}
         <div className="flex-1">
           <div className="flex items-center space-x-2">
             <p
               className={`font-medium ${
                 compact ? 'text-sm' : 'text-base'
-              } text-background-900`}
+              } text-background-900 dark:text-background-50`}
             >
               {transactionTitle !== 'Other'
                 ? transactionTitle
@@ -135,22 +129,20 @@ function TransactionItem({
             </p>
           </div>
           <div className="flex items-center space-x-3 mt-1">
-            {/* Show account first if available */}
             {accountData && (
               <>
                 <p
-                  className={`text-background-500 font-medium ${
+                  className={`text-background-500 dark:text-primary-300 font-medium ${
                     compact ? 'text-xs' : 'text-sm'
                   }`}
                 >
                   {accountTitle}
                 </p>
-                <span className="text-background-300">•</span>
+                <span className="text-background-300 ">•</span>
               </>
             )}
-            {/* Show category info */}
             <p
-              className={`text-background-500 ${
+              className={`text-background-500 dark:text-background-200 ${
                 compact ? 'text-xs' : 'text-sm'
               }`}
             >
@@ -158,7 +150,7 @@ function TransactionItem({
             </p>
             <span className="text-background-300">•</span>
             <p
-              className={`text-background-500 ${
+              className={`text-background-500 dark:text-background-400 ${
                 compact ? 'text-xs' : 'text-sm'
               }`}
             >
@@ -172,10 +164,9 @@ function TransactionItem({
         </div>
       </div>
 
-      {/* Amount and Action Button */}
       <div className="flex items-center space-x-3">
         <div
-          className={`${jetbrainsMono.className} font-semibold ${
+          className={`${jetbrainsMono.className} font-mono ${
             compact ? 'text-sm' : 'text-base'
           } ${config.color} whitespace-nowrap`}
         >
@@ -184,13 +175,12 @@ function TransactionItem({
           {transaction.account?.currency || 'UAH'}
         </div>
 
-        {/* Edit Menu Button */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="p-2 hover:bg-background-100 rounded-lg transition-colors duration-200"
+          className="p-2 hover:bg-background-100 dark:hover:bg-background-600 rounded-lg transition-colors duration-200"
           title="Edit or delete transaction"
         >
-          ⋯
+          <span className="dark:text-background-100">⋯</span>
         </button>
       </div>
 
@@ -219,11 +209,8 @@ export default function TransactionList({
   onEditTransaction,
 }: TransactionListProps) {
   const sortedTransactions = [...transactions].sort((a, b) => {
-    // Sort by createdAt (date added) - newest first (descending order)
     const dateA = new Date(a.createdAt || 0).getTime();
     const dateB = new Date(b.createdAt || 0).getTime();
-
-    // If dates are equal, sort by ID (descending) to ensure consistent order
     if (dateA === dateB) {
       return b.id - a.id;
     }
@@ -236,18 +223,20 @@ export default function TransactionList({
     : sortedTransactions;
 
   return (
-    <div className="bg-white rounded-2xl shadow-financial border border-background-100">
+    <div className="bg-white dark:bg-primary-800 rounded-2xl shadow-financial border border-background-100 dark:border-background-700">
       {showHeader && (
         <div className="flex items-center justify-between p-6 border-b border-background-100">
-          <h3 className="text-lg font-semibold text-background-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-background-900 dark:text-stack-100">
+            {title}
+          </h3>
           {actions}
         </div>
       )}
 
       <div className={showHeader ? 'p-6' : 'p-4'}>
         {displayTransactions.length === 0 ? (
-          <div className="text-center py-8 text-background-500">
-            <div className="text-4xl mb-2">💸</div>
+          <div className="text-center py-8 text-background-500 dark:text-stack-100">
+            <div className="text-4xl mb-2"></div>
             <p>{emptyMessage}</p>
           </div>
         ) : (

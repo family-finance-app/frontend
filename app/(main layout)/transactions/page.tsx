@@ -24,7 +24,7 @@ import { formatTransactionsForList } from '@/utils/transactions';
 
 export default function MyTransactions() {
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [lastCreatedId, setLastCreatedId] = useState<number | null>(null);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -56,12 +56,12 @@ export default function MyTransactions() {
 
   const stats = calculateTransactionStats(filteredTransactions);
 
-  const showSuccessMessage = (transactionId: number) => {
-    setLastCreatedId(transactionId);
+  const showSuccessMessage = () => {
+    setIsVisible(true);
     setShowCreateForm(false);
 
     setTimeout(() => {
-      setLastCreatedId(null);
+      setIsVisible(false);
     }, 3000);
   };
 
@@ -77,15 +77,15 @@ export default function MyTransactions() {
 
   return (
     <div className="space-y-6">
-      <TransactionsHeader onAddClick={() => setShowCreateForm(true)} />
+      {/* <TransactionsHeader onAddClick={() => setShowCreateForm(true)} /> */}
 
-      <TransactionSuccessMessage visible={!!lastCreatedId} />
+      <TransactionSuccessMessage visible={isVisible} />
 
-      <CreateTransactionSection
+      {/* <CreateTransactionSection
         isVisible={showCreateForm}
         onSuccess={showSuccessMessage}
         onCancel={() => setShowCreateForm(false)}
-      />
+      /> */}
 
       <TransactionsFilters
         filterType={filterType}
@@ -122,7 +122,7 @@ export default function MyTransactions() {
           onEditTransaction={handleEditTransaction}
           actions={
             <div className="flex items-center space-x-3">
-              <span className="text-sm text-background-600">
+              <span className="text-sm text-background-600 dark:text-background-100">
                 {filteredTransactions.length} transactions
               </span>
             </div>

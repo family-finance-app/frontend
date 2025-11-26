@@ -8,11 +8,6 @@ interface SidebarExchangeRatesWidgetProps {
   compact?: boolean;
 }
 
-/**
- * Exchange Rates Widget for Sidebar
- * Displays current USD/EUR to UAH exchange rates
- * Available in compact mode for sidebar and full mode for dashboard
- */
 export function SidebarExchangeRatesWidget({
   compact = false,
 }: SidebarExchangeRatesWidgetProps) {
@@ -40,7 +35,6 @@ export function SidebarExchangeRatesWidget({
   ];
 
   if (compact) {
-    // compact version for sidebar
     if (isLoading || !rates) {
       return (
         <div className="bg-background-50 rounded-lg p-3 space-y-2">
@@ -51,16 +45,16 @@ export function SidebarExchangeRatesWidget({
     }
 
     return (
-      <div className="bg-background-50 rounded-lg p-3 space-y-2">
+      <div className="bg-background-50 dark:bg-background-100 dark:text-primary-800 rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-semibold text-background-900 uppercase tracking-wider">
             Exchange Rates
           </span>
           <div className="relative group">
-            <button className="text-xs text-background-500 hover:text-background-700 transition-colors">
+            <button className="text-xs text-background-500 dark:text-background-800 hover:text-background-700 transition-colors">
               ⓘ
             </button>
-            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-background-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-50">
+            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-stack-600 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-50">
               {lastUpdated && `Updated: ${lastUpdated}`}
             </div>
           </div>

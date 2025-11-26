@@ -1,25 +1,9 @@
 'use client';
 
+import React from 'react';
 import FinancialCard from '@/components/ui/FinancialCard';
 import { formatCurrencyAmount } from '@/utils/formatters';
-
-interface DashboardStatsSectionProps {
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  savings: number;
-  savingsRate: number;
-  period: 'week' | 'month' | 'year';
-  incomeChange?: {
-    value: number;
-    type: 'positive' | 'negative' | 'neutral';
-    displayValue: string;
-  };
-  expensesChange?: {
-    value: number;
-    type: 'positive' | 'negative' | 'neutral';
-    displayValue: string;
-  };
-}
+import { DashboardStatsSectionProps } from '@/interfaces/dashboardStatsSectionProps';
 
 const INCOME_ICON = (
   <svg
@@ -70,13 +54,16 @@ const SAVINGS_ICON = (
 );
 
 export function DashboardStatsSection({
-  monthlyIncome,
-  monthlyExpenses,
+  income,
+  expenses,
   savings,
   savingsRate,
   period,
   incomeChange,
   expensesChange,
+  incomeComparison,
+  expensesComparison,
+  savingsComparison,
 }: DashboardStatsSectionProps) {
   const getPeriodLabels = () => {
     switch (period) {
@@ -111,26 +98,30 @@ export function DashboardStatsSection({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-      <FinancialCard
-        title={labels.income}
-        value={formatCurrencyAmount(monthlyIncome)}
-        change={
-          incomeChange
-            ? {
-                value: incomeChange.displayValue,
-                type: incomeChange.type,
-                period: ` vs ${labels.comparison}`,
-              }
-            : undefined
-        }
-        description={`All income sources ${labels.description}`}
-        size="md"
-        icon={INCOME_ICON}
-      />
+      <div>
+        <FinancialCard
+          title={labels.income}
+          value={formatCurrencyAmount(income)}
+          change={
+            incomeChange
+              ? {
+                  value: incomeChange.displayValue,
+                  type: incomeChange.type,
+                  period: ` vs ${labels.comparison}`,
+                }
+              : undefined
+          }
+          description={`All income sources ${labels.description}`}
+          size="md"
+          icon={INCOME_ICON}
+          chartData={incomeComparison}
+          chartColor="moss"
+        />
+      </div>
 
       <FinancialCard
         title={labels.expenses}
-        value={formatCurrencyAmount(monthlyExpenses)}
+        value={formatCurrencyAmount(expenses)}
         change={
           expensesChange
             ? {
@@ -143,6 +134,8 @@ export function DashboardStatsSection({
         description={`All spending ${labels.description}`}
         size="md"
         icon={EXPENSES_ICON}
+        chartData={expensesComparison}
+        chartColor="salmon"
       />
 
       <FinancialCard
@@ -156,6 +149,8 @@ export function DashboardStatsSection({
         description={`All savings ${labels.description}`}
         size="md"
         icon={SAVINGS_ICON}
+        chartData={savingsComparison}
+        chartColor="kashmir"
       />
     </div>
   );

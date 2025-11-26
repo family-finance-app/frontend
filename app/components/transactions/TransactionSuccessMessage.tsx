@@ -12,7 +12,7 @@ export default function TransactionSuccessMessage({
       <div className="flex items-center">
         <div className="shrink-0">
           <svg
-            className="h-5 w-5 text-success-600"
+            className="h-5 w-5 text-primary-600"
             fill="currentColor"
             viewBox="0 0 20 20"
           >

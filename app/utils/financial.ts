@@ -7,7 +7,7 @@ import { Category } from '@/types/category';
 export function calculatePeriodStats(
   transactions: Transaction[],
   period: 'week' | 'month' | 'year' = 'month',
-  accounts?: Account[]
+  _accounts?: Account[]
 ) {
   const now = new Date();
   let startDate = new Date();
@@ -41,13 +41,15 @@ export function calculatePeriodStats(
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 
-  const savingsAmount = periodTransactions
+  const transfers = periodTransactions
     .filter((t) => t.type === 'TRANSFER')
     .reduce((sum, t) => {
       const amount =
         typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
+
+  const savingsAmount = transfers;
 
   const savingsRate = income > 0 ? (savingsAmount / income) * 100 : 0;
 
@@ -56,6 +58,7 @@ export function calculatePeriodStats(
     expenses,
     netAmount: income - expenses,
     savings: savingsAmount,
+    transfers,
     savingsRate: savingsRate,
     savingsPercentage: savingsRate,
     changeType:

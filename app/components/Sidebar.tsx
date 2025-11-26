@@ -86,7 +86,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile hamburger button */}
       <button
         id="toggleSidebarMobile"
         className="lg:hidden fixed top-4 left-4 z-30 p-2 text-white bg-primary-600 hover:bg-primary-500 rounded-lg transition-colors duration-200"
@@ -111,11 +110,10 @@ export default function Sidebar() {
         id="sidebar"
         className={`fixed top-0 left-0 z-20 w-72 h-full pt-16 duration-300 transition-transform ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 bg-white border-r border-background-200 shadow-lg`}
+        } lg:translate-x-0 bg-white border-r dark:bg-primary-800 border-background-200 dark:border-background-700 shadow-lg`}
         aria-label="Sidebar"
       >
         <div className="h-full px-4 py-6 overflow-y-auto">
-          {/* Navigation Menu */}
           <div className="mb-8">
             <SidebarMenu
               items={menuItems}
@@ -124,12 +122,10 @@ export default function Sidebar() {
             />
           </div>
 
-          {/* Exchange Rates Widget */}
           <div className="mb-6">
             <SidebarExchangeRatesWidget compact={true} />
           </div>
 
-          {/* Account Summary */}
           <div className="mb-6">
             <SidebarBalanceWidget />
           </div>

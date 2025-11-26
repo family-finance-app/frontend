@@ -17,10 +17,6 @@ interface SidebarMenuProps {
   onToggleExpanded: (itemId: string) => void;
 }
 
-/**
- * Sidebar Menu Component
- * Renders navigation menu with support for nested items and badges
- */
 export function SidebarMenu({
   items,
   expandedItems,
@@ -44,7 +40,7 @@ export function SidebarMenu({
             type="button"
             className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 group ${
               active
-                ? 'bg-primary-100 text-primary-800 shadow-sm'
+                ? 'bg-primary-500 text-primary-800 shadow-sm dark:bg-stack-700'
                 : 'text-background-700 hover:bg-background-100 hover:text-background-900'
             } ${level > 0 ? 'ml-4 text-sm' : 'text-base font-medium'}`}
             onClick={() => onToggleExpanded(item.id)}
@@ -78,8 +74,8 @@ export function SidebarMenu({
             href={item.href}
             className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 group ${
               active
-                ? 'bg-primary-100 text-primary-800 shadow-sm border-l-4 border-primary-500'
-                : 'text-background-700 hover:bg-background-100 hover:text-background-900'
+                ? 'bg-primary-100 dark:bg-background-100 text-primary-800 shadow-sm border-l-4 border-primary-600'
+                : 'text-background-700 dark:text-stack-200 hover:text-primary-800 dark:hover:text-background-50'
             } ${level > 0 ? 'ml-4 text-sm' : 'text-base font-medium'}`}
           >
             <span>{item.label}</span>

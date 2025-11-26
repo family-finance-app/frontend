@@ -43,29 +43,35 @@ export function SidebarBalanceWidget() {
   }
 
   return (
-    <div className="bg-background-50 rounded-lg p-4 space-y-3">
+    <div className="bg-background-50 dark:bg-background-100 rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-semibold text-background-900 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-background-900 dark:text-background-800 uppercase tracking-wider">
           Balance
         </span>
       </div>
       <div className="flex justify-between items-center text-sm">
-        <span className=" text-background-600">Total Balance</span>
-        <span className="font-mono font-semibold text-background-900">
+        <span className=" text-background-600 dark:text-background-800">
+          Total Balance
+        </span>
+        <span className="font-mono font-semibold text-background-900 dark:text-background-800">
           {formatCurrencyAmount(totalBalance)} UAH
         </span>
       </div>
 
       <div className="flex justify-between items-center text-sm">
-        <span className=" text-background-600">Monthly income</span>
-        <span className="font-mono font-semibold text-success-600">
+        <span className=" text-background-600 dark:text-background-800">
+          Monthly income
+        </span>
+        <span className="font-mono font-semibold text-success-700">
           +{formatCurrencyAmount(monthlyStats.income)}
         </span>
       </div>
 
       <div className="flex justify-between items-center text-sm">
-        <span className=" text-background-600">Monthly expenses</span>
-        <span className="font-mono font-semibold text-danger-600">
+        <span className=" text-background-600 dark:text-background-800">
+          Monthly expenses
+        </span>
+        <span className="font-mono font-semibold text-danger-700">
           -{formatCurrencyAmount(monthlyStats.expenses)}
         </span>
       </div>

@@ -76,7 +76,7 @@ export function AccountTypeSelect({
       <label
         className={`${roboto.className} block text-sm font-semibold text-background-900 mb-3`}
       >
-        Account Type
+        Account Type *
       </label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {ACCOUNT_TYPES.map((type) => (
@@ -84,8 +84,8 @@ export function AccountTypeSelect({
             key={type.value}
             className={`relative flex items-center p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:bg-background-50 ${
               value === type.value
-                ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'
-                : 'border-background-300 bg-white hover:border-background-400'
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-300 dark:hover:bg-primary-400 ring-2 ring-primary-200'
+                : 'border-background-300 bg-white dark:bg-stack-200 dark:hover:bg-primary-400 hover:border-background-400'
             }`}
           >
             <input
@@ -101,8 +101,8 @@ export function AccountTypeSelect({
                 {type.icon}
               </div>
               <div>
-                <p className="font-medium text-background-900">{type.label}</p>
-                <p className="text-sm text-background-600">
+                <p className="font-medium text-primary-800">{type.label}</p>
+                <p className="text-sm text-background-600 dark:text-stack-600">
                   {type.description}
                 </p>
               </div>

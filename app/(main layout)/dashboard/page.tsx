@@ -21,6 +21,11 @@ import { enrichTransactionsWithData } from '@/utils/transactions';
 import { formatAccountsForWidget } from '@/utils/accounts';
 import { formatTransactionsForList } from '@/utils/transactions';
 import { useTotalBalanceInUAH } from '@/hooks/useTotalBalanceInUAH';
+import {
+  getPeriodExpenseComparison,
+  getPeriodIncomeComparison,
+  getPeriodSavingsComparison,
+} from '@/utils/stats';
 
 export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>(
@@ -28,7 +33,7 @@ export default function Dashboard() {
   );
   const [isClient, setIsClient] = useState(false);
   const { data: accounts, isLoading: accountsLoading } = useMyAccounts();
-  const { data: transactions, isLoading: transactionsLoading } =
+  const { data: transactions = [], isLoading: transactionsLoading } =
     useMyTransactions();
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategories();
@@ -70,6 +75,22 @@ export default function Dashboard() {
     categories
   );
 
+  const periodIncomeComparison = getPeriodIncomeComparison(
+    transactions,
+    timeframe
+  );
+
+  const periodExpensesComparison = getPeriodExpenseComparison(
+    transactions,
+    timeframe
+  );
+
+  const periodSavingsComparison = getPeriodSavingsComparison(
+    transactions,
+    accounts,
+    timeframe
+  );
+
   if (!isClient) {
     return null;
   }
@@ -89,13 +110,16 @@ export default function Dashboard() {
 
         <div className="xl:col-span-2">
           <DashboardStatsSection
-            monthlyIncome={periodStats.income}
-            monthlyExpenses={periodStats.expenses}
+            income={periodStats.income}
+            expenses={periodStats.expenses}
             savings={periodStats.savings}
             savingsRate={periodStats.savingsRate}
             period={timeframe}
             incomeChange={incomeChange}
             expensesChange={expensesChange}
+            incomeComparison={periodIncomeComparison}
+            expensesComparison={periodExpensesComparison}
+            savingsComparison={periodSavingsComparison}
           />
         </div>
       </div>

@@ -281,7 +281,7 @@ const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
             )}
             <Pie
               className={cx(
-                'stroke-white dark:stroke-gray-950 [&_.recharts-pie-sector]:outline-hidden',
+                'stroke-white dark:stroke-background-50 [&_.recharts-pie-sector]:outline-hidden',
                 onValueChange ? 'cursor-pointer' : 'cursor-default'
               )}
               data={parseData(data, categoryColors, category)}

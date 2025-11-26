@@ -27,12 +27,12 @@ export function CurrencySelect({
       <label
         className={`${roboto.className} block text-sm font-semibold text-background-900 mb-2`}
       >
-        Currency
+        Currency *
       </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 border border-background-300 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-background-400"
+        className="w-full px-4 py-3 border border-background-300 rounded-xl bg-white dark:bg-stack-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-background-400 dark:text-primary-700"
       >
         {CURRENCIES.map((currency) => (
           <option key={currency.value} value={currency.value}>
@@ -59,9 +59,9 @@ export function AccountBalanceInput({
   return (
     <div>
       <label
-        className={`${roboto.className} block text-sm font-semibold text-background-900 mb-2`}
+        className={`${roboto.className} block text-sm font-semibold text-primary-800 mb-2`}
       >
-        Initial Balance
+        Initial Balance *
       </label>
       <div className="relative">
         <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-background-500 font-medium">
@@ -75,8 +75,8 @@ export function AccountBalanceInput({
           placeholder="0.00"
           className={`w-full pl-8 pr-4 py-3 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
             error
-              ? 'border-danger-300 bg-danger-50'
-              : 'border-background-300 bg-white hover:border-background-400 focus:bg-background-50'
+              ? 'border-danger-600 bg-danger-50'
+              : 'border-background-300 bg-white dark:bg-stack-200 hover:border-background-400 focus:bg-background-50 dark:text-primary-700'
           }`}
         />
       </div>
@@ -114,9 +114,9 @@ export function AccountNameInput({
   return (
     <div>
       <label
-        className={`${roboto.className} block text-sm font-semibold text-background-900 mb-2`}
+        className={`${roboto.className} block text-sm font-semibold text-primary-800 mb-2`}
       >
-        Account Name
+        Account Name *
       </label>
       <input
         type="text"
@@ -125,8 +125,8 @@ export function AccountNameInput({
         placeholder="e.g., Revolut Debit Card"
         className={`w-full px-4 py-3 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
           error
-            ? 'border-danger-300 bg-danger-50'
-            : 'border-background-300 bg-white hover:border-background-400 focus:bg-background-50'
+            ? 'border-danger-600 bg-danger-50'
+            : 'border-background-300 bg-white dark:bg-stack-200 hover:border-background-400 focus:bg-background-50 dark:text-primary-700'
         }`}
         maxLength={50}
       />
