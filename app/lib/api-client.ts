@@ -2,7 +2,8 @@
 
 import { ApiError } from '@/types/auth';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.familyfinance.site';
 
 export interface RequestConfig extends RequestInit {
   token?: string;
@@ -11,7 +12,7 @@ export interface RequestConfig extends RequestInit {
 class APIClient {
   private baseURL: string;
 
-  constructor(baseURL: string = BACKEND_URL || 'http://localhost') {
+  constructor(baseURL: string = BACKEND_URL) {
     this.baseURL = baseURL;
   }
 
