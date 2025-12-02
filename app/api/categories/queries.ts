@@ -22,7 +22,7 @@ export const useCategories = () => {
   return useQuery({
     queryKey: queryKeys.categories.all,
     queryFn: async (): Promise<Category[]> => {
-      return apiClient.get<Category[]>('/api/categories', {
+      return apiClient.get<Category[]>('/categories', {
         token: token || undefined,
       });
     },

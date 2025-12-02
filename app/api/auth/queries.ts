@@ -17,7 +17,7 @@ export const useCurrentUser = () => {
       if (!token) {
         throw new Error('No auth token');
       }
-      const response = await apiClient.get<UserResponse>('/api/auth/me', {
+      const response = await apiClient.get<UserResponse>('/auth/me', {
         token: token,
       });
       return response.user;

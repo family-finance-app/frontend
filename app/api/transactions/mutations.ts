@@ -20,7 +20,7 @@ export const useCreateTransaction = () => {
       data: CreateTransactionFormData
     ): Promise<Transaction> => {
       const token = getAuthToken();
-      return apiClient.post<Transaction>('/api/transactions/create', data, {
+      return apiClient.post<Transaction>('/transactions/create', data, {
         token: token || undefined,
       });
     },
@@ -46,7 +46,7 @@ export const useUpdateTransaction = () => {
       const token = getAuthToken();
 
       return apiClient.put<Transaction>(
-        `/api/transactions/update`,
+        `/transactions/update`,
         {
           id,
           ...data,
@@ -75,7 +75,7 @@ export const useDeleteTransaction = () => {
       const token = getAuthToken();
 
       try {
-        await apiClient.delete<void>(`/api/transactions/delete/${id}`, {
+        await apiClient.delete<void>(`/transactions/delete/${id}`, {
           token: token || undefined,
         });
       } catch (error) {
@@ -111,7 +111,7 @@ export const useCreateTransfer = () => {
     ): Promise<TransactionResponse> => {
       const token = getAuthToken();
       return apiClient.post<TransactionResponse>(
-        '/api/transactions/transfer',
+        '/transactions/transfer',
         { ...data, categoryId: 68 },
         {
           token: token || undefined,

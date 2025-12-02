@@ -22,7 +22,7 @@ export const useAccounts = () => {
   return useQuery({
     queryKey: queryKeys.accounts.all,
     queryFn: async (): Promise<Account[]> => {
-      return apiClient.get<Account[]>('/api/accounts', {
+      return apiClient.get<Account[]>('/accounts', {
         token: token || undefined,
       });
     },
@@ -43,7 +43,7 @@ export const useAccount = (id: number) => {
   return useQuery({
     queryKey: queryKeys.accounts.detail(id),
     queryFn: async (): Promise<Account> => {
-      return apiClient.get<Account>(`/api/accounts/${id}`, {
+      return apiClient.get<Account>(`/accounts/${id}`, {
         token: token || undefined,
       });
     },
@@ -64,7 +64,7 @@ export const useMyAccounts = () => {
   return useQuery({
     queryKey: queryKeys.accounts.my,
     queryFn: async (): Promise<Account[]> => {
-      return apiClient.get<Account[]>('/api/accounts/my', {
+      return apiClient.get<Account[]>('/accounts/my', {
         token: token || undefined,
       });
     },
