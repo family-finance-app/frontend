@@ -1,3 +1,8 @@
+## Hosted Environments
+
+- Development API: [https://dev.familyfinance.site](https://dev.familyfinance.site)
+- Production API: [https://familyfinance.site](https://familyfinance.site)
+
 ## Getting Started
 
 First, run the development server:
