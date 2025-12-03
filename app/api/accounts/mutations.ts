@@ -16,7 +16,7 @@ export const useCreateAccount = () => {
     mutationFn: async (formData: CreateAccountFormData): Promise<Account> => {
       const token = getAuthToken();
       return apiClient.post<Account>(
-        '/api/accounts/create',
+        '/accounts/create',
         {
           name: formData.name,
           type: formData.type,
@@ -46,7 +46,7 @@ export const useUpdateAccount = () => {
       data: Partial<CreateAccountFormData>;
     }): Promise<Account> => {
       const token = getAuthToken();
-      return apiClient.put<Account>(`/api/accounts/${id}`, data, {
+      return apiClient.put<Account>(`/accounts/${id}`, data, {
         token: token || undefined,
       });
     },
@@ -67,7 +67,7 @@ export const useDeleteAccount = () => {
   return useMutation({
     mutationFn: async (id: number): Promise<void> => {
       const token = getAuthToken();
-      return apiClient.delete<void>(`/api/accounts/${id}`, {
+      return apiClient.delete<void>(`/accounts/${id}`, {
         token: token || undefined,
       });
     },

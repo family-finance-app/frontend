@@ -12,7 +12,7 @@ export const useUpdateProfile = () => {
   return useMutation({
     mutationFn: async (formData: Partial<User>): Promise<UserResponse> => {
       const token = getAuthToken();
-      return apiClient.put<UserResponse>('/api/user/profile', formData, {
+      return apiClient.put<UserResponse>('/user/profile', formData, {
         token: token || undefined,
       });
     },

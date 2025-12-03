@@ -39,7 +39,7 @@ export const useTransactions = () => {
   return useQuery({
     queryKey: queryKeys.transactions.all,
     queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/api/transactions', {
+      return apiClient.get<Transaction[]>('/transactions', {
         token: token || undefined,
       });
     },
@@ -60,7 +60,7 @@ export const useTransaction = (id: string) => {
   return useQuery({
     queryKey: queryKeys.transactions.detail(id),
     queryFn: async (): Promise<Transaction> => {
-      return apiClient.get<Transaction>(`/api/transactions/${id}`, {
+      return apiClient.get<Transaction>(`/transactions/${id}`, {
         token: token || undefined,
       });
     },
@@ -84,7 +84,7 @@ export const useTransactionsByAccount = (accountId: string) => {
     queryKey: queryKeys.transactions.byAccount(accountId),
     queryFn: async (): Promise<Transaction[]> => {
       return apiClient.get<Transaction[]>(
-        `/api/transactions?accountId=${accountId}`,
+        `/transactions?accountId=${accountId}`,
         { token: token || undefined }
       );
     },
@@ -105,7 +105,7 @@ export const useMyTransactions = () => {
   return useQuery({
     queryKey: queryKeys.transactions.my,
     queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/api/transactions/all', {
+      return apiClient.get<Transaction[]>('/transactions/all', {
         token: token || undefined,
       });
     },
@@ -126,7 +126,7 @@ export const useFamilyTransactions = () => {
   return useQuery({
     queryKey: queryKeys.transactions.family,
     queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/api/transactions/family', {
+      return apiClient.get<Transaction[]>('/transactions/family', {
         token: token || undefined,
       });
     },

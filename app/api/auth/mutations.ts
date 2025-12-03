@@ -1,7 +1,5 @@
 'use client';
 
-// Sign up, sign in, and sign out operations
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
@@ -16,7 +14,7 @@ export const useSignUp = () => {
     mutationFn: async (
       formData: Partial<SignUpFormData>
     ): Promise<AuthResponse> => {
-      return apiClient.post<AuthResponse>('/api/auth/signup', {
+      return apiClient.post<AuthResponse>('/auth/signup', {
         email: formData.email,
         password: formData.password,
         terms: formData.terms,
@@ -27,7 +25,7 @@ export const useSignUp = () => {
       if (data.accessToken) {
         setAuthToken(data.accessToken);
       }
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
+      queryClient.clear();
     },
     onError: (error) => {
       console.error('Sign up failed:', error);
@@ -41,7 +39,7 @@ export const useSignIn = () => {
 
   return useMutation({
     mutationFn: async (formData: SignInFormData): Promise<AuthResponse> => {
-      return apiClient.post<AuthResponse>('/api/auth/login', {
+      return apiClient.post<AuthResponse>('/auth/login', {
         email: formData.email,
         password: formData.password,
       });
@@ -50,7 +48,7 @@ export const useSignIn = () => {
       if (data.accessToken) {
         setAuthToken(data.accessToken);
       }
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
+      queryClient.clear();
     },
     onError: (error) => {
       console.error('Sign in failed:', error);
@@ -66,7 +64,7 @@ export const useSignOut = () => {
     mutationFn: async (): Promise<void> => {
       const token = getAuthToken();
       await apiClient.post<void>(
-        '/api/auth/logout',
+        '/auth/logout',
         {},
         {
           token: token || undefined,

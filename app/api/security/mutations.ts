@@ -18,13 +18,9 @@ export const useUpdateUserPassword = () => {
       formData: PasswordChangeFormData
     ): Promise<SecurityUpdateResponse> => {
       const token = getAuthToken();
-      return apiClient.put<SecurityUpdateResponse>(
-        '/api/user/password',
-        formData,
-        {
-          token: token || undefined,
-        }
-      );
+      return apiClient.put<SecurityUpdateResponse>('/user/password', formData, {
+        token: token || undefined,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
@@ -40,13 +36,9 @@ export const useUpdateUserEmail = () => {
       formData: EmailChangeFormData
     ): Promise<SecurityUpdateResponse> => {
       const token = getAuthToken();
-      return apiClient.put<SecurityUpdateResponse>(
-        '/api/user/email',
-        formData,
-        {
-          token: token || undefined,
-        }
-      );
+      return apiClient.put<SecurityUpdateResponse>('/user/email', formData, {
+        token: token || undefined,
+      });
     },
     onSuccess() {
       queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
