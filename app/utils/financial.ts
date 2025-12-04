@@ -374,39 +374,78 @@ export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
   }));
 }
 
-export function calculateSavingsStats(transactions: Transaction[]) {
+export function calculateSavingsStats(
+  transactions: Transaction[],
+  accounts: Account[] = []
+) {
+  // Get savings account IDs
+  const savingsAccountIds = accounts
+    .filter((a) => a.type === 'SAVINGS')
+    .map((a) => a.id);
+
+  // Total balance of all SAVINGS accounts
   const getTotalSavingsAmount = (): number => {
-    return (
-      Math.round(
-        transactions
-          .filter((t) => t.type === 'TRANSFER')
-          .reduce((sum, t) => {
-            const amount =
-              typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
-            return sum + (isNaN(amount) ? 0 : amount);
-          }, 0) * 100
-      ) / 100
-    );
+    const totalBalance = accounts
+      .filter((a) => a.type === 'SAVINGS')
+      .reduce((sum, a) => sum + a.balance, 0);
+    return Math.round(totalBalance * 100) / 100;
   };
 
-  const getSavingsStatsPerYear = (): Array<{ name: string; value: number }> => {
+  const getSavingsStatsPerYear = (): Array<{
+    date: string;
+    'Net savings amount per month': number;
+  }> => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
 
-    const savingsStatsPerYear: Array<{ name: string; value: number }> = [];
+    // Debug
+    const allTransfers = transactions.filter((t) => t.type === 'TRANSFER');
+    console.log(
+      'All TRANSFER transactions:',
+      allTransfers.map((t) => ({
+        id: t.id,
+        date: t.date,
+        amount: t.amount,
+        accountId: t.accountId,
+        accountRecipientId: t.accountRecipientId,
+      }))
+    );
+    console.log('savingsAccountIds:', savingsAccountIds);
+
+    const savingsStatsPerYear: Array<{
+      date: string;
+      'Net savings amount per month': number;
+    }> = [];
 
     for (let monthIndex = 0; monthIndex <= currentMonth; monthIndex++) {
       const monthStart = new Date(currentYear, monthIndex, 1);
       const monthEnd = new Date(currentYear, monthIndex + 1, 0);
 
-      const monthSavings = transactions
-        .filter((transaction) => {
-          const transactionDate = new Date(transaction.date);
+      const isInMonth = (t: Transaction): boolean => {
+        const transactionDate = new Date(t.date);
+        return transactionDate >= monthStart && transactionDate <= monthEnd;
+      };
+
+      // TRANSFER to SAVINGS accounts (accountRecipientId is savings account)
+      const monthTransfers = transactions
+        .filter((t) => {
+          if (t.type !== 'TRANSFER' || !isInMonth(t)) return false;
           return (
-            transaction.type === 'TRANSFER' &&
-            transactionDate >= monthStart &&
-            transactionDate <= monthEnd
+            t.accountRecipientId &&
+            savingsAccountIds.includes(t.accountRecipientId)
           );
+        })
+        .reduce((sum, t) => {
+          const amount =
+            typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
+          return sum + (isNaN(amount) ? 0 : amount);
+        }, 0);
+
+      // EXPENSE from SAVINGS accounts (accountId is savings account)
+      const monthExpenses = transactions
+        .filter((t) => {
+          if (t.type !== 'EXPENSE' || !isInMonth(t)) return false;
+          return savingsAccountIds.includes(t.accountId);
         })
         .reduce((sum, t) => {
           const amount =
@@ -419,11 +458,13 @@ export function calculateSavingsStats(transactions: Transaction[]) {
       });
 
       savingsStatsPerYear.push({
-        name: monthName,
-        value: Math.round(monthSavings * 100) / 100,
+        date: monthName,
+        'Net savings amount per month':
+          Math.round((monthTransfers - monthExpenses) * 100) / 100,
       });
     }
 
+    console.log('savingsStatsPerYear:', savingsStatsPerYear);
     return savingsStatsPerYear;
   };
 

@@ -47,7 +47,7 @@ export interface Transaction {
   createdAt: string;
   updatedAt: string;
   type: string;
-  accountRecipientId?: number;
+  accountRecipientId: number | null;
   user?: {
     id: number;
     name: string;

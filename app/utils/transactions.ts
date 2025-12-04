@@ -169,6 +169,7 @@ export function formatTransactionsForList(
     userId: transaction.userId || 0,
     groupId: transaction.groupId,
     accountId: transaction.accountId,
+    accountRecipientId: transaction.recipientAccount,
     type: transaction.type,
     categoryId: transaction.categoryId || 0,
     amount: Number(transaction.amount) || 0,
