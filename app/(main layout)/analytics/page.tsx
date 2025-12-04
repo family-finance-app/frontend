@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
+import { useMyAccounts } from '@/api/accounts/queries';
 import {
   calculateMonthlyIncomeAndExpenses,
   calculateIncomeByCategory,
@@ -12,13 +13,14 @@ import {
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { AreaChart } from '@/components/charts/AreaChart';
 import { DonutChart } from '@/components/charts/DonutChart';
-import { BarList } from '@/components/charts/BarList';
 import { roboto } from '@/assets/fonts/fonts';
+import { BarChart } from '@/components/charts/BarChart';
 
 export default function Analytics() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { data: transactions = [], isLoading } = useMyTransactions();
   const { data: categories = [] } = useCategories();
+  const { data: accounts = [] } = useMyAccounts();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -43,7 +45,8 @@ export default function Analytics() {
         totalSavingsAmount: 0,
       };
     }
-    const savingsStats = calculateSavingsStats(transactions);
+    const savingsStats = calculateSavingsStats(transactions, accounts);
+
     return {
       montlyStats: calculateMonthlyIncomeAndExpenses(transactions),
       totalIncomeCats: calculateIncomeByCategory(transactions, categories),
@@ -51,10 +54,10 @@ export default function Analytics() {
       monthlySavingsStats: savingsStats.getSavingsStatsPerYear(),
       totalSavingsAmount: savingsStats.getTotalSavingsAmount(),
     };
-  }, [transactions, categories]);
+  }, [transactions, categories, accounts]);
 
   return (
-    <div className="w-full min-h-screen bg-linear-to-br from-background-50 to-background-100 dark:from-primary-700 dark:to-background-800 rounded-4xl p-6 md:p-8">
+    <div className="w-full min-h-screen bg-linear-to-br from-background-50 to-white dark:from-primary-700 dark:to-background-800 rounded-4xl p-6 md:p-8">
       <div className="mb-12">
         <h1
           className={`${roboto.variable} text-4xl md:text-5xl font-bold text-background-700 dark:text-background-100 mb-2 font-roboto`}
@@ -168,51 +171,60 @@ export default function Analytics() {
         )}
       </div>
 
-      <div className="mb-12">
-        <div className="relative">
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-600 rounded-full -ml-40 -mb-40 opacity-10"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-end justify-center gap-8 md:gap-16 min-h-48">
-            <div className="flex-1">
-              <h3
-                className={`${roboto.variable} text-2xl font-medium text-background-600 dark:text-background-100 mb-2 font-roboto`}
-              >
-                Total Savings
-              </h3>
-              <h2
-                className={`${roboto.variable} text-6xl md:text-7xl font-bold font-roboto text-kashmir-500 dark:text-moss-100 leading-none`}
-              >
-                {formatCurrencyAmount(chartData.totalSavingsAmount)} UAH
-              </h2>
-            </div>
+      <div className=" rounded-2xl m-6 p-4">
+        <div className="mb-12 ">
+          <div className="relative">
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-600 rounded-full -ml-40 -mb-40 opacity-10"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-end justify-center gap-8 md:gap-16 min-h-48">
+              <div className="flex-1 ">
+                <h3
+                  className={`${roboto.variable} text-2xl font-medium text-background-600 dark:text-background-100 mb-2 font-roboto`}
+                >
+                  Total Savings
+                </h3>
+                <h2
+                  className={`${roboto.variable} text-6xl md:text-7xl font-bold font-roboto text-moss-400 dark:text-moss-100 leading-none`}
+                >
+                  {formatCurrencyAmount(chartData.totalSavingsAmount)} UAH
+                </h2>
+              </div>
 
-            <div className="flex-1 pb-4">
-              <p className="text-background-600 dark:text-background-200 text-center font-medium text-2xl">
-                All time savings across all accounts
-              </p>
+              <div className="flex-1 pb-4">
+                <p className="text-background-600 dark:text-background-200 text-right font-medium text-lg">
+                  There is your monthly savings growth below — positive values
+                  show money transferred to savings, negative values indicate
+                  expenses from your savings accounts.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="mb-12">
-        <div className=" p-3 rounded-2xl  opacity-80">
-          <h3
-            className={`${roboto.variable} text-2xl font-bold text-background-950 dark:text-background-50 mb-6 font-roboto`}
-          >
-            Monthly Savings Overview for {new Date().getFullYear()}
-          </h3>
-          {chartData.monthlySavingsStats.length > 0 ? (
-            <BarList
-              data={chartData.monthlySavingsStats}
-              sortOrder="none"
-              showAnimation={true}
-              valueFormatter={(value) => formatCurrencyAmount(value)}
-              className={`${roboto.variable}`}
-            />
-          ) : (
-            <div className="text-center py-8 text-background-500 dark:text-background-400">
-              No savings data available
-            </div>
-          )}
+        <div className="mb-12">
+          <div className="rounded-2xl  opacity-80">
+            <h3
+              className={`${roboto.variable} text-2xl font-bold text-primary-800 dark:text-background-50 font-roboto`}
+            >
+              Monthly Savings Overview for {new Date().getFullYear()}
+            </h3>
+            {chartData.monthlySavingsStats.length > 0 ? (
+              <BarChart
+                className="h-72"
+                data={chartData.monthlySavingsStats}
+                index="date"
+                categories={['Net savings amount per month']}
+                yAxisWidth={80}
+                valueFormatter={(number: number) =>
+                  `${formatCurrencyAmount(number)}`
+                }
+                yAxisLabel="UAH"
+                isDarkMode={isDarkMode}
+              />
+            ) : (
+              <div className="text-center py-8 text-background-500 dark:text-background-400">
+                No savings data available
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

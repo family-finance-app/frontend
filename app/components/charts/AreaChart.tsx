@@ -578,8 +578,8 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
 
     const resolvedIsDarkMode =
       typeof isDarkMode === 'boolean' ? isDarkMode : detectedDarkMode;
-    const axisTickColor = resolvedIsDarkMode ? '#E2E8F0' : '#475569';
-    const axisLabelColor = resolvedIsDarkMode ? '#CBD5F5' : '#1E293B';
+    const axisTickColor = resolvedIsDarkMode ? '#d8e2d5' : '#243935';
+    const axisLabelColor = resolvedIsDarkMode ? '#d8e2d5' : '#243935';
 
     const getFillContent = ({
       fillType,
