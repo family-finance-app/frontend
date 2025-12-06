@@ -69,7 +69,6 @@ jobs:
     timeout-minutes: 5
     if: |
       github.event_name == 'push'
-    needs: [manifest-validation]
     permissions:
       packages: write
       contents: write
