@@ -4,7 +4,13 @@ const nextConfig: NextConfig = {
   output: 'export',
   images: {
     unoptimized: true,
-    domains: ['cdn2.iconfinder.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn2.iconfinder.com',
+        pathname: '/**',
+      },
+    ],
   },
 };
 
