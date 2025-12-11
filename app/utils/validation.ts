@@ -1,5 +1,5 @@
 import { SignUpFormData, SignInFormData, FormErrors } from '@/types/auth';
-import { CreateAccountFormData } from '@/types/account';
+import { CreateAccountFormData, EditAccountFormData } from '@/types/account';
 import { CreateTransactionFormData } from '@/types/transaction';
 
 // auth validation
@@ -80,6 +80,26 @@ export const validateCreateAccountForm = (
 
   const balanceError = validateBalance(String(formData.balance));
   if (balanceError) errors.balance = balanceError;
+
+  return errors;
+};
+
+export const validateEditAccountForm = (
+  formData: EditAccountFormData
+): FormErrors => {
+  const errors: FormErrors = {};
+
+  if (!formData.name.trim()) {
+    errors.name = 'Account name is required';
+  }
+
+  if (!formData.currency.trim()) {
+    errors.currency = 'Choose account currency';
+  }
+
+  if (!formData.type.trim()) {
+    errors.type = 'Choose account type';
+  }
 
   return errors;
 };

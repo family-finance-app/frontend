@@ -37,9 +37,9 @@ export const transactionFormatters = {
   // sets color matching (app palette) for transaction amount according to the type
   typeColor: (type: string): string => {
     const colors: Record<string, string> = {
-      INCOME: 'text-success-600 dark:text-green-400',
-      EXPENSE: 'text-danger-600 dark:text-red-400',
-      TRANSFER: 'text-gray-600 dark:text-gray-400',
+      INCOME: 'text-success-700',
+      EXPENSE: 'text-danger-600',
+      TRANSFER: 'text-kashmir-500',
     };
     return colors[type] || 'text-gray-600';
   },
@@ -92,16 +92,17 @@ export const dateFormatters = {
   },
 
   // from Date object to DD.MM.YYYY
-  toDisplay: (date: Date): string => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+  toDisplay: (date: string): string => {
+    const dateObject = new Date(date);
+    const day = String(dateObject.getDate()).padStart(2, '0');
+    const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+    const year = dateObject.getFullYear();
     return `${day}.${month}.${year}`;
   },
 
   // returns Today in string DD.MM.YYYY
   today: (): string => {
-    return dateFormatters.toDisplay(new Date());
+    return dateFormatters.toDisplay(new Date().toISOString());
   },
 
   isValidFormat: (dateString: string): boolean => {
