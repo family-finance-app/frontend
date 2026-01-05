@@ -13,6 +13,11 @@ export interface CreateAccountFormData {
   currency: 'UAH' | 'USD' | 'EUR';
 }
 
+export interface EditAccountFormData {
+  name: string;
+  type: Account['type'];
+  currency: Account['currency'];
+}
 export interface Account {
   id: number;
   name: string;
