@@ -14,7 +14,7 @@
     "deploy:local": "npm install && npm run build && npm start"
   },
   "dependencies": {
-    "@remixicon/react": "^4.7.0",
+    "@remixicon/react": "^4.8.0",
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-query-devtools": "^5.91.1",
     "clsx": "^2.1.1",
