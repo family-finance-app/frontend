@@ -61,7 +61,6 @@ export default function CreateAccountForm({
       };
 
       const result = await createMutation.mutateAsync(accountData);
-      console.log('Account created:', result);
 
       onSuccess?.(formData.name);
       reset();

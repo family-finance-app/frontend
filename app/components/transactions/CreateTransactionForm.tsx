@@ -70,7 +70,6 @@ export default function CreateTransactionForm({
       createTransferMutation.mutate(transferData, {
         onSuccess: (data: any) => {
           onSuccess(data?.transaction?.id ?? 0);
-          console.log(data);
         },
         onError: () => {
           onError?.();

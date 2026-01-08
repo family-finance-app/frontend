@@ -198,20 +198,6 @@ export function calculateSavingsStats(
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
 
-    // Debug
-    const allTransfers = transactions.filter((t) => t.type === 'TRANSFER');
-    console.log(
-      'All TRANSFER transactions:',
-      allTransfers.map((t) => ({
-        id: t.id,
-        date: t.date,
-        amount: t.amount,
-        accountId: t.accountId,
-        accountRecipientId: t.accountRecipientId,
-      }))
-    );
-    console.log('savingsAccountIds:', savingsAccountIds);
-
     const savingsStatsPerYear: Array<{
       date: string;
       'Net savings amount per month': number;
@@ -264,7 +250,6 @@ export function calculateSavingsStats(
       });
     }
 
-    console.log('savingsStatsPerYear:', savingsStatsPerYear);
     return savingsStatsPerYear;
   };
 

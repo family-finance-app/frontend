@@ -63,7 +63,6 @@ export default function calculatePeriodStats(
     }, 0);
 
   const savings = savingsInflows - savingsOutflows;
-  console.log(savings);
 
   const savingsRate = income > 0 ? (savings / income) * 100 : 0;
 

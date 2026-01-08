@@ -32,7 +32,6 @@ export default function Navigation() {
       'success',
       `Transaction created successfully! ID: ${transactionId}`
     );
-    console.log('Transaction created successfully with ID:', transactionId);
   };
 
   const handleTransactionError = () => {
