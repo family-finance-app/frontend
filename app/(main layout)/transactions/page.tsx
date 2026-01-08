@@ -5,8 +5,8 @@ import { Transaction } from '@/types/transaction';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useCategories } from '@/api/categories/queries';
-import TransactionList from '@/components/ui/TransactionList';
-import EditTransactionModal from '@/components/ui/EditTransactionModal';
+import TransactionList from '@/components/transactions/TransactionList';
+import EditTransactionModal from '@/components/transactions/EditTransactionModal';
 import Button from '@/components/ui/Button';
 import {
   TransactionsHeader,

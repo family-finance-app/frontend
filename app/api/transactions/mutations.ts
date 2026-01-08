@@ -8,6 +8,7 @@ import type {
   CreateTransferFormData,
   Transaction,
   TransactionResponse,
+  UpdateTransactionFormData,
 } from '@/types/transaction';
 import type { Account } from '@/types/account';
 import { getAuthToken } from '@/utils/token';
@@ -41,7 +42,7 @@ export const useUpdateTransaction = () => {
       data,
     }: {
       id: number;
-      data: Partial<CreateTransactionFormData>;
+      data: UpdateTransactionFormData;
     }): Promise<Transaction> => {
       const token = getAuthToken();
 
@@ -112,7 +113,7 @@ export const useCreateTransfer = () => {
       const token = getAuthToken();
       return apiClient.post<TransactionResponse>(
         '/transactions/transfer',
-        { ...data, categoryId: 68 },
+        data,
         {
           token: token || undefined,
         }

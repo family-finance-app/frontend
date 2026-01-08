@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { AuthResponse, SignUpFormData, FormErrors } from '@/types/auth';
 import { validateSignUpForm } from '@/utils/validation';
 import { FormInput } from '../shared/forms';
+import SuccessMessage from '../ui/SuccessMessage';
+import ErrorMessage from '../ui/ErrorMessage';
 
 interface SignUpFormProps {
   onSubmit: (formData: SignUpFormData) => Promise<AuthResponse>;
@@ -88,41 +90,19 @@ export default function SignUpForm({
 
   return (
     <>
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-medium text-gray-900 dark:text-white">
-          Create your account
-        </h2>
-      </div>
-
       <form className="space-y-6" onSubmit={handleSubmit}>
         {isSuccess && (
-          <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md text-sm">
-            Account created successfully! Redirecting...
-          </div>
+          <SuccessMessage
+            message="Account created successfully! Redirecting..."
+            classname="dark:bg-background-200 p-4"
+          />
         )}
 
         {isError && apiError?.trim() && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-            <div className="flex items-center gap-3">
-              <svg
-                className="h-5 w-5 text-danger-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div>
-                <p className="text-sm font-medium text-danger-500">
-                  Registration failed
-                </p>
-                <p className="text-sm text-danger-500 mt-1">{apiError}</p>
-              </div>
-            </div>
-          </div>
+          <ErrorMessage
+            message={`Registration failed. ${apiError ? apiError : ''}`}
+            classname="dark:bg-danger-100 p-4"
+          />
         )}
 
         <FormInput
@@ -132,9 +112,9 @@ export default function SignUpForm({
           id="email"
           value={formData.email}
           onChange={handleInputChange}
-          placeholder="name@example.com"
-          required={true}
-          error={errors.email}
+          placeholder="email@example.com"
+          error={errors.email ? errors.email : ''}
+          classname="auth"
         />
 
         <FormInput
@@ -145,8 +125,8 @@ export default function SignUpForm({
           value={formData.password}
           onChange={handleInputChange}
           placeholder="••••••••"
-          required={true}
-          error={errors.password}
+          error={errors.password ? errors.password : ''}
+          classname="auth"
         />
 
         <FormInput
@@ -157,8 +137,8 @@ export default function SignUpForm({
           value={formData.confirmPassword}
           onChange={handleInputChange}
           placeholder="••••••••"
-          required={true}
-          error={errors.confirmPassword}
+          error={errors.confirmPassword ? errors.confirmPassword : ''}
+          classname="auth"
         />
 
         <div className="flex items-start">
@@ -169,25 +149,25 @@ export default function SignUpForm({
               type="checkbox"
               checked={formData.terms}
               onChange={handleInputChange}
-              className="w-4 h-4 border-hazel-400 rounded bg-moss-100 focus:ring-3 focus:ring-moss-400"
+              className="w-4 h-4 border-hazel-400 rounded focus:ring-moss-400 text-primary-400 accent-moss-400"
               required
             />
           </div>
           <div className="ml-3 text-sm">
             <label
               htmlFor="terms"
-              className="font-medium text-gray-900 dark:text-white"
+              className="font-medium text-gray-900 dark:text-background-100"
             >
               I agree to the{' '}
               <Link
-                href="/terms"
-                className="text-primary-500 hover:text-primary-600"
+                href="/sign-up" // TODO: write terms and conditions
+                className="text-primary-700 hover:text-moss-300"
               >
                 Terms and Conditions
               </Link>
             </label>
             {errors.terms && (
-              <p className="mt-1 text-sm text-danger-600">{errors.terms}</p>
+              <p className="mt-1 text-sm text-danger-700">{errors.terms}</p>
             )}
           </div>
         </div>
@@ -204,7 +184,7 @@ export default function SignUpForm({
           Already have an account?{' '}
           <Link
             href="/sign-in"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-primary-700 hover:text-indigo-500 dark:text-background-100 dark:hover:text-hazel-400"
           >
             Sign in here
           </Link>

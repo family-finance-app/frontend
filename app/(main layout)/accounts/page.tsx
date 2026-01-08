@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import CreateAccountForm from '@/components/accounts/CreateAccountForm';
-import FinancialCard from '@/components/ui/FinancialCard';
+import FinancialCard from '@/(main layout)/dashboard/cards/FinancialCard';
 import Button from '@/components/ui/Button_financial';
 import { roboto } from '@/assets/fonts/fonts';
 import { useMyAccounts } from '@/api/accounts/queries';
@@ -36,10 +36,13 @@ export default function Accounts() {
   const familyStats = calculateAccountStats(familyAccounts);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {lastCreatedAccount && (
-        <div className="bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded-xl animate-fade-in">
-          <div className="flex items-center space-x-2">
+        <div
+          role="status"
+          className="bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded-xl animate-fade-in"
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -61,7 +64,7 @@ export default function Accounts() {
       )}
 
       {/* Page Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1
             className={`${roboto.className} text-3xl font-bold text-primary-800 mb-2`}
@@ -73,12 +76,13 @@ export default function Accounts() {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 mt-4 lg:mt-0">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
           <Button
             text="Manage Accounts"
             type="button"
             variant="outline"
             size="md"
+            className="w-full sm:w-auto"
             onClick={() => (window.location.href = '/settings/accounts')}
           />
           <Button
@@ -86,17 +90,19 @@ export default function Accounts() {
             type="button"
             variant={showCreateForm ? 'outline' : 'primary'}
             size="md"
+            className="w-full sm:w-auto"
             onClick={() => setShowCreateForm(!showCreateForm)}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FinancialCard
           title="Personal Accounts"
           value={personalStats.totalCount.toString()}
           description="Your accounts"
           size="md"
+          className="h-full"
           icon={
             <svg
               className="w-6 h-6"
@@ -119,6 +125,7 @@ export default function Accounts() {
           value={familyStats.totalCount.toString()}
           description="Shared accounts"
           size="md"
+          className="h-full"
           icon={
             <svg
               className="w-6 h-6"
@@ -135,7 +142,7 @@ export default function Accounts() {
             </svg>
           }
         />
-      </div>
+      </section>
 
       {/* Create Account Form */}
       {showCreateForm && (
@@ -155,14 +162,22 @@ export default function Accounts() {
         </div>
       )}
 
-      {/* Personal Accounts Section */}
       {personalAccounts.length > 0 && (
-        <PersonalAccountsSection accounts={personalAccounts} />
+        <section aria-labelledby="personal-accounts">
+          <h2 id="personal-accounts" className="sr-only">
+            Personal Accounts
+          </h2>
+          <PersonalAccountsSection accounts={personalAccounts} />
+        </section>
       )}
 
-      {/* Family Accounts Section */}
       {familyAccounts.length > 0 && (
-        <FamilyAccountsSection accounts={familyAccounts} />
+        <section aria-labelledby="family-accounts">
+          <h2 id="family-accounts" className="sr-only">
+            Family Accounts
+          </h2>
+          <FamilyAccountsSection accounts={familyAccounts} />
+        </section>
       )}
     </div>
   );

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Account } from '@/types/account';
-import Button from '@/components/ui/Button_financial';
-import { roboto } from '@/assets/fonts/fonts';
+import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
+import { formatCurrencyAmount } from '@/utils/formatters';
 import { AccountCard } from './AccountCard';
 import { AccountsFilter } from './AccountsFilter';
 import {
@@ -23,9 +23,34 @@ export function PersonalAccountsSection({
 
   const filteredAccounts = filterAccountsByType(accounts, filterType);
   const stats = calculateAccountStats(accounts);
+  const positiveAccounts = accounts.filter((account) => account.balance >= 0);
+
+  const statsSummary = [
+    { label: 'Total accounts', value: stats.totalCount.toString() },
+    { label: 'Total balance', value: formatCurrencyAmount(stats.totalBalance) },
+    { label: 'Positive balances', value: `${positiveAccounts.length}` },
+  ];
 
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {statsSummary.map((item) => (
+          <div
+            key={item.label}
+            className="rounded-2xl border border-background-100 bg-white dark:bg-primary-800 p-4"
+          >
+            <p className="text-sm text-background-500 dark:text-background-300">
+              {item.label}
+            </p>
+            <p
+              className={`${jetbrainsMono.className} text-2xl font-semibold text-background-900 dark:text-background-50`}
+            >
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
       <AccountsFilter
         filterType={filterType}
         onFilterChange={setFilterType}
@@ -34,7 +59,7 @@ export function PersonalAccountsSection({
       />
 
       {filteredAccounts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredAccounts.map((account) => (
             <AccountCard key={account.id} account={account} />
           ))}

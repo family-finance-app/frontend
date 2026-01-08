@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
 import { useMyAccounts } from '@/api/accounts/queries';
@@ -13,27 +13,17 @@ import {
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { AreaChart } from '@/components/charts/AreaChart';
 import { DonutChart } from '@/components/charts/DonutChart';
-import { roboto } from '@/assets/fonts/fonts';
+import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import { BarChart } from '@/components/charts/BarChart';
+import { useColorTheme } from '@/hooks/useColorTheme';
 
 export default function Analytics() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const { data: transactions = [], isLoading } = useMyTransactions();
   const { data: categories = [] } = useCategories();
   const { data: accounts = [] } = useMyAccounts();
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const root = document.documentElement;
-    const update = () => setIsDarkMode(root.classList.contains('dark'));
-
-    update();
-
-    const observer = new MutationObserver(update);
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-
-    return () => observer.disconnect();
-  }, []);
+  const colorTheme = useColorTheme();
+  const isDarkMode = colorTheme === 'dark';
 
   const chartData = useMemo(() => {
     if (!transactions || transactions.length === 0) {
@@ -56,8 +46,32 @@ export default function Analytics() {
     };
   }, [transactions, categories, accounts]);
 
+  const totalIncomeAllTime = chartData.montlyStats.reduce(
+    (sum, item) => sum + (item?.Income ?? 0),
+    0
+  );
+  const totalExpensesAllTime = chartData.montlyStats.reduce(
+    (sum, item) => sum + (item?.Expenses ?? 0),
+    0
+  );
+  const netSavingsAllTime = totalIncomeAllTime - totalExpensesAllTime;
+  const summaryCards = [
+    {
+      label: 'Total Income (all time)',
+      value: formatCurrencyAmount(totalIncomeAllTime),
+    },
+    {
+      label: 'Total Expenses (all time)',
+      value: formatCurrencyAmount(totalExpensesAllTime),
+    },
+    {
+      label: 'Net Savings',
+      value: formatCurrencyAmount(netSavingsAllTime),
+    },
+  ];
+
   return (
-    <div className="w-full min-h-screen bg-linear-to-br from-background-50 to-white dark:from-primary-700 dark:to-background-800 rounded-4xl p-6 md:p-8">
+    <div className="w-full min-h-[calc(100vh-4rem)] bg-linear-to-br from-background-50 to-white dark:from-primary-700 dark:to-background-800 rounded-4xl p-4 sm:p-6 lg:p-10">
       <div className="mb-12">
         <h1
           className={`${roboto.variable} text-4xl md:text-5xl font-bold text-background-700 dark:text-background-100 mb-2 font-roboto`}
@@ -69,9 +83,12 @@ export default function Analytics() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
+        <div
+          className="xl:col-span-4
+        grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
+          <div>
             <div className="mb-6">
               <h3
                 className={`${roboto.variable} text-2xl font-bold text-center text-background-600 dark:text-background-100 mb-2 font-roboto`}
@@ -94,7 +111,7 @@ export default function Analytics() {
                   category="name"
                   value="rate"
                   valueFormatter={(number: number) => `${number}%`}
-                  className="h-80 w-80"
+                  className="h-60 w-full max-w-xs sm:h-64 sm:max-w-sm md:h-72 md:max-w-md"
                 />
               ) : (
                 <div className="text-center py-12 text-background-500 dark:text-background-400">
@@ -104,7 +121,7 @@ export default function Analytics() {
             </div>
           </div>
 
-          <div className="">
+          <div>
             <div className="mb-6">
               <h3
                 className={`${roboto.variable} text-2xl text-center font-bold text-background-600 dark:text-background-100 mb-2 font-roboto`}
@@ -120,14 +137,14 @@ export default function Analytics() {
                 </p>
               </div>
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-6">
               {chartData.totalExpensesCats.length > 0 ? (
                 <DonutChart
                   data={chartData.totalExpensesCats}
                   category="name"
                   value="rate"
                   valueFormatter={(number: number) => `${number}%`}
-                  className="h-80 w-80"
+                  className="h-60 w-full max-w-xs sm:h-64 sm:max-w-sm md:h-72 md:max-w-md"
                 />
               ) : (
                 <div className="text-center py-12 text-background-500 dark:text-background-400">
@@ -139,7 +156,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className=" rounded-2xl  p-8 mb-12  border-background-100 dark:border-background-700">
+      <div className="rounded-2xl border border-background-100 dark:border-background-700 bg-white/70 dark:bg-primary-700/40 p-5 sm:p-8 mb-12">
         <div className="mb-6">
           <h3
             className={`${roboto.variable} text-2xl font-bold text-background-600 dark:text-background-50 mb-2 font-roboto`}
@@ -149,7 +166,7 @@ export default function Analytics() {
         </div>
         {chartData.montlyStats.length > 0 ? (
           <AreaChart
-            className="h-150 w-full text-sm  dark:bg-primary-700 p-3 dark:border dark:border-background-300 rounded-3xl"
+            className="w-full min-h-[300px] md:min-h-[360px] text-sm dark:bg-primary-700 p-3 dark:border dark:border-background-300 rounded-3xl"
             data={chartData.montlyStats}
             index="date"
             categories={['Income', 'Expenses']}
@@ -171,12 +188,12 @@ export default function Analytics() {
         )}
       </div>
 
-      <div className=" rounded-2xl m-6 p-4">
-        <div className="mb-12 ">
+      <div className="rounded-2xl border border-background-100 dark:border-background-700 bg-white/80 dark:bg-primary-700/40 p-4 sm:p-6 lg:p-8">
+        <div className="mb-12">
           <div className="relative">
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-600 rounded-full -ml-40 -mb-40 opacity-10"></div>
-            <div className="relative z-10 flex flex-col md:flex-row items-end justify-center gap-8 md:gap-16 min-h-48">
-              <div className="flex-1 ">
+            <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between text-center lg:text-left min-h-48">
+              <div className="flex-1">
                 <h3
                   className={`${roboto.variable} text-2xl font-medium text-background-600 dark:text-background-100 mb-2 font-roboto`}
                 >
@@ -190,7 +207,7 @@ export default function Analytics() {
               </div>
 
               <div className="flex-1 pb-4">
-                <p className="text-background-600 dark:text-background-200 text-right font-medium text-lg">
+                <p className="text-background-600 dark:text-background-200 font-medium text-lg">
                   There is your monthly savings growth below — positive values
                   show money transferred to savings, negative values indicate
                   expenses from your savings accounts.
@@ -208,7 +225,7 @@ export default function Analytics() {
             </h3>
             {chartData.monthlySavingsStats.length > 0 ? (
               <BarChart
-                className="h-72"
+                className="h-72 w-full"
                 data={chartData.monthlySavingsStats}
                 index="date"
                 categories={['Net savings amount per month']}

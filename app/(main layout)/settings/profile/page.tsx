@@ -35,13 +35,11 @@ export default function ProfileSettings() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1
-            className={`${roboto.className} text-3xl font-bold text-background-900 mb-2`}
+            className={`${roboto.className} text-3xl font-bold text-primary-800 mb-2`}
           >
             Profile Settings
           </h1>
-          <p className="text-background-600">
-            Manage your personal information
-          </p>
+          <p className="text-primary-800">Manage your personal information</p>
         </div>
 
         <div className="mt-4 lg:mt-0">

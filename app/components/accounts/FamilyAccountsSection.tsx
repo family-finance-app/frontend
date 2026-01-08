@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Account } from '@/types/account';
-import { roboto } from '@/assets/fonts/fonts';
+import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import { AccountCard } from './AccountCard';
 import { AccountsFilter } from './AccountsFilter';
 import {
@@ -10,6 +10,7 @@ import {
   calculateAccountStats,
   type AccountType,
 } from '@/utils/accounts';
+import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface FamilyAccountsSectionProps {
   accounts: Account[];
@@ -22,6 +23,13 @@ export function FamilyAccountsSection({
 
   const filteredAccounts = filterAccountsByType(accounts, filterType);
   const stats = calculateAccountStats(accounts);
+  const averageBalance =
+    accounts.length === 0 ? 0 : stats.totalBalance / accounts.length;
+  const summaryCards = [
+    { label: 'Family accounts', value: stats.totalCount.toString() },
+    { label: 'Total balance', value: formatCurrencyAmount(stats.totalBalance) },
+    { label: 'Average balance', value: formatCurrencyAmount(averageBalance) },
+  ];
 
   if (accounts.length === 0) {
     return null;
@@ -29,6 +37,24 @@ export function FamilyAccountsSection({
 
   return (
     <div className="space-y-6 mt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {summaryCards.map((item) => (
+          <div
+            key={item.label}
+            className="rounded-2xl border border-background-100 bg-white dark:bg-primary-800 p-4"
+          >
+            <p className="text-sm text-background-500 dark:text-background-300">
+              {item.label}
+            </p>
+            <p
+              className={`${jetbrainsMono.className} text-2xl font-semibold text-background-900 dark:text-background-50`}
+            >
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
       <AccountsFilter
         filterType={filterType}
         onFilterChange={setFilterType}
@@ -38,7 +64,7 @@ export function FamilyAccountsSection({
 
       {/* Account Cards Grid */}
       {filteredAccounts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredAccounts.map((account) => (
             <AccountCard key={account.id} account={account} />
           ))}

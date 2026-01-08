@@ -9,7 +9,8 @@ import Button from '@/components/ui/Button_financial';
 import { getAccountTypeName } from '@/utils/accounts';
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { AccountTransactions } from './AccountTransactions';
-import { EditAccountForm, type EditAccountFormData } from './EditAccountForm';
+import { EditAccountForm } from './EditAccountForm';
+import { EditAccountFormData } from '@/types/account';
 
 interface AccountDetailsProps {
   account: Account;
@@ -45,37 +46,24 @@ export function AccountDetails({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Account Info Header */}
-      <div className="bg-white rounded-xl shadow-financial border border-background-100 p-4">
+      {/* List of account's transactions*/}
+      <AccountTransactions
+        accountId={account.id}
+        transactions={accountTransactions}
+        categories={categories}
+        currency={account.currency}
+        isLoading={isLoading}
+      />
+
+      {/* Edit/delete account*/}
+      <div className="bg-white dark:bg-background-200 rounded-xl shadow-financial border border-primary-400 p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h3
-              className={`${roboto.className} text-xl font-bold text-background-900 truncate`}
+              className={`${roboto.className} text-xl font-bold text-primary-800 truncate`}
             >
               {account.name}
             </h3>
-            <div className="flex items-center gap-4 mt-2 text-sm">
-              <span className="text-background-600">
-                {getAccountTypeName(account.type as Account['type'])}
-              </span>
-              <span
-                className={`${jetbrainsMono.className} font-semibold ${
-                  account.balance >= 0 ? 'text-success-600' : 'text-danger-600'
-                }`}
-              >
-                {account.balance < 0 ? '-' : ''}
-                {formatCurrencyAmount(Math.abs(account.balance))}{' '}
-                {account.currency}
-              </span>
-              <span className="text-background-500 text-xs">
-                Created:{' '}
-                {new Date(account.createdAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Button
@@ -96,32 +84,14 @@ export function AccountDetails({
             />
           </div>
         </div>
-      </div>
-
-      {/* Edit Form - Below account info */}
-      {onSave && (
-        <EditAccountForm
-          account={account}
-          isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-          onSave={onSave}
-        />
-      )}
-
-      {/* Transactions Section - At the bottom */}
-      <div>
-        <h3
-          className={`${roboto.className} text-lg font-bold text-background-900 mb-4`}
-        >
-          Transactions ({accountTransactions.length})
-        </h3>
-        <AccountTransactions
-          accountId={account.id}
-          transactions={accountTransactions}
-          categories={categories}
-          currency={account.currency}
-          isLoading={isLoading}
-        />
+        {onSave && (
+          <EditAccountForm
+            account={account}
+            isOpen={isEditOpen}
+            onClose={() => setIsEditOpen(false)}
+            onSave={onSave}
+          />
+        )}
       </div>
     </div>
   );
