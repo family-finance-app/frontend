@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '../types';
 import { useDeleteTransaction } from '@/api/transactions/mutations';
 import {
   formatCurrencyAmount,
   transactionFormatters,
 } from '@/utils/formatters';
-import { roboto } from '../../assets/fonts/fonts';
-import Button from '../ui/Button_financial';
+import { roboto } from '../../../assets/fonts/fonts';
+import Button from '../../../components/ui/Button_financial';
 
 interface TransactionActionModalProps {
   transaction: Transaction;

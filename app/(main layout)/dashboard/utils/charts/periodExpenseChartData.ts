@@ -1,6 +1,9 @@
-import { DashboardChartDataProps } from '../../types/dashboardChartDataProps';
+import { DashboardChartDataProps } from '../../types';
 import { PeriodType } from '@/types/utilities';
-import { Transaction, TransactionType } from '@/types/transaction';
+import {
+  Transaction,
+  TransactionType,
+} from '@/(main layout)/transactions/types';
 
 // calculate total expenses per period for last three periods for dashboard stats expense section chart
 export default function getPeriodExpenseComparison(

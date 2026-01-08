@@ -5,8 +5,11 @@ import { useMyTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
 import { useTotalBalanceInUAH } from '@/hooks';
 import { periodStats } from '@/(main layout)/dashboard/utils';
-import { enrichTransactionsWithData } from '@/utils/transactions';
-import { formatTransactionsForList } from '@/utils/transactions';
+import {
+  enrichTransactions,
+  formatTransactions,
+} from '@/(main layout)/transactions';
+
 import { formatCurrencyAmount } from '@/utils/formatters';
 
 export function SidebarBalanceWidget() {
@@ -18,8 +21,8 @@ export function SidebarBalanceWidget() {
   const { totalBalance, isLoading: balanceLoading } =
     useTotalBalanceInUAH(accounts);
 
-  const formattedTransactions = formatTransactionsForList(transactions || []);
-  const enrichedTransactions = enrichTransactionsWithData(
+  const formattedTransactions = formatTransactions(transactions || []);
+  const enrichedTransactions = enrichTransactions(
     formattedTransactions,
     accounts || [],
     categories || []

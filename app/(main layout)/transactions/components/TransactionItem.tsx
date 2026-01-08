@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import * as RemixIcon from '@remixicon/react';
-import TransactionActionModal from '../transactions/TransactionActionModal';
-import { Transaction } from '@/types/transaction';
+import TransactionActionModal from '../modals/TransactionActionModal';
+import { Transaction } from '../types';
 import { formatCurrencyAmount } from '@/utils/formatters';
-import { jetbrainsMono } from '../../assets/fonts/fonts';
+import { jetbrainsMono } from '../../../assets/fonts/fonts';
 
 interface TransactionItemProps {
   transaction: Transaction;

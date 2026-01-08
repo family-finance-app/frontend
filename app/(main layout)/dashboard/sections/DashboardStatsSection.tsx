@@ -2,7 +2,7 @@
 
 import FinancialCard from '@/(main layout)/dashboard/cards/FinancialCard';
 import { formatCurrencyAmount } from '@/utils/formatters';
-import { DashboardChartDataProps } from '../types/dashboardChartDataProps';
+import { DashboardChartDataProps } from '../types';
 
 export interface DashboardStatsSectionProps {
   income: number;

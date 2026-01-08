@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button_financial';
-import TransactionList from '../../../components/transactions/TransactionList';
-import EditTransactionModal from '@/components/transactions/EditTransactionModal';
-import { Transaction } from '@/types/transaction';
+import TransactionList from '../../transactions/components/TransactionList';
+import EditTransactionModal from '@/(main layout)/transactions/modals/EditTransactionModal';
+import { Transaction } from '@/(main layout)/transactions/types';
 import { Account } from '@/types/account';
 import { useRouter } from 'next/navigation';
 

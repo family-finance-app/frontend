@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { roboto } from '../assets/fonts/fonts';
-import CreateTransactionForm from '@/components/transactions/CreateTransactionForm';
+import CreateTransactionForm from '@/(main layout)/transactions/modals/CreateTransactionModal';
 import Notifications from './Notifications';
 import ColorModeSwitcher from './ColorModeSwitcher';
 import ProfileAvatar from './ProfileAvatar';

@@ -1,6 +1,9 @@
-import { DashboardChartDataProps } from '../../types/dashboardChartDataProps';
+import { DashboardChartDataProps } from '../../types';
 import { PeriodType } from '@/types/utilities';
-import { Transaction, TransactionType } from '@/types/transaction';
+import {
+  Transaction,
+  TransactionType,
+} from '@/(main layout)/transactions/types';
 import { Account } from '@/types/account';
 
 // calculate total savings balance per priod for last three periods (cumulative balance of all SAVINGS accounts at end of each period)

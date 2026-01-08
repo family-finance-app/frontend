@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '../types';
 import TransactionItem from './TransactionItem';
 
 interface TransactionListProps {

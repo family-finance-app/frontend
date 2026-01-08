@@ -54,7 +54,7 @@ export default function TransactionsFilters({
               <button
                 key={type}
                 onClick={() => onFilterTypeChange(type)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex-shrink-0 ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shrink-0 ${
                   filterType === type
                     ? 'bg-white text-primary-800 dark:bg-background-50 shadow-sm'
                     : 'text-background-600 dark:text-stack-600 hover:text-stack-700'
@@ -108,7 +108,7 @@ export default function TransactionsFilters({
                 <button
                   key={range}
                   onClick={() => onTimeRangeChange(range)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex-shrink-0 ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shrink-0 ${
                     timeRange === range
                       ? 'bg-white text-primary-800 dark:bg-background-50 shadow-sm'
                       : 'text-background-600 dark:text-stack-600 hover:text-stack-700'

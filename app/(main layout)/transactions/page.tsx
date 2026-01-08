@@ -1,19 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { Transaction } from '@/types/transaction';
+
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useCategories } from '@/api/categories/queries';
-import TransactionList from '@/components/transactions/TransactionList';
-import EditTransactionModal from '@/components/transactions/EditTransactionModal';
-import { TransactionsFilters } from '@/components/transactions';
 import {
+  TransactionList,
+  EditTransactionModal,
+  TransactionsFilters,
   filterTransactions,
-  calculateTransactionStats,
-} from '@/utils/transactions';
-import { enrichTransactionsWithData } from '@/utils/transactions';
-import { formatTransactionsForList } from '@/utils/transactions';
+  enrichTransactions,
+  formatTransactions,
+} from './index';
+import { Transaction } from './types';
 
 export default function MyTransactions() {
   const [editingTransaction, setEditingTransaction] =
@@ -31,9 +31,9 @@ export default function MyTransactions() {
   const { data: accounts, isLoading: accountsLoading } = useMyAccounts();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
 
-  const formattedTransactions = formatTransactionsForList(transactions || []);
+  const formattedTransactions = formatTransactions(transactions || []);
 
-  const enrichedTransactions = enrichTransactionsWithData(
+  const enrichedTransactions = enrichTransactions(
     formattedTransactions,
     accounts || [],
     categories || []

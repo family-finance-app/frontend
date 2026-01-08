@@ -1,6 +1,6 @@
 import { SignUpFormData, SignInFormData, FormErrors } from '@/types/auth';
 import { CreateAccountFormData, EditAccountFormData } from '@/types/account';
-import { CreateTransactionFormData } from '@/types/transaction';
+import { CreateTransactionFormData } from '@/(main layout)/transactions/types';
 
 // auth validation
 export const validateEmail = (email: string): string | null => {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Account } from '@/types/account';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '@/(main layout)/transactions/types';
 import { Category } from '@/types/category';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';

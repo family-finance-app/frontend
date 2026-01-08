@@ -20,9 +20,8 @@ import {
   periodIncomeChartData,
   periodSavingsChartData,
 } from './utils/index';
-import { enrichTransactionsWithData } from '@/utils/transactions';
+import { enrichTransactions, formatTransactions } from '../transactions';
 import { formatAccountsForWidget } from '@/utils/accounts';
-import { formatTransactionsForList } from '@/utils/transactions';
 import { useTotalBalanceInUAH } from '@/hooks';
 
 export default function Dashboard() {
@@ -39,9 +38,9 @@ export default function Dashboard() {
 
   const formattedAccounts = formatAccountsForWidget(accounts || []);
 
-  const formattedTransactions = formatTransactionsForList(transactions || []);
+  const formattedTransactions = formatTransactions(transactions || []);
 
-  const enrichedTransactions = enrichTransactionsWithData(
+  const enrichedTransactions = enrichTransactions(
     formattedTransactions,
     accounts,
     categories

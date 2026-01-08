@@ -2,7 +2,7 @@
 
 import { Account } from '@/types/account';
 import { jetbrainsMono } from '@/assets/fonts/fonts';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '@/(main layout)/transactions/types';
 import { getAccountTypeName } from '@/utils/accounts';
 import { formatCurrencyAmount } from '@/utils/formatters';
 

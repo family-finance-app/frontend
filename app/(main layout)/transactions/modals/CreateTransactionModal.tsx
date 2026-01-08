@@ -6,7 +6,7 @@ import {
   CreateTransactionFormData,
   TransactionType,
   CurrencyType,
-} from '@/types/transaction';
+} from '../types';
 import { useCategories } from '@/api/categories/queries';
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useCreateTransaction } from '@/api/transactions/mutations';
@@ -21,7 +21,7 @@ interface CreateTransactionFormProps {
   onError?: () => void;
 }
 
-export default function CreateTransactionForm({
+export default function CreateTransactionModal({
   onSuccess,
   onCancel,
   onError,

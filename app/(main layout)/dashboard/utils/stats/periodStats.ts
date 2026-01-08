@@ -1,4 +1,4 @@
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '@/(main layout)/transactions/types';
 import { Account } from '@/types/account';
 
 // Utility for dashboard stats section that calculates income, expenses, and savings for the chosen period with change rate

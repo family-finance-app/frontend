@@ -1,4 +1,4 @@
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '@/(main layout)/transactions/types';
 
 // calculates income and expenses statistics for the previous period relative to the current date.
 export default function getPreviousPeriodStats(

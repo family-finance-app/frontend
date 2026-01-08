@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import type { CreateTransactionFormData } from '@/types/transaction';
-import type { Transaction } from '@/types/transaction';
+import type { Transaction, CreateTransactionFormData } from '../types';
 import { Category } from '@/types/category';
 import type { Account } from '@/types/account';
 import { useCreateTransaction } from '@/api/transactions/mutations';
@@ -15,9 +14,9 @@ interface UseCreateTransactionFormReturn {
   resetForm: () => void;
 }
 
-export const useCreateTransactionForm = (
+export default function useCreateTransactionForm(
   onSuccess?: (transaction: Transaction) => void
-): UseCreateTransactionFormReturn => {
+): UseCreateTransactionFormReturn {
   const createMutation = useCreateTransaction();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -108,4 +107,4 @@ export const useCreateTransactionForm = (
     handleSubmit,
     resetForm,
   };
-};
+}

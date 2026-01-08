@@ -1,4 +1,4 @@
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '@/(main layout)/transactions/types';
 import previousPeriodStats from './previousPeriodStats';
 import { formatCurrencyAmount } from '@/utils/formatters';
 

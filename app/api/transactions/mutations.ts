@@ -3,13 +3,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import type {
+import {
   CreateTransactionFormData,
   CreateTransferFormData,
   Transaction,
   TransactionResponse,
   UpdateTransactionFormData,
-} from '@/types/transaction';
+} from '@/(main layout)/transactions/types';
 import type { Account } from '@/types/account';
 import { getAuthToken } from '@/utils/token';
 

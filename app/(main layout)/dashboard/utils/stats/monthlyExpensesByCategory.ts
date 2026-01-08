@@ -1,5 +1,4 @@
-import { Transaction } from '@/types/transaction';
-import { Category } from '@/types/category';
+import { Transaction } from '@/(main layout)/transactions/types';
 
 // calculates expenses per current month by category
 export default function calculateMonthExpensesByCategory(

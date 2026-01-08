@@ -4,7 +4,7 @@ import { AreaChart } from '@/components/charts/AreaChart';
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { ReactNode } from 'react';
 
-import { DashboardChartDataProps } from '../types/dashboardChartDataProps';
+import { DashboardChartDataProps } from '../types';
 
 export interface FinancialCardProps {
   title: string;

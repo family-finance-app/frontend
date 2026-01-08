@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '../types';
 import { useUpdateTransaction } from '@/api/transactions/mutations';
 import { useCategories } from '@/api/categories/queries';
-import { roboto } from '../../assets/fonts/fonts';
-import { FormActions, FormInput, FormSelect } from '../shared/forms';
+import { roboto } from '../../../assets/fonts/fonts';
+import {
+  FormActions,
+  FormInput,
+  FormSelect,
+} from '../../../components/shared/forms';
 
 interface EditTransactionModalProps {
   transaction: Transaction | null;

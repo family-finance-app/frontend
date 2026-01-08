@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '../types';
 
 export interface TransactionEditState {
   transaction: Transaction | null;
   isOpen: boolean;
 }
 
-export function useTransactionEdit() {
+export default function useTransactionEdit() {
   const [editState, setEditState] = useState<TransactionEditState>({
     transaction: null,
     isOpen: false,

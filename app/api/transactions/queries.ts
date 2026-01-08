@@ -2,9 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { Transaction } from '@/types/transaction';
+import { Transaction } from '@/(main layout)/transactions/types';
 import { getAuthToken } from '@/utils/token';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const queryKeys = {
   transactions: {
@@ -28,13 +28,9 @@ const queryKeys = {
 
 // get all transactions
 export const useTransactions = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.transactions.all,
@@ -43,19 +39,15 @@ export const useTransactions = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
   });
 };
 
 // get a transaction by id
 export const useTransaction = (id: string) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.transactions.detail(id),
@@ -64,7 +56,7 @@ export const useTransaction = (id: string) => {
         token: token || undefined,
       });
     },
-    enabled: !!token && !!id && isClient,
+    enabled: !!token && !!id,
   });
 };
 
@@ -72,13 +64,9 @@ export const useTransaction = (id: string) => {
  * Get transactions by account ID
  */
 export const useTransactionsByAccount = (accountId: string) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.transactions.byAccount(accountId),
@@ -88,19 +76,15 @@ export const useTransactionsByAccount = (accountId: string) => {
         { token: token || undefined }
       );
     },
-    enabled: !!token && !!accountId && isClient,
+    enabled: !!token && !!accountId,
   });
 };
 
 // get the current user's transactions
 export const useMyTransactions = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.transactions.my,
@@ -109,19 +93,15 @@ export const useMyTransactions = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
   });
 };
 
 // get family transactions
 export const useFamilyTransactions = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.transactions.family,
@@ -130,6 +110,6 @@ export const useFamilyTransactions = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
   });
 };
