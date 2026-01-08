@@ -7,14 +7,7 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useCategories } from '@/api/categories/queries';
 import TransactionList from '@/components/transactions/TransactionList';
 import EditTransactionModal from '@/components/transactions/EditTransactionModal';
-import Button from '@/components/ui/Button';
-import {
-  TransactionsHeader,
-  // TransactionsStats,
-  TransactionsFilters,
-  TransactionSuccessMessage,
-  CreateTransactionSection,
-} from '@/components/transactions';
+import { TransactionsFilters } from '@/components/transactions';
 import {
   filterTransactions,
   calculateTransactionStats,
@@ -23,8 +16,6 @@ import { enrichTransactionsWithData } from '@/utils/transactions';
 import { formatTransactionsForList } from '@/utils/transactions';
 
 export default function MyTransactions() {
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -54,17 +45,6 @@ export default function MyTransactions() {
     timeRange
   );
 
-  const stats = calculateTransactionStats(filteredTransactions);
-
-  const showSuccessMessage = () => {
-    setIsVisible(true);
-    setShowCreateForm(false);
-
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 3000);
-  };
-
   const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setIsEditModalOpen(true);
@@ -77,16 +57,6 @@ export default function MyTransactions() {
 
   return (
     <div className="space-y-6">
-      {/* <TransactionsHeader onAddClick={() => setShowCreateForm(true)} /> */}
-
-      <TransactionSuccessMessage visible={isVisible} />
-
-      {/* <CreateTransactionSection
-        isVisible={showCreateForm}
-        onSuccess={showSuccessMessage}
-        onCancel={() => setShowCreateForm(false)}
-      /> */}
-
       <TransactionsFilters
         filterType={filterType}
         timeRange={timeRange}
