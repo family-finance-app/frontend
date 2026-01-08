@@ -210,6 +210,30 @@ const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
     },
     forwardedRef
   ) => {
+    const containerRef = React.useRef<HTMLDivElement>(null); // CUSTOM
+    const [containerSize, setContainerSize] = React.useState({
+      width: 0,
+      height: 0,
+    });
+
+    React.useEffect(() => {
+      if (!containerRef.current) return;
+
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          if (width > 0 && height > 0) {
+            setContainerSize({ width, height });
+          }
+        }
+      });
+
+      resizeObserver.observe(containerRef.current);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, []); //
     const CustomTooltip = customTooltip;
     const [activeIndex, setActiveIndex] = React.useState<number | undefined>(
       undefined
@@ -251,13 +275,15 @@ const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
 
     return (
       <div
-        ref={forwardedRef}
+        ref={containerRef}
         className={cx('h-40 w-40', className)}
         tremor-id="tremor-raw"
         {...other}
       >
-        <ResponsiveContainer className="size-full">
+        {containerSize.width > 0 && containerSize.height > 0 ? (
           <ReChartsDonutChart
+            width={containerSize.width}
+            height={containerSize.height}
             onClick={
               onValueChange && activeIndex !== undefined
                 ? () => {
@@ -346,7 +372,7 @@ const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
               />
             )}
           </ReChartsDonutChart>
-        </ResponsiveContainer>
+        ) : null}
       </div>
     );
   }

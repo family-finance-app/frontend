@@ -1,6 +1,6 @@
-import React from 'react';
 import { roboto, jetbrainsMono } from '../../../assets/fonts/fonts';
 import { AreaChart } from '@/components/charts/AreaChart';
+
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { ReactNode } from 'react';
 

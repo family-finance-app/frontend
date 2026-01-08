@@ -538,6 +538,32 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
       isDarkMode,
       ...other
     } = props;
+
+    const containerRef = React.useRef<HTMLDivElement>(null); // CUSTOM
+    const [containerSize, setContainerSize] = React.useState({
+      //
+      width: 0,
+      height: 0,
+    });
+
+    React.useEffect(() => {
+      if (!containerRef.current) return;
+
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          if (width > 0 && height > 0) {
+            setContainerSize({ width, height });
+          }
+        }
+      });
+
+      resizeObserver.observe(containerRef.current);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, []); //
     const CustomTooltip = customTooltip;
     const paddingValue =
       (!showXAxis && !showYAxis) || (startEndOnly && !showYAxis) ? 0 : 20;
@@ -669,18 +695,15 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
 
     return (
       <div
-        ref={ref}
+        ref={containerRef}
         className={cx('h-80 w-full', className)}
         tremor-id="tremor-raw"
         {...other}
       >
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-          minWidth={1}
-          minHeight={1}
-        >
+        {containerSize.width > 0 && containerSize.height > 0 ? (
           <RechartsAreaChart
+            width={containerSize.width}
+            height={containerSize.height}
             data={data}
             onClick={
               hasOnValueChange && (activeLegend || activeDot)
@@ -1037,7 +1060,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
                 ))
               : null}
           </RechartsAreaChart>
-        </ResponsiveContainer>
+        ) : null}
       </div>
     );
   }

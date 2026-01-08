@@ -582,6 +582,33 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
       isDarkMode,
       ...other
     } = props;
+
+    const containerRef = React.useRef<HTMLDivElement>(null); // CUSTOM
+    const [containerSize, setContainerSize] = React.useState({
+      //
+      width: 0,
+      height: 0,
+    });
+
+    React.useEffect(() => {
+      if (!containerRef.current) return;
+
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          if (width > 0 && height > 0) {
+            setContainerSize({ width, height });
+          }
+        }
+      });
+
+      resizeObserver.observe(containerRef.current);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, []); //
+
     const paddingValue = !showXAxis && !showYAxis ? 0 : 20;
     const [legendHeight, setLegendHeight] = React.useState(60);
     const [activeLegend, setActiveLegend] = React.useState<string | undefined>(
@@ -635,12 +662,14 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
 
     return (
       <div
-        ref={forwardedRef}
+        ref={containerRef}
         className={cx('h-80 w-full', className)}
         {...other}
       >
-        <ResponsiveContainer>
+        {containerSize.width > 0 && containerSize.height > 0 ? (
           <RechartsBarChart
+            width={containerSize.width}
+            height={containerSize.height}
             data={data}
             onClick={
               hasOnValueChange && (activeLegend || activeBar)
@@ -819,7 +848,7 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
               />
             ))}
           </RechartsBarChart>
-        </ResponsiveContainer>
+        ) : null}
       </div>
     );
   }
