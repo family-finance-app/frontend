@@ -1,8 +1,36 @@
 import React from 'react';
-import { roboto, jetbrainsMono } from '../../assets/fonts/fonts';
+import { roboto, jetbrainsMono } from '../../../assets/fonts/fonts';
 import { AreaChart } from '@/components/charts/AreaChart';
-import { FinancialCardProps } from '@/interfaces/financialCardProps';
 import { formatCurrencyAmount } from '@/utils/formatters';
+import { ReactNode } from 'react';
+
+import { DashboardChartDataProps } from '../types/dashboardChartDataProps';
+
+export interface FinancialCardProps {
+  title: string;
+  value: number | string;
+  change?: {
+    value: string | number;
+    type: 'positive' | 'negative' | 'neutral';
+    period?: string;
+  };
+  description?: string;
+  icon?: ReactNode;
+  trend?: ReactNode;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  chartData?: DashboardChartDataProps[];
+  chartColor?:
+    | 'moss'
+    | 'hazel'
+    | 'salmon'
+    | 'kashmir_light'
+    | 'kashmir'
+    | 'primary'
+    | 'pink'
+    | 'moss_light'
+    | 'fuchsia_pink';
+}
 
 export default function FinancialCard({
   title,
@@ -88,17 +116,19 @@ export default function FinancialCard({
       </div>
 
       {chartData && chartData.length > 0 && (
-        <AreaChart
-          data={chartData}
-          index="date"
-          categories={['amount']}
-          showLegend={false}
-          showYAxis={false}
-          startEndOnly={true}
-          valueFormatter={(value) => formatCurrencyAmount(value)}
-          className="-mb-2 mt-8 h-48"
-          colors={[chartColor]}
-        />
+        <div className="mt-8 -mb-2 h-48 min-h-48 w-full min-w-0">
+          <AreaChart
+            data={chartData}
+            index="date"
+            categories={['amount']}
+            showLegend={false}
+            showYAxis={false}
+            startEndOnly={true}
+            valueFormatter={(value) => formatCurrencyAmount(value)}
+            className="h-full w-full"
+            colors={[chartColor]}
+          />
+        </div>
       )}
     </div>
   );

@@ -7,7 +7,7 @@ interface DashboardHeaderProps {
   onTimeframeChange: (timeframe: 'week' | 'month' | 'year') => void;
 }
 
-export function DashboardHeader({
+export default function DashboardHeader({
   timeframe,
   onTimeframeChange,
 }: DashboardHeaderProps) {
@@ -23,7 +23,7 @@ export function DashboardHeader({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <h1
           className={`${roboto.className} text-3xl font-bold text-primary-800 mb-2`}
@@ -35,13 +35,13 @@ export function DashboardHeader({
         </p>
       </div>
 
-      <div className="flex items-center space-x-3 mt-4 lg:mt-0">
-        <div className="flex bg-background-100 dark:bg-background-300 rounded-xl p-1">
+      <div className="w-full hidden lg:flex lg:w-auto space-y-3 sm:space-y-0">
+        <div className="sm:hidden md:hidden lg:flex bg-background-100 dark:bg-background-300 rounded-xl p-1 overflow-x-auto">
           {(['week', 'month', 'year'] as const).map((period) => (
             <button
               key={period}
               onClick={() => onTimeframeChange(period)}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shrink-0 ${
                 timeframe === period
                   ? 'bg-white text-primary-800 dark:bg-background-100 shadow-sm'
                   : 'text-background-600 hover:text-background-900'

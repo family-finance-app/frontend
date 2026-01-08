@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button_financial';
-import TransactionList from '@/components/ui/TransactionList';
-import EditTransactionModal from '@/components/ui/EditTransactionModal';
+import TransactionList from '../../../components/transactions/TransactionList';
+import EditTransactionModal from '@/components/transactions/EditTransactionModal';
 import { Transaction } from '@/types/transaction';
 import { Account } from '@/types/account';
 import { useRouter } from 'next/navigation';
@@ -23,7 +23,7 @@ interface DashboardTransactionsSectionProps {
   isLoading: boolean;
 }
 
-export function DashboardTransactionsSection({
+export default function DashboardTransactionsSection({
   transactions,
   accounts,
   categories,
@@ -36,6 +36,10 @@ export function DashboardTransactionsSection({
   const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setIsEditModalOpen(true);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditModalOpen(false);
   };
 
   const router = useRouter();

@@ -1,13 +1,13 @@
 'use client';
 
-import StatsCard from '@/components/ui/StatsCard';
+import StatsCard from '../cards/StatsCard';
 
 interface DashboardExpensesSectionProps {
   expensesByCategory: Array<{ label: string; value: number }>;
   isLoading: boolean;
 }
 
-export function DashboardExpensesSection({
+export default function DashboardExpensesSection({
   expensesByCategory,
   isLoading,
 }: DashboardExpensesSectionProps) {

@@ -1,8 +1,7 @@
-import { ReactNode } from 'react';
-import { jetbrainsMono, roboto } from '../../assets/fonts/fonts';
+import { jetbrainsMono, roboto } from '@/assets/fonts/fonts';
 import { formatCurrencyAmount } from '@/utils/formatters';
-import SimpleBarChart from '../charts/SimpleBarChart';
-import ProgressBar from '../charts/ProgressBar';
+import SimpleBarChart from '@/components/charts/SimpleBarChart';
+import ProgressBar from '@/components/charts/ProgressBar';
 
 interface ChartData {
   label: string;
@@ -76,29 +75,42 @@ export default function StatsCard({
 
       {showLegend && (
         <div className="mt-6 pt-6 border-t border-background-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 lg:gap-6">
             {data.map((item, index) => {
               const percentage = ((item.value / total) * 100).toFixed(1);
               const colorKey = colorPalette[index % colorPalette.length];
               const tailwindClass = colorToTailwind[colorKey];
+              const shortLabel =
+                item.label.length > 14
+                  ? `${item.label.slice(0, 14)}…`
+                  : item.label;
 
               return (
                 <div key={index} className="flex items-center space-x-3">
                   <div className={`w-3 h-3 rounded-full ${tailwindClass}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-background-900 dark:text-background-100 truncate">
-                      {item.label}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <p
-                        className={`${jetbrainsMono.className} text-sm text-background-600 dark:text-white`}
-                      >
-                        {formatCurrencyAmount(item.value)}
+                    <div className="lg:hidden 2xl:block">
+                      <p className="text-sm font-medium text-background-900 dark:text-background-100 truncate">
+                        {item.label}
                       </p>
-                      <span
-                        className={`text-sm text-background-500 dark:text-background-100`}
-                      >
-                        ({percentage}%)
+                      <div className="flex items-center space-x-2">
+                        <p
+                          className={`${jetbrainsMono.className} text-sm text-background-600 dark:text-white`}
+                        >
+                          {formatCurrencyAmount(item.value)}
+                        </p>
+                        <span className="text-sm text-background-500 dark:text-background-100">
+                          ({percentage}%)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="hidden lg:flex 2xl:hidden items-center justify-between gap-4">
+                      <p className="text-sm font-medium text-background-900 dark:text-background-100 truncate">
+                        {shortLabel}
+                      </p>
+                      <span className="text-sm text-background-500 dark:text-background-100 whitespace-nowrap ml-4 min-w-14 text-right">
+                        {percentage}%
                       </span>
                     </div>
                   </div>

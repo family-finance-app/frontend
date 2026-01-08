@@ -1,9 +1,29 @@
 'use client';
 
-import React from 'react';
-import FinancialCard from '@/components/ui/FinancialCard';
+import FinancialCard from '@/(main layout)/dashboard/cards/FinancialCard';
 import { formatCurrencyAmount } from '@/utils/formatters';
-import { DashboardStatsSectionProps } from '@/interfaces/dashboardStatsSectionProps';
+import { DashboardChartDataProps } from '../types/dashboardChartDataProps';
+
+export interface DashboardStatsSectionProps {
+  income: number;
+  expenses: number;
+  savings: number;
+  savingsRate: number;
+  period: 'week' | 'month' | 'year';
+  incomeChange?: {
+    value: number;
+    type: 'positive' | 'negative' | 'neutral';
+    displayValue: string;
+  };
+  expensesChange?: {
+    value: number;
+    type: 'positive' | 'negative' | 'neutral';
+    displayValue: string;
+  };
+  incomeComparison?: DashboardChartDataProps[];
+  expensesComparison?: DashboardChartDataProps[];
+  savingsComparison?: DashboardChartDataProps[];
+}
 
 const INCOME_ICON = (
   <svg
@@ -53,7 +73,7 @@ const SAVINGS_ICON = (
   </svg>
 );
 
-export function DashboardStatsSection({
+export default function DashboardStatsSection({
   income,
   expenses,
   savings,
@@ -97,7 +117,7 @@ export function DashboardStatsSection({
   const labels = getPeriodLabels();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full min-h-48 min-w-0">
       <div>
         <FinancialCard
           title={labels.income}
@@ -119,39 +139,42 @@ export function DashboardStatsSection({
         />
       </div>
 
-      <FinancialCard
-        title={labels.expenses}
-        value={formatCurrencyAmount(expenses)}
-        change={
-          expensesChange
-            ? {
-                value: expensesChange.displayValue,
-                type: expensesChange.type,
-                period: ` vs ${labels.comparison}`,
-              }
-            : undefined
-        }
-        description={`All spending ${labels.description}`}
-        size="md"
-        icon={EXPENSES_ICON}
-        chartData={expensesComparison}
-        chartColor="salmon"
-      />
-
-      <FinancialCard
-        title={labels.savings}
-        value={formatCurrencyAmount(savings)}
-        change={{
-          value: `${savingsRate.toFixed(1)}%`,
-          type: 'neutral',
-          period: ` of income ${labels.description}`,
-        }}
-        description={`All savings ${labels.description}`}
-        size="md"
-        icon={SAVINGS_ICON}
-        chartData={savingsComparison}
-        chartColor="kashmir"
-      />
+      <div>
+        <FinancialCard
+          title={labels.expenses}
+          value={formatCurrencyAmount(expenses)}
+          change={
+            expensesChange
+              ? {
+                  value: expensesChange.displayValue,
+                  type: expensesChange.type,
+                  period: ` vs ${labels.comparison}`,
+                }
+              : undefined
+          }
+          description={`All spending ${labels.description}`}
+          size="md"
+          icon={EXPENSES_ICON}
+          chartData={expensesComparison}
+          chartColor="salmon"
+        />
+      </div>
+      <div>
+        <FinancialCard
+          title={labels.savings}
+          value={formatCurrencyAmount(savings)}
+          change={{
+            value: `${savingsRate.toFixed(1)}%`,
+            type: 'neutral',
+            period: ` of income ${labels.description}`,
+          }}
+          description={`All savings ${labels.description}`}
+          size="md"
+          icon={SAVINGS_ICON}
+          chartData={savingsComparison}
+          chartColor="kashmir"
+        />
+      </div>
     </div>
   );
 }

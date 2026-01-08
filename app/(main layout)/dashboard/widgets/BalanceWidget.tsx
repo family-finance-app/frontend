@@ -1,5 +1,8 @@
-import { ReactNode } from 'react';
-import { roboto, jetbrainsMono } from '../../assets/fonts/fonts';
+'use client';
+
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
+import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import Link from 'next/link';
 
 interface BalanceWidgetProps {
@@ -20,19 +23,27 @@ export default function BalanceWidget({
   accounts,
   className = '',
 }: BalanceWidgetProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-      .format(amount)
-      .replace(/,/g, ' ');
-  };
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const infoRef = useRef<HTMLDivElement>(null);
 
-  const formatPercentage = (percentage: number) => {
-    const validPercentage = isNaN(percentage) ? 0 : percentage;
-    return `${validPercentage > 0 ? '+' : ''}${validPercentage.toFixed(1)}%`;
-  };
+  useEffect(() => {
+    if (!isInfoOpen) return;
+
+    const handleOutside = (event: MouseEvent | TouchEvent) => {
+      if (!infoRef.current) return;
+      if (!infoRef.current.contains(event.target as Node)) {
+        setIsInfoOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+
+    return () => {
+      document.removeEventListener('click', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isInfoOpen]);
 
   return (
     <div
@@ -40,28 +51,7 @@ export default function BalanceWidget({
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <pattern
-              id="grid"
-              width="10"
-              height="10"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M 10 0 L 0 0 0 10"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100" height="100" fill="url(#grid)" />
-        </svg>
+        <Image src="/background.svg" fill alt="balance widget background" />
       </div>
 
       {/* Main Balance Section */}
@@ -74,11 +64,22 @@ export default function BalanceWidget({
               >
                 Total Balance
               </p>
-              <div className="relative group">
-                <button className="text-primary-200 hover:text-white transition-colors text-sm leading-none">
+              <div className="relative group" ref={infoRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsInfoOpen((prev) => !prev)}
+                  className="text-primary-200 hover:text-white transition-colors text-sm leading-none"
+                  aria-expanded={isInfoOpen}
+                  aria-controls="total-balance-tooltip"
+                >
                   ⓘ
                 </button>
-                <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-primary-900/95 border border-primary-700 text-primary-50 text-sm rounded-lg px-4 py-3 whitespace-normal z-50 w-72 backdrop-blur-sm shadow-lg">
+                <div
+                  id="total-balance-tooltip"
+                  className={`absolute left-0 top-full mt-2 ${
+                    isInfoOpen ? 'block' : 'hidden'
+                  } md:group-hover:block bg-primary-900/95 border border-primary-700 text-primary-50 text-sm rounded-lg px-4 py-3 whitespace-normal z-80 w-52 backdrop-blur-sm shadow-lg`}
+                >
                   Total balance of all accounts in UAH equivalent, calculated at
                   current exchange rates
                 </div>
