@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import * as RemixIcon from '@remixicon/react';
 import TransactionActionModal from '../transactions/TransactionActionModal';
 import { Transaction } from '@/types/transaction';
 import { formatCurrencyAmount } from '@/utils/formatters';
@@ -61,8 +62,18 @@ export default function TransactionItem({
 
   const category = categories.find((cat) => cat.id === transaction.categoryId);
   const categoryName = transaction.category?.name || category?.name || 'Other';
+  const categoryIcon = transaction.category?.icon || category?.icon;
 
   const transactionTitle = transaction.description || categoryName;
+
+  const IconComponent = useMemo(() => {
+    if (!categoryIcon) return null;
+    const pascalCase = categoryIcon
+      .split('-')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
+    return (RemixIcon as any)[pascalCase] || null;
+  }, [categoryIcon]);
 
   const accountData =
     transaction.account ||
@@ -79,7 +90,7 @@ export default function TransactionItem({
         <div
           className={`w-8 h-8 rounded-lg ${config.bgColor} flex items-center justify-center text-sm`}
         >
-          {config.icon}
+          {IconComponent ? <IconComponent className="w-5 h-5" /> : config.icon}
         </div>
 
         <div className="flex-1 min-w-0">
