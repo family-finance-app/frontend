@@ -15,38 +15,40 @@ import {
 } from '@/api/exchangeRate/cache';
 
 export interface CurrencyRateResponse {
-  r030: number;
-  txt: string;
-  rate: number;
-  cc: string;
-  exchangedate: string;
+  currencyCodeA: number;
+  currencyCodeB: number;
+  date: number;
+  rateSell: number;
+  rateBuy: number;
+  rateCross: number;
 }
 
-const NBU_API_URL = process.env.NEXT_PUBLIC_NBU_API_URL;
+const MONO_EXCHANGE_API_URL = process.env.NEXT_PUBLIC_MONO_EXCHANGE_API_URL;
 
 async function fetchExchangeRates(): Promise<ExchangeRate> {
   try {
     // use central api client for third-party requests
     const data = await apiClient.externalGet<CurrencyRateResponse[]>(
-      NBU_API_URL ||
-        'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json'
+      MONO_EXCHANGE_API_URL || 'https://api.monobank.ua/bank/currency'
     );
 
     const rates: ExchangeRate = { UAH: 1 };
 
-    // parse currencies (USD, EUR, etc.)
+    // parse currencies using currency codes (840 = USD, 978 = EUR)
     data.forEach((item) => {
-      const cc = (item.cc || '').toUpperCase();
-      if (cc === 'USD') {
-        rates.USD = item.rate;
-      } else if (cc === 'EUR') {
-        rates.EUR = item.rate;
+      // 840 = USD, 978 = EUR, 980 = UAH
+      if (item.currencyCodeA === 840 && item.currencyCodeB === 980) {
+        // USD to UAH
+        rates.USD = item.rateCross || item.rateSell;
+      } else if (item.currencyCodeA === 978 && item.currencyCodeB === 980) {
+        // EUR to UAH
+        rates.EUR = item.rateCross || item.rateSell;
       }
     });
 
     return rates;
   } catch (error) {
-    console.warn('⚠️ Using fallback exchange rates (API unavailable)');
+    console.warn('Using fallback exchange rates (API unavailable)');
     return DEFAULT_RATES;
   }
 }
