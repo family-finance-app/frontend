@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { useExchangeRates } from '@/api/exchangeRate/queries';
 import { formatCurrencyAmount } from '@/utils/formatters';
 
@@ -12,6 +12,27 @@ export function SidebarExchangeRatesWidget({
   compact = false,
 }: SidebarExchangeRatesWidgetProps) {
   const { data: rates, isLoading } = useExchangeRates();
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const infoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isInfoOpen) return;
+
+    const handleOutside = (event: MouseEvent | TouchEvent) => {
+      if (!infoRef.current) return;
+      if (!infoRef.current.contains(event.target as Node)) {
+        setIsInfoOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+
+    return () => {
+      document.removeEventListener('click', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isInfoOpen]);
 
   const lastUpdated = useMemo(() => {
     try {
@@ -50,12 +71,24 @@ export function SidebarExchangeRatesWidget({
           <span className="text-xs font-semibold text-background-900 uppercase tracking-wider">
             Exchange Rates
           </span>
-          <div className="relative group">
-            <button className="text-xs text-background-500 dark:text-background-800 hover:text-background-700 transition-colors">
+          <div className="relative group" ref={infoRef}>
+            <button
+              className="text-xs text-background-500 dark:text-background-800 hover:text-background-700 transition-colors"
+              type="button"
+              onClick={() => setIsInfoOpen((prev) => !prev)}
+              aria-expanded={isInfoOpen}
+              aria-controls="exchange-rate-tooltip"
+            >
               ⓘ
             </button>
-            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-stack-600 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-50">
-              {lastUpdated && `Updated: ${lastUpdated}`}
+            <div
+              className={`absolute right-0 top-full mt-2 ${
+                isInfoOpen ? 'block' : 'hidden'
+              } md:group-hover:block bg-primary-900/95 border border-primary-700 text-primary-50 text-sm rounded-lg px-4 py-3 whitespace-normal z-80 w-52 backdrop-blur-sm shadow-lg`}
+              id="exchange-rate-tooltip"
+            >
+              {lastUpdated &&
+                `Monobank exchange rate. Last updated: ${lastUpdated}`}
             </div>
           </div>
         </div>

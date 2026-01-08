@@ -1,27 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Account } from '@/types/account';
+import { Account, EditAccountFormData } from '@/types/account';
+import { FormErrors } from '@/types/auth';
 import { roboto } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
 import {
   getAccountTypeName,
-  type AccountType,
   ACCOUNT_TYPES,
   CURRENCY_OPTIONS,
 } from '@/utils/accounts';
+import { validateEditAccountForm } from '@/utils/validation';
 
 interface EditAccountFormProps {
   account: Account;
   isOpen: boolean;
   onClose: () => void;
   onSave: (accountId: number, data: EditAccountFormData) => Promise<void>;
-}
-
-export interface EditAccountFormData {
-  name: string;
-  type: AccountType;
-  currency: string;
 }
 
 export function EditAccountForm({
@@ -32,18 +27,19 @@ export function EditAccountForm({
 }: EditAccountFormProps) {
   const [formData, setFormData] = useState<EditAccountFormData>({
     name: account?.name || '',
-    type: (account?.type as AccountType) || 'BANK',
-    currency: account?.currency || 'USD',
+    type: account?.type || 'BANK',
+    currency: account?.currency || 'UAH',
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (account) {
       setFormData({
         name: account.name || '',
-        type: (account.type as AccountType) || 'BANK',
+        type: account.type || 'BANK',
         currency: account.currency || 'USD',
       });
     }
@@ -59,34 +55,33 @@ export function EditAccountForm({
       ...prev,
       [name]: value,
     }));
+    setFormErrors((prev) => {
+      if (!prev[name]) return prev;
+      const nextErrors = { ...prev };
+      delete nextErrors[name];
+      return nextErrors;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setSubmitError(null);
+    setFormErrors({});
     setIsLoading(true);
 
     try {
-      // Validate form data
-      if (!formData.name.trim()) {
-        setError('Account name is required');
+      const validationErrors = validateEditAccountForm(formData);
+      if (Object.keys(validationErrors).length > 0) {
+        setFormErrors(validationErrors);
         setIsLoading(false);
         return;
       }
-
-      if (!formData.currency.trim()) {
-        setError('Currency is required');
-        setIsLoading(false);
-        return;
-      }
-
-      // Call API through parent component
       await onSave(account.id, formData);
-
-      // Close form on success
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save account');
+      setSubmitError(
+        err instanceof Error ? err.message : 'Failed to save account'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -96,32 +91,23 @@ export function EditAccountForm({
 
   return (
     <div className="bg-background-50 border border-background-200 rounded-2xl p-6 mt-6 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3
-          className={`${roboto.className} text-lg font-bold text-background-900`}
+          className={`${roboto.className} text-lg font-bold text-primary-800`}
         >
           Edit Account
         </h3>
-        <button
-          onClick={onClose}
-          className="text-background-500 hover:text-background-900 transition-colors"
-        >
-          ✕
-        </button>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Error Message */}
-        {error && (
+        {submitError && (
           <div className="bg-danger-50 border border-danger-200 rounded-lg p-3">
-            <p className="text-danger-700 text-sm font-medium">{error}</p>
+            <p className="text-danger-700 text-sm font-medium">{submitError}</p>
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Account Name */}
           <div>
             <label
               htmlFor="name"
@@ -136,12 +122,18 @@ export function EditAccountForm({
               value={formData.name}
               onChange={handleChange}
               disabled={isLoading}
+              aria-invalid={Boolean(formErrors.name)}
+              aria-describedby={formErrors.name ? 'name-error' : undefined}
               className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-background-50 disabled:text-background-500"
               placeholder="My Checking Account"
             />
+            {formErrors.name && (
+              <p id="name-error" className="mt-1 text-sm text-danger-600">
+                {formErrors.name}
+              </p>
+            )}
           </div>
 
-          {/* Account Type */}
           <div>
             <label
               htmlFor="type"
@@ -155,6 +147,8 @@ export function EditAccountForm({
               value={formData.type}
               onChange={handleChange}
               disabled={isLoading}
+              aria-invalid={Boolean(formErrors.type)}
+              aria-describedby={formErrors.type ? 'type-error' : undefined}
               className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-background-50 disabled:text-background-500"
             >
               {ACCOUNT_TYPES.map((type) => (
@@ -163,9 +157,13 @@ export function EditAccountForm({
                 </option>
               ))}
             </select>
+            {formErrors.type && (
+              <p id="type-error" className="mt-1 text-sm text-danger-600">
+                {formErrors.type}
+              </p>
+            )}
           </div>
 
-          {/* Currency */}
           <div>
             <label
               htmlFor="currency"
@@ -179,6 +177,10 @@ export function EditAccountForm({
               value={formData.currency}
               onChange={handleChange}
               disabled={isLoading}
+              aria-invalid={Boolean(formErrors.currency)}
+              aria-describedby={
+                formErrors.currency ? 'currency-error' : undefined
+              }
               className="w-full px-3 py-2 border border-background-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-background-50 disabled:text-background-500 uppercase"
             >
               {CURRENCY_OPTIONS.map((currency) => (
@@ -187,10 +189,14 @@ export function EditAccountForm({
                 </option>
               ))}
             </select>
+            {formErrors.currency && (
+              <p id="currency-error" className="mt-1 text-sm text-danger-600">
+                {formErrors.currency}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="flex items-center gap-3 pt-4 ">
           <Button
             text="Cancel"

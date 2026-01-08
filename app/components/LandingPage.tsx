@@ -6,13 +6,13 @@ import { useState, useEffect } from 'react';
 import Hero from './Hero';
 import Features from './Features';
 import CTA from './CTA';
-import Logo_dark from './ui/Logo_dark';
 import Footer from './ui/Footer';
 import Logo_light from './ui/Logo_light';
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
   const [scrollBlur, setScrollBlur] = useState(0);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,7 +20,7 @@ export default function LandingPage() {
       const maxScroll =
         document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = (scrolled / maxScroll) * 100;
-      // Max blur of 20px
+
       const blur = Math.min((scrollPercent / 100) * 20, 20);
       setScrollBlur(blur);
     };
@@ -42,16 +42,64 @@ export default function LandingPage() {
           transition: 'filter 0.1s ease-out',
         }}
       />
-      <nav className="relative z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Logo_light />
+      <nav className="relative z-50 border-b border-white/20 backdrop-blur-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="shrink-0">
+              <Logo_light />
+            </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center space-x-3">
+                {isAuthenticated ? (
+                  <Link
+                    href="/dashboard"
+                    className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/sign-in"
+                      className="text-background-600 hover:text-primary-500 px-4 py-2 rounded-lg font-medium transition-colors"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              <button
+                className="sm:hidden inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/20 px-4 py-2 text-sm font-semibold text-background-800 shadow-inner shadow-white/40 backdrop-blur"
+                onClick={() => setIsMobileNavOpen((prev) => !prev)}
+                aria-controls="landing-mobile-nav"
+                aria-expanded={isMobileNavOpen}
+              >
+                {isMobileNavOpen ? 'Close' : 'Menu'}
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="landing-mobile-nav"
+            className={`sm:hidden transition-all duration-200 ease-out ${
+              isMobileNavOpen
+                ? 'max-h-96 opacity-100 mt-4'
+                : 'max-h-0 opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="flex flex-col gap-3 rounded-2xl bg-white/90 p-4 text-center shadow-xl backdrop-blur">
               {isAuthenticated ? (
                 <Link
                   href="/dashboard"
-                  className="bg-primary-300 hover:bg-primary-400 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+                  className="w-full rounded-xl bg-primary-600 px-4 py-3 text-white font-semibold shadow-lg"
                 >
                   Go to Dashboard
                 </Link>
@@ -59,13 +107,13 @@ export default function LandingPage() {
                 <>
                   <Link
                     href="/sign-in"
-                    className="text-background-300 hover:text-primary-400 px-4 py-2 rounded-lg font-medium transition-colors"
+                    className="w-full rounded-xl border border-primary-600 px-4 py-3 font-semibold text-primary-600"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/sign-up"
-                    className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl"
+                    className="w-full rounded-xl bg-primary-600 px-4 py-3 text-white font-semibold shadow-lg"
                   >
                     Get Started
                   </Link>

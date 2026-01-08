@@ -11,13 +11,7 @@ import { useEffect, useState } from 'react';
 
 // get all categories
 export const useCategories = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const token = getAuthToken();
 
   return useQuery({
     queryKey: queryKeys.categories.all,
@@ -26,7 +20,7 @@ export const useCategories = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
     staleTime: 1000 * 60 * 5, // 5min
   });
 };

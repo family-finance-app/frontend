@@ -4,4 +4,3 @@ export { AccountTransactions } from './AccountTransactions';
 export { EditAccountModal } from './EditAccountModal';
 export { EditAccountForm } from './EditAccountForm';
 export { DeleteAccountModal } from './DeleteAccountModal';
-export type { EditAccountFormData } from './EditAccountForm';

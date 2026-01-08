@@ -76,6 +76,10 @@ export default function Sidebar() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const handleMenuNavigate = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
       prev.includes(itemId)
@@ -88,8 +92,10 @@ export default function Sidebar() {
     <>
       <button
         id="toggleSidebarMobile"
-        className="lg:hidden fixed top-4 left-4 z-30 p-2 text-white bg-primary-600 hover:bg-primary-500 rounded-lg transition-colors duration-200"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 text-white bg-primary-600 hover:bg-primary-500 rounded-lg shadow-lg transition-colors duration-200"
         onClick={toggleSidebar}
+        aria-label="Toggle sidebar"
+        aria-expanded={isMobileMenuOpen}
       >
         <svg
           className="w-6 h-6"
@@ -108,7 +114,7 @@ export default function Sidebar() {
 
       <aside
         id="sidebar"
-        className={`fixed top-0 left-0 z-20 w-72 h-full pt-16 duration-300 transition-transform ${
+        className={`fixed top-0 left-0 z-20 w-72 max-w-[90vw] h-full pt-16 duration-300 transition-transform ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 bg-white border-r dark:bg-primary-800 border-background-200 dark:border-background-700 shadow-lg`}
         aria-label="Sidebar"
@@ -119,6 +125,7 @@ export default function Sidebar() {
               items={menuItems}
               expandedItems={expandedItems}
               onToggleExpanded={toggleExpanded}
+              onNavigate={handleMenuNavigate}
             />
           </div>
 

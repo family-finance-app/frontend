@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type { CreateTransactionFormData } from '@/types/transaction';
 import type { Transaction } from '@/types/transaction';
 import { Category } from '@/types/category';
@@ -21,14 +21,17 @@ export const useCreateTransactionForm = (
   const createMutation = useCreateTransaction();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const initialFormData: CreateTransactionFormData = {
-    accountId: '',
-    type: 'EXPENSE' as any,
-    amount: 0,
-    categoryId: '',
-    currency: 'UAH' as any,
-    date: dateFormatters.today(),
-  };
+  const initialFormData = useMemo(
+    () => ({
+      accountId: 0,
+      type: 'EXPENSE' as any,
+      amount: 0,
+      categoryId: 0,
+      currency: 'UAH' as any,
+      date: dateFormatters.today(),
+    }),
+    []
+  );
 
   const [formData, setFormData] =
     useState<CreateTransactionFormData>(initialFormData);

@@ -9,11 +9,11 @@ interface TwoFactorAuthProps {
 
 export function TwoFactorAuth({ isEnabled = false }: TwoFactorAuthProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
+    <div className="bg-white dark:bg-primary-600 rounded-2xl shadow-financial  p-6">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h2
-            className={`${roboto.className} text-lg font-bold text-background-900 mb-2`}
+            className={`${roboto.className} text-lg font-bold text-background-900 dark:text-background-100 mb-2`}
           >
             Two-Factor Authentication
           </h2>
@@ -31,11 +31,10 @@ export function TwoFactorAuth({ isEnabled = false }: TwoFactorAuthProps) {
           )}
 
           {!isEnabled && (
-            <div className="mb-4 p-3 bg-background-50 border border-background-200 rounded-lg">
+            <div className="mb-4 p-3 bg-background-50 dark:bg-background-100 border border-background-200 rounded-lg">
               <p className="text-sm text-background-600">
-                🔒 This feature is coming soon. Enable 2FA to protect your
-                account with an authenticator app like Google Authenticator or
-                Authy.
+                This feature is coming soon. Enable 2FA to protect your account
+                with an authenticator app like Google Authenticator or Authy.
               </p>
             </div>
           )}

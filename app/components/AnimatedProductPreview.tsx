@@ -7,19 +7,22 @@ export default function AnimatedProductPreview() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true);
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div
-      className={`mt-20 transition-all duration-1500 delay-500 ${
+      className={`mt-16 sm:mt-20 px-2 sm:px-0 transition-all duration-1500 delay-500 ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
       }`}
     >
-      <div className="relative mx-auto max-w-5xl">
+      <div className="relative mx-auto w-full max-w-5xl">
         <div className="bg-white rounded-2xl shadow-2xl border border-background-200 overflow-hidden">
           {/* Fake window header */}
-          <div className="bg-linear-to-r from-primary-600 to-primary-700 p-4">
+          <div className="bg-linear-to-r from-primary-600 to-primary-700 p-3 sm:p-4">
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-white/30" />
               <span className="w-2.5 h-2.5 rounded-full bg-white/30" />
@@ -35,7 +38,7 @@ export default function AnimatedProductPreview() {
           </div>
 
           {/* Body – mini version of real dashboard layout */}
-          <div className="p-6 md:p-8 bg-linear-to-br from-white to-background-50">
+          <div className="p-4 sm:p-6 md:p-8 bg-linear-to-br from-white to-background-50">
             {/* Header */}
             <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
@@ -45,7 +48,7 @@ export default function AnimatedProductPreview() {
                   Personal Dashboard
                 </h2>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap justify-center md:justify-end">
                 {['Week', 'Month', 'Year'].map((label, index) => {
                   const isActive = label === 'Month';
                   return (
@@ -65,7 +68,7 @@ export default function AnimatedProductPreview() {
             </div>
 
             {/* First row: Balance (left) + Stats (right) */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Balance Section (mini) */}
               <div className="xl:col-span-1">
                 <div className="bg-white rounded-xl border border-background-200 p-4 shadow-sm">
@@ -111,7 +114,7 @@ export default function AnimatedProductPreview() {
               {/* Stats Section (mini) */}
               <div className="xl:col-span-2">
                 <div className="bg-white rounded-xl border border-background-200 p-4 shadow-sm h-full">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                     <div className="bg-success-50 border border-success-200 rounded-lg p-3">
                       <p className="text-xs text-success-700 font-medium mb-1">
                         Monthly Income

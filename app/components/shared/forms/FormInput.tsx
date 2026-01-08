@@ -4,6 +4,7 @@ interface FormInputProps {
   label?: {
     type: string;
     text: string;
+    clasname?: string;
   };
   name: string;
   type?: string;
@@ -14,6 +15,7 @@ interface FormInputProps {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  classname?: 'auth' | 'internal';
 }
 
 export function FormInput({
@@ -27,12 +29,17 @@ export function FormInput({
   placeholder,
   required = false,
   disabled = false,
+  classname,
 }: FormInputProps) {
   return (
     <div>
       <label
         htmlFor={label?.type}
-        className="block text-sm font-medium text-gray-700 dark:text-background-800 mb-1"
+        className={`block text-sm font-medium mb-1 ${
+          classname === 'internal'
+            ? 'text-gray-700 dark:text-background-800'
+            : 'text-background-800 dark:text-background-300'
+        }`}
       >
         {label?.text}
         {required && <span className="text-danger-700 ml-1">*</span>}
@@ -46,11 +53,11 @@ export function FormInput({
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        className={`
-          w-full px-3 py-2 border rounded-md
-          focus:outline-none focus:ring-2 focus:ring-background-100 dark:focus:ring-primary-600
-          dark:text-primary-800 dark:border-background-800 
-          transition-colors
+        className={`w-full px-3 py-2 border rounded-md transition-colors focus:outline-none focus:ring-2 ${
+          classname === 'internal'
+            ? 'focus:ring-background-100 dark:focus:ring-primary-600 dark:text-primary-800 dark:border-background-800'
+            : 'bg-background-200 dark:bg-background-100 focus:ring-primary-500 dark:focus:ring-primary-500 dark:border-background-100'
+        }  
           ${
             error
               ? 'border-danger-700 dark:border-danger-700'
@@ -63,7 +70,13 @@ export function FormInput({
           }
         `}
       />
-      {error && <p className="text-danger-600 text-sm mt-1">{error}</p>}
+      {error && classname === 'internal' ? (
+        <p className="text-danger-600 text-sm mt-1">{error}</p>
+      ) : (
+        <p className="text-danger-600 dark:text-danger-200 text-sm mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

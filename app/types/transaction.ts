@@ -5,10 +5,10 @@ export interface CreateTransactionFormData {
   amount: number;
   date: string;
   currency: CurrencyType;
-  categoryId: string;
-  accountId: string;
+  categoryId: number;
+  accountId: number;
   description?: string;
-  groupId?: string;
+  groupId?: number;
 }
 
 export interface CreateTransferFormData {
@@ -20,6 +20,13 @@ export interface CreateTransferFormData {
   currency: CurrencyType;
   description?: string;
   date: string;
+}
+
+export interface UpdateTransactionFormData {
+  amount: number;
+  date: string;
+  categoryId?: number;
+  description?: string;
 }
 
 export enum CurrencyType {
@@ -58,8 +65,9 @@ export interface Transaction {
     name: string;
     type: string;
     currency: string;
+    balance: number;
   };
-  category?: {
+  category: {
     id: number;
     name: string;
     type: string;

@@ -1,4 +1,4 @@
-import FinancialCard from '@/components/ui/FinancialCard';
+import FinancialCard from '@/(main layout)/dashboard/cards/FinancialCard';
 
 interface TransactionsStatsProps {
   totalIncome: number;

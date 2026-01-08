@@ -20,9 +20,9 @@ export function LinkedResources({
   return (
     <div className="space-y-6">
       {familyGroups && familyGroups.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
+        <div className="bg-white dark:bg-primary-600 rounded-2xl shadow-financial p-6">
           <h2
-            className={`${roboto.className} text-lg font-bold text-background-900 mb-4`}
+            className={`${roboto.className} text-lg font-bold text-background-900 dark:text-background-100 mb-4`}
           >
             Family Groups (Coming Soon)
           </h2>
@@ -31,7 +31,7 @@ export function LinkedResources({
             {familyGroups.map((group) => (
               <div
                 key={group.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-background-50 border border-background-100 hover:border-primary-300 transition-colors"
+                className="flex items-center justify-between p-3 rounded-lg bg-background-50 dark:bg-background-100 border border-background-100 hover:border-primary-300 transition-colors"
               >
                 <div className="flex-1">
                   <p className="font-medium text-background-900">

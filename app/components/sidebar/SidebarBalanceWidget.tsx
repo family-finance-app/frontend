@@ -3,8 +3,8 @@
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
-import { useTotalBalanceInUAH } from '@/hooks/useTotalBalanceInUAH';
-import { calculatePeriodStats } from '@/utils/financial';
+import { useTotalBalanceInUAH } from '@/hooks';
+import { periodStats } from '@/(main layout)/dashboard/utils';
 import { enrichTransactionsWithData } from '@/utils/transactions';
 import { formatTransactionsForList } from '@/utils/transactions';
 import { formatCurrencyAmount } from '@/utils/formatters';
@@ -24,7 +24,7 @@ export function SidebarBalanceWidget() {
     accounts || [],
     categories || []
   );
-  const monthlyStats = calculatePeriodStats(enrichedTransactions, 'month');
+  const monthlyStats = periodStats(enrichedTransactions, 'month');
 
   const isLoading =
     accountsLoading ||

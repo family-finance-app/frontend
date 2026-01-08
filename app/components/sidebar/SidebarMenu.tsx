@@ -15,12 +15,14 @@ interface SidebarMenuProps {
   items: MenuItem[];
   expandedItems: string[];
   onToggleExpanded: (itemId: string) => void;
+  onNavigate?: () => void;
 }
 
 export function SidebarMenu({
   items,
   expandedItems,
   onToggleExpanded,
+  onNavigate,
 }: SidebarMenuProps) {
   const pathname = usePathname();
 
@@ -77,6 +79,7 @@ export function SidebarMenu({
                 ? 'bg-primary-100 dark:bg-background-100 text-primary-800 shadow-sm border-l-4 border-primary-600'
                 : 'text-background-700 dark:text-stack-200 hover:text-primary-800 dark:hover:text-background-50'
             } ${level > 0 ? 'ml-4 text-sm' : 'text-base font-medium'}`}
+            onClick={() => onNavigate?.()}
           >
             <span>{item.label}</span>
             {item.badge && (

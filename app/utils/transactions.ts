@@ -41,6 +41,7 @@ export function enrichTransactionsWithData(
   categories: any[]
 ): any[] {
   return transactions.map((transaction) => {
+    // Always get account data from the accounts array for complete information
     const account = accounts.find((acc) => acc.id === transaction.accountId);
     const recipientAccount = transaction.accountRecipientId
       ? accounts.find((acc) => acc.id === transaction.accountRecipientId)
@@ -51,16 +52,15 @@ export function enrichTransactionsWithData(
 
     return {
       ...transaction,
-      account:
-        transaction.account ||
-        (account
-          ? {
-              id: account.id,
-              name: account.name,
-              type: account.type,
-              currency: account.currency,
-            }
-          : undefined),
+      // Always use the complete account object from the accounts array
+      account: account
+        ? {
+            id: account.id,
+            name: account.name,
+            type: account.type,
+            currency: account.currency,
+          }
+        : undefined,
       recipientAccount: recipientAccount
         ? {
             id: recipientAccount.id,

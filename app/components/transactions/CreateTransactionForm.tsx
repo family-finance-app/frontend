@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import {
-  CreateTransactionFormData,
   CreateTransferFormData,
+  CreateTransactionFormData,
   TransactionType,
   CurrencyType,
 } from '@/types/transaction';
@@ -57,24 +57,20 @@ export default function CreateTransactionForm({
         newErrors.accountRecipientId =
           'Source and recipient accounts must be different';
 
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        return;
-      }
-
       const transferData: CreateTransferFormData = {
-        accountId: parseInt(accountId),
-        accountRecipientId: parseInt(accountRecipientId),
+        accountId: parseInt(accountId, 10),
+        accountRecipientId: parseInt(accountRecipientId, 10),
         amount: parseFloat(amount),
         currency: CurrencyType.UAH,
         date,
         description,
-        categoryId: parseInt(categoryId) || 68,
+        categoryId: parseInt(categoryId),
       };
 
       createTransferMutation.mutate(transferData, {
         onSuccess: (data: any) => {
-          onSuccess(data.transaction?.id || 0);
+          onSuccess(data?.transaction?.id ?? 0);
+          console.log(data);
         },
         onError: () => {
           onError?.();
@@ -89,17 +85,17 @@ export default function CreateTransactionForm({
         return;
       }
 
-      const formData: CreateTransactionFormData = {
+      const payload: CreateTransactionFormData = {
         type: type as TransactionType,
         amount: parseFloat(amount),
         date,
         currency: CurrencyType.UAH,
         description,
-        accountId,
-        categoryId,
+        accountId: parseInt(accountId),
+        categoryId: parseInt(categoryId),
       };
 
-      createMutation.mutate(formData, {
+      createMutation.mutate(payload, {
         onSuccess: (data: any) => {
           onSuccess(data.id || 0);
         },
@@ -117,7 +113,6 @@ export default function CreateTransactionForm({
 
   const categoryOptions: SelectOption[] = (categories || [])
     .filter((cat) => {
-      if (type === 'TRANSFER') return false;
       return cat.type.toUpperCase() === type;
     })
     .map((cat) => ({
@@ -162,6 +157,7 @@ export default function CreateTransactionForm({
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         error={errors.amount}
+        classname="internal"
       />
 
       <FormInput
@@ -171,6 +167,7 @@ export default function CreateTransactionForm({
         value={date}
         onChange={(e) => setDate(e.target.value)}
         error={errors.date}
+        classname="internal"
       />
 
       {type === 'TRANSFER' ? (
@@ -206,26 +203,27 @@ export default function CreateTransactionForm({
             placeholder="Select an account"
             error={errors.accountId}
           />
-
-          <FormSelect
-            label="Category"
-            name="categoryId"
-            value={categoryId}
-            onChange={setCategoryId}
-            options={categoryOptions}
-            placeholder="Select a category"
-            error={errors.categoryId}
-          />
         </>
       )}
 
+      <FormSelect
+        label="Category"
+        name="categoryId"
+        value={categoryId}
+        onChange={setCategoryId}
+        options={categoryOptions}
+        placeholder="Select a category"
+        error={errors.categoryId}
+      />
+
       <FormInput
-        label={{ type: 'description', text: 'Description' }}
+        label={{ type: 'description', text: 'Description (Optional)' }}
         name="description"
         type="text"
-        placeholder="Add a note..."
+        placeholder="Add a the description to new transaction..."
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        classname="internal"
       />
 
       <FormActions

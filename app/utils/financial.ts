@@ -3,114 +3,7 @@ import { Account } from '@/types/account';
 import { formatCurrencyAmount } from './formatters';
 import { Category } from '@/types/category';
 
-// universal utility for dashboard that calculates income/expenses/savings per chosen period
-export function calculatePeriodStats(
-  transactions: Transaction[],
-  period: 'week' | 'month' | 'year' = 'month',
-  _accounts?: Account[]
-) {
-  const now = new Date();
-  let startDate = new Date();
-
-  if (period === 'week') {
-    startDate.setDate(now.getDate() - now.getDay());
-  } else if (period === 'month') {
-    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-  } else if (period === 'year') {
-    startDate = new Date(now.getFullYear(), 0, 1);
-  }
-
-  const periodTransactions = transactions.filter((transaction) => {
-    const transactionDate = new Date(transaction.date);
-    return transactionDate >= startDate && transactionDate <= now;
-  });
-
-  const income = periodTransactions
-    .filter((t) => t.type === 'INCOME')
-    .reduce((sum, t) => {
-      const amount =
-        typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
-
-  const expenses = periodTransactions
-    .filter((t) => t.type === 'EXPENSE')
-    .reduce((sum, t) => {
-      const amount =
-        typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
-
-  const transfers = periodTransactions
-    .filter((t) => t.type === 'TRANSFER')
-    .reduce((sum, t) => {
-      const amount =
-        typeof t.amount === 'string' ? parseFloat(t.amount) : t.amount;
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
-
-  const savingsAmount = transfers;
-
-  const savingsRate = income > 0 ? (savingsAmount / income) * 100 : 0;
-
-  return {
-    income,
-    expenses,
-    netAmount: income - expenses,
-    savings: savingsAmount,
-    transfers,
-    savingsRate: savingsRate,
-    savingsPercentage: savingsRate,
-    changeType:
-      income - expenses >= 0 ? ('positive' as const) : ('negative' as const),
-    transactionsCount: periodTransactions.length,
-  };
-}
-
-export function calculateMonthlyStats(transactions: Transaction[]) {
-  return calculatePeriodStats(transactions, 'month');
-}
-
-// calculates expenses per current month by category
-export function calculateMonthExpensesByCategory(
-  transactions: Transaction[],
-  categories: any[]
-) {
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-
-  const currentMonthTransactions = transactions.filter((transaction) => {
-    const transactionDate = new Date(transaction.date);
-    return (
-      transactionDate.getMonth() === currentMonth &&
-      transactionDate.getFullYear() === currentYear
-    );
-  });
-
-  const expensesByCategory = currentMonthTransactions
-    .filter((t) => t.type === 'EXPENSE')
-    .reduce((acc, transaction) => {
-      const category = categories.find(
-        (cat) => cat.id === transaction.categoryId
-      );
-      const categoryName =
-        transaction.category?.name || category?.name || 'Other';
-      const existingCategory = acc.find((item) => item.label === categoryName);
-
-      if (existingCategory) {
-        existingCategory.value += transaction.amount;
-      } else {
-        acc.push({ label: categoryName, value: transaction.amount });
-      }
-
-      return acc;
-    }, [] as Array<{ label: string; value: number }>)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
-
-  return expensesByCategory;
-}
-
+// calculates total expenses by category for analytics donut chart
 export function calculateExpensesByCategory(
   transactions: Transaction[],
   categories: Category[]
@@ -195,101 +88,7 @@ export function calculateIncomeByCategory(
   }));
 }
 
-export function getPreviousPeriodStats(
-  transactions: Transaction[],
-  period: 'week' | 'month' | 'year' = 'month'
-) {
-  const now = new Date();
-  let startDate = new Date();
-  let prevStartDate = new Date();
-
-  if (period === 'week') {
-    startDate.setDate(now.getDate() - now.getDay());
-    prevStartDate.setDate(now.getDate() - now.getDay() - 7);
-  } else if (period === 'month') {
-    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    prevStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  } else if (period === 'year') {
-    startDate = new Date(now.getFullYear(), 0, 1);
-    prevStartDate = new Date(now.getFullYear() - 1, 0, 1);
-  }
-
-  let prevEndDate = new Date(startDate);
-  prevEndDate.setDate(prevEndDate.getDate() - 1);
-
-  const previousPeriodTransactions = transactions.filter((transaction) => {
-    const transactionDate = new Date(transaction.date);
-    return transactionDate >= prevStartDate && transactionDate <= prevEndDate;
-  });
-
-  const previousIncome = previousPeriodTransactions
-    .filter((t) => t.type === 'INCOME')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const previousExpenses = previousPeriodTransactions
-    .filter((t) => t.type === 'EXPENSE')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  return {
-    income: previousIncome,
-    expenses: previousExpenses,
-  };
-}
-
-export function getPreviousMonthStats(transactions: Transaction[]) {
-  return getPreviousPeriodStats(transactions, 'month');
-}
-
-export function calculateIncomeChange(
-  currentIncome: number,
-  transactions: Transaction[],
-  period: 'week' | 'month' | 'year' = 'month'
-): {
-  value: number;
-  type: 'positive' | 'negative' | 'neutral';
-  displayValue: string;
-} {
-  const previousStats = getPreviousPeriodStats(transactions, period);
-  const change = currentIncome - previousStats.income;
-  const absoluteChange = Math.abs(change);
-
-  return {
-    value: absoluteChange,
-    type: change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral',
-    displayValue:
-      change > 0
-        ? `+${formatCurrencyAmount(absoluteChange)}`
-        : change < 0
-        ? `-${formatCurrencyAmount(absoluteChange)}`
-        : '0.00',
-  };
-}
-
-export function calculateExpensesChange(
-  currentExpenses: number,
-  transactions: Transaction[],
-  period: 'week' | 'month' | 'year' = 'month'
-): {
-  value: number;
-  type: 'positive' | 'negative' | 'neutral';
-  displayValue: string;
-} {
-  const previousStats = getPreviousPeriodStats(transactions, period);
-  const change = currentExpenses - previousStats.expenses;
-  const absoluteChange = Math.abs(change);
-
-  return {
-    value: absoluteChange,
-    type: change < 0 ? 'positive' : change > 0 ? 'negative' : 'neutral',
-    displayValue:
-      change > 0
-        ? `+${formatCurrencyAmount(absoluteChange)}`
-        : change < 0
-        ? `-${formatCurrencyAmount(absoluteChange)}`
-        : '0.00',
-  };
-}
-
+// analytics area chart
 export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
   if (!transactions) {
     return Array.from({ length: 12 }, (_, i) => {
@@ -374,6 +173,7 @@ export function calculateMonthlyIncomeAndExpenses(transactions: Transaction[]) {
   }));
 }
 
+// analitycs savings bar chart
 export function calculateSavingsStats(
   transactions: Transaction[],
   accounts: Account[] = []

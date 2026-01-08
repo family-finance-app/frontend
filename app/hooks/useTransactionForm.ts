@@ -21,8 +21,8 @@ const getInitialFormData = (): CreateTransactionFormData => {
     date: `${pad(today.getDate())}.${pad(
       today.getMonth() + 1
     )}.${today.getFullYear()}`,
-    categoryId: '',
-    accountId: '',
+    categoryId: 0,
+    accountId: 0,
     currency: CurrencyType.UAH,
   };
 };

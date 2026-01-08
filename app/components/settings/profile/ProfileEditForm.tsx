@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { User } from '@/types/profile';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
+import { formInputClassname } from '@/assets/globalClassnames';
 
 export interface ProfileFormData extends Partial<User> {
   name: string;
@@ -58,19 +59,19 @@ export function ProfileEditForm({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
+    <div className="bg-white dark:bg-primary-500 rounded-2xl shadow-financial border border-background-100 dark:border-primary-500 p-6">
       <h2
-        className={`${roboto.className} text-lg font-bold text-background-900 mb-6`}
+        className={`${roboto.className} text-lg font-bold text-primary-800 dark:text-stack-800 mb-6`}
       >
         Personal Information
       </h2>
 
       {/* Success Message */}
       {showSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
+        <div className="mb-6 p-4 bg-green-50  dark:bg-background-100 border border-green-200 dark:border-primary-500 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
           <div className="shrink-0">
             <svg
-              className="h-5 w-5 text-green-600"
+              className="h-5 w-5 text-green-700"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -94,7 +95,7 @@ export function ProfileEditForm({
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-background-900 mb-2"
+            className="block text-sm font-medium text-background-900 dark:text-stack-800 mb-2"
           >
             Full Name
           </label>
@@ -105,7 +106,7 @@ export function ProfileEditForm({
             value={formData.name}
             onChange={handleInputChange}
             placeholder={user.name}
-            className="w-full px-4 py-2 border border-background-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-background-900"
+            className={`${formInputClassname}`}
           />
         </div>
 
@@ -113,7 +114,7 @@ export function ProfileEditForm({
         <div>
           <label
             htmlFor="dateOfBirth"
-            className="block text-sm font-medium text-background-900 mb-2"
+            className="block text-sm font-medium text-background-900 dark:text-stack-800 mb-2"
           >
             Date of Birth
           </label>
@@ -124,7 +125,7 @@ export function ProfileEditForm({
             value={formData.birthdate}
             onChange={handleInputChange}
             placeholder={user.birthdate}
-            className="w-full px-4 py-2 border border-background-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-background-900"
+            className={`${formInputClassname}`}
           />
         </div>
 
@@ -139,8 +140,8 @@ export function ProfileEditForm({
           />
           <Button
             text="Cancel"
-            type="button"
-            variant="outline"
+            type="reset"
+            variant="background"
             size="md"
             onClick={() => {
               setFormData({

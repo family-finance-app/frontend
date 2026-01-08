@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { roboto } from '../assets/fonts/fonts';
 import CreateTransactionForm from '@/components/transactions/CreateTransactionForm';
 import Notifications from './Notifications';
 import ColorModeSwitcher from './ColorModeSwitcher';
 import ProfileAvatar from './ProfileAvatar';
+import { RiAccountCircleFill, RiAddLine } from '@remixicon/react';
+import Logo_light from './ui/Logo_light';
+import Link from 'next/link';
 
 export default function Navigation() {
   const [notifications] = useState(3);
@@ -16,10 +20,6 @@ export default function Navigation() {
     type: 'success' | 'error';
     message: string;
   } | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -48,56 +48,43 @@ export default function Navigation() {
 
   return (
     <nav className="fixed z-30 w-full bg-primary-700/95 dark:bg-primary-800 backdrop-blur-md border-b border-primary-600">
-      <div className="px-4 lg:px-6">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-linear-to-br from-primary-300 to-primary-500 rounded-lg flex items-center justify-center">
-                <span
-                  className={`${roboto.className} text-white font-bold text-lg`}
-                >
-                  F
-                </span>
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+        <div className="flex items-center justify-between h-16 gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-2 sm:ml-4 lg:ml-6">
+              <div className="hidden md:block md:ml-8">
+                <Link href="/dashboard">
+                  <Logo_light responsive />
+                </Link>
               </div>
-              <h1
-                className={`${roboto.className} text-white font-bold text-xl tracking-tight hidden sm:block`}
-              >
-                FamilyFinance
-              </h1>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setShowTransactionModal(true)}
               className="hidden md:flex items-center space-x-2 px-4 py-2 bg-primary-500 hover:bg-primary-400 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <RiAddLine />
               <span className="font-medium">Add Transaction</span>
             </button>
 
-            <Notifications />
+            <div>
+              <Notifications />
+            </div>
 
-            <ColorModeSwitcher />
-            <ProfileAvatar />
+            <div>
+              <ColorModeSwitcher />
+            </div>
+
+            <div>
+              <ProfileAvatar />
+            </div>
           </div>
         </div>
       </div>
 
-      {mounted &&
-        showTransactionModal &&
+      {showTransactionModal &&
         createPortal(
           <div
             className="fixed inset-0 backdrop-blur-sm bg-background-900/10 z-100 flex items-center justify-center p-4"
@@ -108,10 +95,10 @@ export default function Navigation() {
             }}
           >
             <div className="bg-white dark:bg-stack-200 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto animate-scale-in relative z-101">
-              <div className="sticky top-0 bg-white dark:bg-stack-200 border-b border-background-100 px-6 py-4 rounded-t-2xl">
+              <div className="sticky top-0 bg-background-50 dark:bg-stack-200 border-b border-background-100 px-6 py-4 rounded-t-2xl">
                 <div className="flex items-center justify-between">
                   <h2
-                    className={`${roboto.className} text-xl font-semibold text-background-900 dark:text-primary-800`}
+                    className={`${roboto.className} text-xl font-semibold text-primary-800`}
                   >
                     Add New Transaction
                   </h2>
@@ -119,7 +106,7 @@ export default function Navigation() {
                     onClick={handleTransactionCancel}
                     className="p-2 hover:bg-background-100 rounded-lg transition-colors"
                   >
-                    <svg
+                    {/* <svg
                       className="w-5 h-5 text-background-600"
                       fill="none"
                       stroke="currentColor"
@@ -131,7 +118,7 @@ export default function Navigation() {
                         strokeWidth={2}
                         d="M6 18L18 6M6 6l12 12"
                       />
-                    </svg>
+                    </svg> */}
                   </button>
                 </div>
               </div>
@@ -141,74 +128,6 @@ export default function Navigation() {
                   onCancel={handleTransactionCancel}
                   onError={handleTransactionError}
                 />
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
-
-      {mounted &&
-        notification &&
-        createPortal(
-          <div className="fixed top-20 right-4 z-200 animate-slide-in">
-            <div
-              className={`px-6 py-4 rounded-xl shadow-lg border ${
-                notification.type === 'success'
-                  ? 'bg-success-50 border-success-200 text-success-800'
-                  : 'bg-danger-50 border-danger-200 text-danger-800'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="shrink-0">
-                  {notification.type === 'success' ? (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <p className="text-sm font-medium">{notification.message}</p>
-                <button
-                  onClick={() => setNotification(null)}
-                  className="shrink-0 p-1 rounded-lg hover:bg-black/5 transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
               </div>
             </div>
           </div>,

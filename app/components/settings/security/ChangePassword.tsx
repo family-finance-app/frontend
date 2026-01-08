@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { roboto } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
 import { PasswordChangeFormData } from '@/types/security';
+import {
+  formInputClassname,
+  errorInputClassname,
+} from '@/assets/globalClassnames';
 
 export interface ChangePasswordProps {
   onSubmit?: (data: PasswordChangeFormData) => Promise<void>;
@@ -100,19 +104,19 @@ export function ChangePassword({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6">
+    <div className="bg-white dark:bg-primary-500 dark:border-primary-500 rounded-2xl shadow-financial border border-background-100 p-6">
       <h2
-        className={`${roboto.className} text-lg font-bold text-background-900 mb-6`}
+        className={`${roboto.className} text-lg font-bold text-primary-800 dark:text-stack-800 mb-6`}
       >
         Change Password
       </h2>
 
       {/* Success Message */}
       {showSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
+        <div className="mb-6 p-4 bg-green-50 dark:bg-background-100 border border-green-200 dark:border-primary-500 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
           <div className="shrink-0">
             <svg
-              className="h-5 w-5 text-green-600"
+              className="h-5 w-5 text-green-700"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -134,7 +138,9 @@ export function ChangePassword({
       {/* Error Message */}
       {errors.general && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm font-medium text-red-800">{errors.general}</p>
+          <p className="text-sm font-medium text-red-800 dark:text-danger-500">
+            {errors.general}
+          </p>
         </div>
       )}
 
@@ -143,7 +149,7 @@ export function ChangePassword({
         <div>
           <label
             htmlFor="oldPassword"
-            className="block text-sm font-medium text-background-900 mb-2"
+            className="block text-sm font-medium text-background-900 dark:text-stack-800 mb-2"
           >
             Current Password
           </label>
@@ -155,11 +161,9 @@ export function ChangePassword({
               value={formData.oldPassword}
               onChange={handleInputChange}
               placeholder="Enter your current password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 pr-10 ${
-                errors.oldPassword
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-background-200 focus:border-primary-500 focus:ring-primary-500'
-              } text-background-900`}
+              className={`${formInputClassname} ${
+                errors.oldPassword ? errorInputClassname : ''
+              }`}
             />
             <button
               type="button"
@@ -175,7 +179,9 @@ export function ChangePassword({
             </button>
           </div>
           {errors.oldPassword && (
-            <p className="text-xs text-red-600 mt-1">{errors.oldPassword}</p>
+            <p className="text-xs text-danger-600 dark:text-danger-100 mt-1">
+              {errors.oldPassword}
+            </p>
           )}
         </div>
 
@@ -195,11 +201,9 @@ export function ChangePassword({
               value={formData.newPassword}
               onChange={handleInputChange}
               placeholder="Enter your new password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 pr-10 ${
-                errors.newPassword
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-background-200 focus:border-primary-500 focus:ring-primary-500'
-              } text-background-900`}
+              className={`${formInputClassname} ${
+                errors.newPassword ? errorInputClassname : ''
+              }`}
             />
             <button
               type="button"
@@ -215,7 +219,9 @@ export function ChangePassword({
             </button>
           </div>
           {errors.newPassword && (
-            <p className="text-xs text-red-600 mt-1">{errors.newPassword}</p>
+            <p className="text-xs text-danger-600 dark:text-danger-100 mt-1">
+              {errors.newPassword}
+            </p>
           )}
         </div>
 
@@ -235,11 +241,9 @@ export function ChangePassword({
               value={formData.confirmPassword}
               onChange={handleInputChange}
               placeholder="Confirm your new password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 pr-10 ${
-                errors.confirmPassword
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-background-200 focus:border-primary-500 focus:ring-primary-500'
-              } text-background-900`}
+              className={`${formInputClassname} ${
+                errors.confirmPassword ? errorInputClassname : ''
+              }`}
             />
             <button
               type="button"
@@ -255,7 +259,7 @@ export function ChangePassword({
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-xs text-red-600 mt-1">
+            <p className="text-xs text-danger-600 dark:text-danger-100 mt-1">
               {errors.confirmPassword}
             </p>
           )}

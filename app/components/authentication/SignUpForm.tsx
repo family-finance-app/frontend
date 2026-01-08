@@ -38,12 +38,6 @@ export default function SignUpForm({
     terms: '',
   });
 
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (errorMessage) setApiError(errorMessage);
-  }, [errorMessage]);
-
   const validateForm = (formData: SignUpFormData): boolean => {
     const validationErrors = validateSignUpForm(formData);
     if (validationErrors.email)
@@ -66,14 +60,10 @@ export default function SignUpForm({
     setFormData((prev) => ({ ...prev, [name]: fieldValue }));
     if (errors[name as keyof SignUpFormData])
       setErrors((prev) => ({ ...prev, [name]: '' }));
-    if (apiError) {
-      setApiError(null);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError(null);
     if (!validateForm(formData)) return;
 
     try {
@@ -98,9 +88,9 @@ export default function SignUpForm({
           />
         )}
 
-        {isError && apiError?.trim() && (
+        {isError && errorMessage?.trim() && (
           <ErrorMessage
-            message={`Registration failed. ${apiError ? apiError : ''}`}
+            message={`Registration failed. ${errorMessage ? errorMessage : ''}`}
             classname="dark:bg-danger-100 p-4"
           />
         )}

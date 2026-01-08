@@ -32,13 +32,6 @@ export default function SignInForm({
   });
 
   const [errors, setErrors] = useState<FormErrors>({ email: '', password: '' });
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (errorMessage) {
-      setApiError(errorMessage);
-    }
-  }, [errorMessage]);
 
   const validateForm = (formData: SignInFormData): boolean => {
     const validationErrors = validateSignInForm(formData);
@@ -54,14 +47,10 @@ export default function SignInForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof SignInFormData])
       setErrors((prev) => ({ ...prev, [name]: '' }));
-    if (apiError) {
-      setApiError(null);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError(null);
 
     if (!validateForm(formData)) return;
 
@@ -82,9 +71,9 @@ export default function SignInForm({
           />
         )}
 
-        {isError && apiError && (
+        {isError && errorMessage && (
           <ErrorMessage
-            message={`Login failed. ${apiError ? apiError : ''}`}
+            message={`Login failed. ${errorMessage}`}
             classname="bg-danger-100 border-0 dark:bg-danger-100 p-4"
           />
         )}
