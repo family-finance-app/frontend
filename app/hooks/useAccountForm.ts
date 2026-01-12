@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CreateAccountFormData } from '@/types/account';
+import { CreateAccountFormData } from '@/(main layout)/accounts/types';
 
 export function useAccountForm() {
   const getInitialFormData = (): CreateAccountFormData => ({

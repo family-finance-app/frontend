@@ -1,7 +1,7 @@
 import { Transaction } from '@/(main layout)/transactions/types';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 
-// Utility for dashboard stats section that calculates income, expenses, and savings for the chosen period with change rate
+// utility for dashboard stats section that calculates income, expenses, and savings for the chosen period with change rate
 export default function calculatePeriodStats(
   transactions: Transaction[],
   period: 'week' | 'month' | 'year' = 'month',
@@ -51,7 +51,6 @@ export default function calculatePeriodStats(
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 
-  // Expenses from savings accounts
   const savingsOutflows = periodTransactions
     .filter(
       (t) => t.type === 'EXPENSE' && savingsAccounts.includes(t.accountId)

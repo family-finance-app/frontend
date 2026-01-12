@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Account, EditAccountFormData } from '@/types/account';
+import {
+  Account,
+  ACCOUNT_TYPES,
+  EditAccountFormData,
+} from '@/(main layout)/accounts/types';
 import { FormErrors } from '@/types/auth';
 import { roboto } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
-import {
-  getAccountTypeName,
-  ACCOUNT_TYPES,
-  CURRENCY_OPTIONS,
-} from '@/utils/accounts';
+import { accountTypeName } from '@/(main layout)/accounts/utils/';
 import { validateEditAccountForm } from '@/utils/validation';
 
 interface EditAccountFormProps {
@@ -18,6 +18,7 @@ interface EditAccountFormProps {
   onClose: () => void;
   onSave: (accountId: number, data: EditAccountFormData) => Promise<void>;
 }
+const CURRENCY_OPTIONS = ['USD', 'EUR', 'UAH'] as const;
 
 export function EditAccountForm({
   account,
@@ -99,7 +100,6 @@ export function EditAccountForm({
         </h3>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {submitError && (
           <div className="bg-danger-50 border border-danger-200 rounded-lg p-3">
@@ -153,7 +153,7 @@ export function EditAccountForm({
             >
               {ACCOUNT_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {getAccountTypeName(type)}
+                  {accountTypeName(type)}
                 </option>
               ))}
             </select>

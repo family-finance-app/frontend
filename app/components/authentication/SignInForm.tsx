@@ -8,7 +8,7 @@ import { validateSignInForm } from '@/utils/validation';
 import { RiCheckFill } from '@remixicon/react';
 import SuccessMessage from '../ui/SuccessMessage';
 import ErrorMessage from '../ui/ErrorMessage';
-import { FormInput } from '../shared/forms';
+import { FormInput } from '../shared';
 
 interface SignInFormProps {
   onSubmit: (formData: SignInFormData) => Promise<AuthResponse>;

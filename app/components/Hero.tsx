@@ -9,9 +9,6 @@ interface HeroProps {
 
 export default function Hero({ isAuthenticated }: HeroProps) {
   const [isVisible, setIsVisible] = useState(false);
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   return (
     <section className="pt-20 pb-12 sm:pt-28 sm:pb-16 lg:pb-24">

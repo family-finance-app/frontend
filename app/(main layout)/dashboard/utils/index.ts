@@ -10,3 +10,6 @@ export { default as expensesChange } from './stats/expensesChange';
 export { default as periodExpenseChartData } from './charts/periodExpenseChartData';
 export { default as periodIncomeChartData } from './charts/periodIncomeChartData';
 export { default as periodSavingsChartData } from './charts/periodSavingsChartData';
+
+// other
+export { default as formatAccountsForDashboardWidget } from './formatters/formatAccountsForDashboardWidget';

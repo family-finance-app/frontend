@@ -1,6 +1,6 @@
 'use client';
 
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { getCurrencySymbol } from '@/utils/currency';
 
 interface AccountListRowProps {

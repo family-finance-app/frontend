@@ -5,19 +5,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { getAuthToken } from '@/utils/token';
 import { useEffect, useState } from 'react';
 
 // get all accounts (MOCK ROUTE, DO NOT USE)
 export const useAccounts = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.accounts.all,
@@ -26,19 +22,15 @@ export const useAccounts = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
   });
 };
 
 // get account by id
 export const useAccount = (id: number) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.accounts.detail(id),
@@ -47,19 +39,15 @@ export const useAccount = (id: number) => {
         token: token || undefined,
       });
     },
-    enabled: !!token && !!id && isClient,
+    enabled: !!token && !!id,
   });
 };
 
 // get current user's accounts (backend extracts token from query parameters)
 export const useMyAccounts = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
+  const [token] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getAuthToken() : null
+  );
 
   return useQuery({
     queryKey: queryKeys.accounts.my,
@@ -68,6 +56,6 @@ export const useMyAccounts = () => {
         token: token || undefined,
       });
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
   });
 };

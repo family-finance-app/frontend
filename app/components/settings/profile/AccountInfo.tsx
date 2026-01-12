@@ -32,7 +32,6 @@ export function AccountInfo({ user }: AccountInfoProps) {
       </h2>
 
       <div className="space-y-4">
-        {/* Email */}
         <div className="flex items-center justify-between py-3 border-b border-background-100">
           <span className="text-background-600 font-medium">Email</span>
           <span className={`${jetbrainsMono.className} text-background-900`}>
@@ -40,7 +39,6 @@ export function AccountInfo({ user }: AccountInfoProps) {
           </span>
         </div>
 
-        {/* User ID */}
         <div className="flex items-center justify-between py-3 border-b border-background-100">
           <span className="text-background-600 font-medium">User ID</span>
           <span className={`${jetbrainsMono.className} text-background-900`}>
@@ -48,7 +46,6 @@ export function AccountInfo({ user }: AccountInfoProps) {
           </span>
         </div>
 
-        {/* Role */}
         <div className="flex items-center justify-between py-3 border-b border-background-100">
           <span className="text-background-600 font-medium">Role</span>
           <span className="inline-flex px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
@@ -56,7 +53,6 @@ export function AccountInfo({ user }: AccountInfoProps) {
           </span>
         </div>
 
-        {/* Account Created */}
         <div className="flex items-center justify-between py-3">
           <span className="text-background-600 font-medium">
             Account Created

@@ -4,7 +4,7 @@ import {
   Transaction,
   TransactionType,
 } from '@/(main layout)/transactions/types';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 
 // calculate total savings balance per priod for last three periods (cumulative balance of all SAVINGS accounts at end of each period)
 export default function getPeriodSavingsComparison(
@@ -14,7 +14,6 @@ export default function getPeriodSavingsComparison(
 ): DashboardChartDataProps[] {
   const now = new Date();
 
-  // Get savings account IDs
   const savingsAccountIds = accounts
     .filter((a) => a.type === 'SAVINGS')
     .map((a) => a.id);
@@ -27,7 +26,6 @@ export default function getPeriodSavingsComparison(
       return transactionDate >= startDate && transactionDate <= endDate;
     });
 
-    // TRANSFER to savings accounts (inflows)
     const savingsInflows = periodTransactions
       .filter(
         (t) =>
@@ -35,7 +33,6 @@ export default function getPeriodSavingsComparison(
       )
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    // EXPENSE from savings accounts (outflows)
     const savingsOutflows = periodTransactions
       .filter(
         (t) =>

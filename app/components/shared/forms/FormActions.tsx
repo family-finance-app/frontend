@@ -1,9 +1,3 @@
-/**
- * FormActions - компонент для кнопок формы
- */
-
-import React from 'react';
-
 interface FormActionsProps {
   onSubmit?: () => void;
   onCancel?: () => void;
@@ -12,7 +6,7 @@ interface FormActionsProps {
   cancelLabel?: string;
 }
 
-export function FormActions({
+export default function FormActions({
   onCancel,
   isLoading = false,
   submitLabel = 'Submit',

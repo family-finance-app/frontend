@@ -1,8 +1,8 @@
 'use client';
 
 import { roboto } from '@/assets/fonts/fonts';
-import { getAccountTypeName, ACCOUNT_TYPES } from '@/utils/accounts';
-import { Account } from '@/types/account';
+import { accountTypeName } from '../utils';
+import { Account, ACCOUNT_TYPES } from '../types';
 
 interface AccountsFilterProps {
   filterType: Account['type'] | 'all';
@@ -11,7 +11,7 @@ interface AccountsFilterProps {
   totalCount: number;
 }
 
-export function AccountsFilter({
+export default function AccountsFilter({
   filterType,
   onFilterChange,
   accountsCount,
@@ -49,9 +49,9 @@ export function AccountsFilter({
               }
             >
               <option value="all">All</option>
-              {ACCOUNT_TYPES.map((type) => (
+              {ACCOUNT_TYPES.map((type: Account['type']) => (
                 <option key={type} value={type}>
-                  {getAccountTypeName(type)}
+                  {accountTypeName(type)}
                 </option>
               ))}
             </select>
@@ -68,7 +68,7 @@ export function AccountsFilter({
             >
               All
             </button>
-            {ACCOUNT_TYPES.map((type) => (
+            {ACCOUNT_TYPES.map((type: Account['type']) => (
               <button
                 key={type}
                 onClick={() => onFilterChange(type)}
@@ -78,7 +78,7 @@ export function AccountsFilter({
                     : 'text-background-600 dark:text-stack-600 hover:text-background-900'
                 }`}
               >
-                {getAccountTypeName(type)}
+                {accountTypeName(type)}
               </button>
             ))}
           </div>

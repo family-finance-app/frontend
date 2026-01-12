@@ -1,47 +1,17 @@
 'use client';
 
-import { Account } from '@/types/account';
+import { Account } from '../types';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
-import { getAccountTypeName } from '@/utils/accounts';
+import { accountTypeName } from '../utils';
 import { formatCurrencyAmount } from '@/utils/formatters';
+import getCardColorStyles from '@/(main layout)/accounts/utils/cardColorStyles';
 import Link from 'next/link';
 
 interface AccountCardProps {
   account: Account;
 }
 
-const getCardColorStyles = (accountType: Account['type']) => {
-  const colorMap: Record<Account['type'], { accent: string }> = {
-    BANK: {
-      accent: 'text-background-500',
-    },
-    DEBIT: {
-      accent: 'text-primary-600',
-    },
-    CREDIT: {
-      accent: 'text-danger-500',
-    },
-    CASH: {
-      accent: 'text-warning-600',
-    },
-    INVESTMENT: {
-      accent: 'text-smalt-400',
-    },
-    DEPOSIT: {
-      accent: 'text-hazel-400',
-    },
-    DIGITAL: {
-      accent: 'text-kashmir-500',
-    },
-    SAVINGS: {
-      accent: 'text-success-600',
-    },
-  };
-
-  return colorMap[accountType] || colorMap.BANK;
-};
-
-export function AccountCard({ account }: AccountCardProps) {
+export default function AccountCard({ account }: AccountCardProps) {
   const colors = getCardColorStyles(account.type);
 
   return (
@@ -60,7 +30,7 @@ export function AccountCard({ account }: AccountCardProps) {
             </h4>
 
             <p className={`text-sm font-medium ${colors.accent}`}>
-              {getAccountTypeName(account.type)}
+              {accountTypeName(account.type)}
             </p>
           </div>
 

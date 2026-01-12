@@ -4,17 +4,14 @@ import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import { useRouter } from 'next/navigation';
 import { useMyAccounts } from '@/api/accounts/queries';
-import { AccountCard } from './AccountCard';
-import type { Account } from '@/types/account';
+import { AccountCard } from '@/(main layout)/accounts/components';
+import { Account } from '@/(main layout)/accounts/types';
 
 export default function AccountsDashboard() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   const { data: accountsData, isLoading } = useMyAccounts();
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const accountsArray = Array.isArray(accountsData) ? accountsData : [];
 

@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import Link from 'next/link';
 import { AuthResponse, SignUpFormData, FormErrors } from '@/types/auth';
 import { validateSignUpForm } from '@/utils/validation';
-import { FormInput } from '../shared/forms';
+import { FormInput } from '../shared';
 import SuccessMessage from '../ui/SuccessMessage';
 import ErrorMessage from '../ui/ErrorMessage';
 

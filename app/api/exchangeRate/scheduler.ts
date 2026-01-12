@@ -1,6 +1,4 @@
-export const UPDATE_TIMES = [8, 15]; // 8 AM and 3 PM
-
-// calculate milliseconds until next scheduled update (8 AM or 3 PM)
+export const UPDATE_TIMES = [8, 15];
 export function getTimeUntilNextUpdate(): number {
   const now = new Date();
   let nextUpdate = new Date();
@@ -36,7 +34,6 @@ export function getTimeUntilNextUpdate(): number {
   return timeUntilUpdate;
 }
 
-// check if current time is near a scheduled update time (within 5 minutes)
 export function isNearUpdateTime(): boolean {
   const now = new Date();
   const currentHour = now.getHours();

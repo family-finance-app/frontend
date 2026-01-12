@@ -5,7 +5,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import { CreateAccountFormData, Account } from '@/types/account';
+import { Account, CreateAccountFormData } from '@/(main layout)/accounts/types';
 import { getAuthToken } from '@/utils/token';
 
 // create new account (card, cash etc)

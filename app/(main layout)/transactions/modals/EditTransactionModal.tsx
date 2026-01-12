@@ -9,8 +9,8 @@ import { roboto } from '../../../assets/fonts/fonts';
 import {
   FormActions,
   FormInput,
-  FormSelect,
-} from '../../../components/shared/forms';
+  FormSelectList,
+} from '../../../components/shared';
 
 interface EditTransactionModalProps {
   transaction: Transaction | null;
@@ -198,7 +198,7 @@ export default function EditTransactionModal({
             </div>
 
             <div>
-              <FormSelect
+              <FormSelectList
                 label="Category"
                 name="categoryId"
                 value={formData.categoryId}

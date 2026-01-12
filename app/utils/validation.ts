@@ -1,5 +1,8 @@
 import { SignUpFormData, SignInFormData, FormErrors } from '@/types/auth';
-import { CreateAccountFormData, EditAccountFormData } from '@/types/account';
+import {
+  CreateAccountFormData,
+  EditAccountFormData,
+} from '@/(main layout)/accounts/types';
 import { CreateTransactionFormData } from '@/(main layout)/transactions/types';
 
 // auth validation

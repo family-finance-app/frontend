@@ -1,6 +1,3 @@
-/**
- * getCurrencySymbol - получить символ валюты
- */
 export function getCurrencySymbol(currency?: string): string {
   if (!currency) return '';
   const symbols: Record<string, string> = {

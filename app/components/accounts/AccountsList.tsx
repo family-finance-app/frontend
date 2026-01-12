@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useDeleteAccount } from '@/api/accounts/mutations';
 import { AccountListRow } from './AccountListRow';
-import type { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 
 export default function AccountsList() {
   const { data: accountsData, isLoading } = useMyAccounts();

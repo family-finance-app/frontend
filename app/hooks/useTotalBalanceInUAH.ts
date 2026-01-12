@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { calculateTotalBalanceInUAH } from '@/utils/currency-converter';
 import { useExchangeRates } from '@/api/exchangeRate/queries';
 

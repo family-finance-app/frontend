@@ -1,16 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Account } from '@/types/account';
+import { Account, EditAccountFormData } from '@/(main layout)/accounts/types';
 import { Transaction } from '@/(main layout)/transactions/types';
 import { Category } from '@/types/category';
 import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
-import { getAccountTypeName } from '@/utils/accounts';
-import { formatCurrencyAmount } from '@/utils/formatters';
 import { AccountTransactions } from './AccountTransactions';
 import { EditAccountForm } from './EditAccountForm';
-import { EditAccountFormData } from '@/types/account';
 
 interface AccountDetailsProps {
   account: Account;
@@ -46,7 +43,6 @@ export function AccountDetails({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* List of account's transactions*/}
       <AccountTransactions
         accountId={account.id}
         transactions={accountTransactions}
@@ -55,7 +51,6 @@ export function AccountDetails({
         isLoading={isLoading}
       />
 
-      {/* Edit/delete account*/}
       <div className="bg-white dark:bg-background-200 rounded-xl shadow-financial border border-primary-400 p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">

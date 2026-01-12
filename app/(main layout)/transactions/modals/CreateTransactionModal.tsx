@@ -12,8 +12,8 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useCreateTransaction } from '@/api/transactions/mutations';
 import { useCreateTransfer } from '@/api/transactions/mutations';
 import { roboto } from '@/assets/fonts/fonts';
-import { FormInput, FormSelect, FormActions } from '@/components/shared/forms';
-import type { SelectOption } from '@/components/shared/forms/FormSelect';
+import { FormInput, FormActions, FormSelectList } from '@/components/shared';
+import type { SelectOption } from '@/components/shared/forms/FormSelectList';
 
 interface CreateTransactionFormProps {
   onSuccess: (transactionId: number) => void;
@@ -171,7 +171,7 @@ export default function CreateTransactionModal({
 
       {type === 'TRANSFER' ? (
         <>
-          <FormSelect
+          <FormSelectList
             label="From Account"
             name="accountId"
             value={accountId}
@@ -181,7 +181,7 @@ export default function CreateTransactionModal({
             error={errors.accountId}
           />
 
-          <FormSelect
+          <FormSelectList
             label="To Account"
             name="accountRecipientId"
             value={accountRecipientId}
@@ -193,7 +193,7 @@ export default function CreateTransactionModal({
         </>
       ) : (
         <>
-          <FormSelect
+          <FormSelectList
             label="Account"
             name="accountId"
             value={accountId}
@@ -205,7 +205,7 @@ export default function CreateTransactionModal({
         </>
       )}
 
-      <FormSelect
+      <FormSelectList
         label="Category"
         name="categoryId"
         value={categoryId}

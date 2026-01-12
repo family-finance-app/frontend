@@ -1,6 +1,6 @@
 'use client';
 
-import FinancialCard from '@/(main layout)/dashboard/cards/FinancialCard';
+import { FinancialCard } from '@/components/shared';
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { DashboardChartDataProps } from '../types';
 

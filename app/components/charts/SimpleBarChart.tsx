@@ -13,7 +13,6 @@ export default function SimpleBarChart({
   size?: 'sm' | 'md' | 'lg';
 }) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
-  let cumulativePercentage = 0;
 
   const sizeClasses = {
     sm: 'w-24 h-24',
@@ -36,6 +35,9 @@ export default function SimpleBarChart({
         {data.map((item, index) => {
           const percentage = (item.value / total) * 100;
           const angle = (percentage / 100) * 360;
+          const cumulativePercentage = data
+            .slice(0, index)
+            .reduce((sum, prev) => sum + (prev.value / total) * 100, 0);
           const startAngle = (cumulativePercentage / 100) * 360 - 90;
           const endAngle = startAngle + angle;
 
@@ -52,8 +54,6 @@ export default function SimpleBarChart({
             `A 40 40 0 ${largeArc} 1 ${x2} ${y2}`,
             'Z',
           ].join(' ');
-
-          cumulativePercentage += percentage;
 
           return (
             <path

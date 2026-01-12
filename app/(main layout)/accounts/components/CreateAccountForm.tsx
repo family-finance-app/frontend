@@ -1,36 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateAccountFormData } from '@/types/account';
+import {
+  CreateAccountFormData,
+  currencyList,
+  SELECT_ACCOUNT_TYPES,
+} from '@/(main layout)/accounts/types';
 import { useCreateAccount } from '@/api/accounts/mutations';
 import { useAccountForm } from '@/hooks/useAccountForm';
-import { useAccountValidation } from '@/hooks/useAccountValidation';
-import { FormActions } from '@/components/shared/forms';
 import {
-  AccountNameInput,
-  AccountBalanceInput,
-  CurrencySelect,
-  CURRENCIES,
-} from './AccountInputs';
-import { AccountTypeSelect, ACCOUNT_TYPES } from './AccountTypeSelect';
-import { AccountPreview } from './AccountPreview';
-import { roboto } from '@/assets/fonts/fonts';
+  validateCreateAccountForm,
+  handleCreateAccountErrors,
+} from '@/(main layout)/accounts/utils/validation';
+import { FormActions, FormInput, FormSelectList } from '@/components/shared';
+import AccountPreview from './AccountPreview';
+import { RiErrorWarningLine } from '@remixicon/react';
+import FormSelectGrid from '../../../components/shared/forms/FormSelectGrid';
 
 interface CreateAccountFormProps {
   onSuccess?: (accountName: string) => void;
+  onError?: (errorMessage: string) => void;
   onCancel?: () => void;
 }
 
 export default function CreateAccountForm({
   onSuccess,
+  onError,
   onCancel,
 }: CreateAccountFormProps) {
   const createMutation = useCreateAccount();
   const { formData, setFormField, reset } = useAccountForm();
-  const { validateForm, handleBackendErrors } = useAccountValidation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const selectedCurrency = CURRENCIES.find(
+  const selectedCurrency = currencyList.find(
     (curr) => curr.value === formData.currency
   );
 
@@ -38,7 +40,7 @@ export default function CreateAccountForm({
     e.preventDefault();
     setErrors({});
 
-    const validationErrors = validateForm(formData);
+    const validationErrors = validateCreateAccountForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -65,21 +67,36 @@ export default function CreateAccountForm({
       onSuccess?.(formData.name);
       reset();
     } catch (error) {
-      const backendErrors = handleBackendErrors(error);
-      setErrors(backendErrors);
+      const createAccountErrors = handleCreateAccountErrors(error);
+      setErrors(createAccountErrors);
+
+      const errorMessage =
+        createAccountErrors.submit || 'Failed to create account';
+      onError?.(errorMessage);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <AccountNameInput
+      <FormInput
+        label={{ type: 'accountName', text: 'Account Name' }}
+        name="accountName"
+        type="text"
+        id="accountName"
         value={formData.name}
-        onChange={(name) => setFormField('name', name)}
+        onChange={(e) => setFormField('name', e.target.value)}
         error={errors.name}
+        placeholder="e.g., Revolut Debit Card"
+        required
+        classname="internal"
       />
 
-      <AccountTypeSelect
+      <FormSelectGrid
+        label={{ htmlFor: 'accountType', text: 'Account Type' }}
+        name="accountType"
+        id="accountType"
         value={formData.type}
+        options={SELECT_ACCOUNT_TYPES}
         onChange={(type) =>
           setFormField('type', type as CreateAccountFormData['type'])
         }
@@ -87,15 +104,25 @@ export default function CreateAccountForm({
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AccountBalanceInput
-          value={formData.balance}
-          onChange={(balance) => setFormField('balance', balance)}
-          symbol={selectedCurrency?.symbol || '₴'}
+        <FormInput
+          label={{ type: 'balance', text: 'Initial Balance' }}
+          span={selectedCurrency?.symbol || '₴'}
+          name="balance"
+          type="number"
+          id="balance"
+          value={formData.balance === 0 ? '' : formData.balance}
+          onChange={(e) =>
+            setFormField('balance', parseFloat(e.target.value) || 0)
+          }
           error={errors.balance}
+          placeholder="0.00"
+          required
+          classname="internal"
         />
 
-        {/* Currency */}
-        <CurrencySelect
+        <FormSelectList
+          label="Currency"
+          name="currency"
           value={formData.currency}
           onChange={(currency) =>
             setFormField(
@@ -103,33 +130,20 @@ export default function CreateAccountForm({
               currency as CreateAccountFormData['currency']
             )
           }
+          options={currencyList}
           error={errors.currency}
         />
       </div>
 
-      {/* Form Errors */}
       {errors.submit && (
         <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-xl">
           <div className="flex items-center space-x-2">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <RiErrorWarningLine />
             <span className="font-medium">{errors.submit}</span>
           </div>
         </div>
       )}
 
-      {/* Form Actions */}
       <FormActions
         submitLabel={
           createMutation.isPending ? 'Creating...' : 'Create Account'
@@ -138,7 +152,6 @@ export default function CreateAccountForm({
         onCancel={onCancel}
       />
 
-      {/* Account Preview */}
       <AccountPreview
         name={formData.name}
         accountType={formData.type}

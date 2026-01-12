@@ -1,4 +1,4 @@
-import type { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import type { ExchangeRate } from '@/api/exchangeRate/cache';
 import { DEFAULT_RATES } from '@/api/exchangeRate/cache';
 

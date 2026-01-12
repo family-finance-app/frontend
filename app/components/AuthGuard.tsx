@@ -22,7 +22,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const { data: user, isLoading, isError } = useCurrentUser();
 
   useEffect(() => {
-    setIsClient(true);
     const handleStorageChange = () => {
       setTokenChanged((prev) => prev + 1);
     };
@@ -32,8 +31,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }, []);
 
   useEffect(() => {
-    if (!isClient) return;
-
     const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
     const isAuthRoute = AUTH_ROUTES.includes(pathname);
     const isProtectedRoute = !isPublicRoute && !isAuthRoute;
@@ -66,7 +63,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     tokenChanged,
   ]);
 
-  if (!isClient) {
+  if (!isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg text-gray-600">Loading...</div>

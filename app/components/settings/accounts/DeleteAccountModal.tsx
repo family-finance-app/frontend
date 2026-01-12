@@ -25,7 +25,6 @@ export function DeleteAccountModal({
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-white shadow-2xl max-w-md w-full animate-scale-in border-3 border-danger-200">
-        {/* Header */}
         <div className="border-b border-danger-100 p-6 bg-danger-50">
           <h2
             className={`${roboto.className} text-2xl font-bold text-danger-900`}
@@ -34,7 +33,6 @@ export function DeleteAccountModal({
           </h2>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-4">
           {error && (
             <div className="bg-danger-50 border border-danger-200 p-4 rounded-lg">
@@ -60,7 +58,6 @@ export function DeleteAccountModal({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="border-t border-background-100 p-6 flex items-center space-x-3">
           <Button
             text="Cancel"

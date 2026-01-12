@@ -1,4 +1,5 @@
 const CACHE_KEY = 'exchange_rates_cache';
+const CACHE_DURATION_MS = 2 * 60 * 60 * 1000;
 
 export interface ExchangeRate {
   [key: string]: number;
@@ -16,11 +17,9 @@ export function getCachedRates(): ExchangeRate | null {
     }
 
     const { rates, timestamp } = JSON.parse(cached);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const cacheDate = new Date(timestamp);
-    cacheDate.setHours(0, 0, 0, 0);
-    if (cacheDate.getTime() === today.getTime()) {
+    const now = Date.now();
+
+    if (now - timestamp < CACHE_DURATION_MS) {
       return rates;
     }
 
@@ -44,7 +43,7 @@ export function setCachedRates(rates: ExchangeRate): void {
       })
     );
   } catch (error) {
-    console.warn('❌ Cache write error:', error);
+    console.warn('Cache write error:', error);
   }
 }
 

@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button_financial';
 import TransactionList from '../../transactions/components/TransactionList';
 import EditTransactionModal from '@/(main layout)/transactions/modals/EditTransactionModal';
 import { Transaction } from '@/(main layout)/transactions/types';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { useRouter } from 'next/navigation';
 
 interface Category {

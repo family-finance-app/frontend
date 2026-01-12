@@ -1,15 +1,9 @@
-/**
- * FormSelect - переиспользуемый компонент для select полей
- */
-
-import React from 'react';
-
 export interface SelectOption {
   value: string | number;
   label: string;
 }
 
-interface FormSelectProps {
+interface FormSelectListProps {
   label: string;
   name: string;
   value: string | number;
@@ -21,7 +15,7 @@ interface FormSelectProps {
   disabled?: boolean;
 }
 
-export function FormSelect({
+export default function FormSelectList({
   label,
   name,
   value,
@@ -31,7 +25,7 @@ export function FormSelect({
   placeholder,
   required = false,
   disabled = false,
-}: FormSelectProps) {
+}: FormSelectListProps) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-primary-800 mb-1">
@@ -45,7 +39,7 @@ export function FormSelect({
         required={required}
         disabled={disabled}
         className={`
-          w-full px-3 py-2 border rounded-md
+          w-full pl-4 py-3 border rounded-md
           focus:outline-none focus:ring-2 focus:ring-background-100 dark:focus:ring-primary-600
            dark:text-primary-800 dark:border-background-800
           transition-colors

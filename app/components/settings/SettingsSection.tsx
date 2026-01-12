@@ -10,7 +10,6 @@ interface SettingsSectionProps {
 export default function SettingsSection({ section }: SettingsSectionProps) {
   return (
     <div className="bg-white rounded-2xl shadow-financial border border-background-100 p-6 hover:shadow-lg transition-shadow duration-200">
-      {/* Section Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-lg">
@@ -29,14 +28,12 @@ export default function SettingsSection({ section }: SettingsSectionProps) {
         </div>
       </div>
 
-      {/* Section Items */}
       <div className="space-y-4 mb-6">
         {section.items.map((item, itemIndex) => (
           <SettingItem key={itemIndex} item={item} />
         ))}
       </div>
 
-      {/* Primary Action */}
       {section.primaryAction && (
         <Button
           text={section.primaryAction.label}

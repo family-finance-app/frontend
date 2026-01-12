@@ -1,5 +1,5 @@
 import { Transaction } from '@/(main layout)/transactions/types';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { formatCurrencyAmount } from './formatters';
 import { Category } from '@/types/category';
 

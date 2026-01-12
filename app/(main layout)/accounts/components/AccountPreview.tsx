@@ -1,8 +1,9 @@
 'use client';
 
 import { roboto } from '@/assets/fonts/fonts';
-import { ACCOUNT_TYPES } from './AccountTypeSelect';
-import { CURRENCIES } from './AccountInputs';
+import { SELECT_ACCOUNT_TYPES } from '@/(main layout)/accounts/types';
+import { currencyList } from '@/(main layout)/accounts/types';
+import { getRemixIcon } from '@/utils/getRemixIcon';
 
 interface AccountPreviewProps {
   name: string;
@@ -11,14 +12,16 @@ interface AccountPreviewProps {
   currency: string;
 }
 
-export function AccountPreview({
+export default function AccountPreview({
   name,
   accountType,
   balance,
   currency,
 }: AccountPreviewProps) {
-  const selectedType = ACCOUNT_TYPES.find((type) => type.value === accountType);
-  const selectedCurrency = CURRENCIES.find((curr) => curr.value === currency);
+  const selectedType = SELECT_ACCOUNT_TYPES.find(
+    (type) => type.value === accountType
+  );
+  const selectedCurrency = currencyList.find((curr) => curr.value === currency);
 
   return (
     <div className="bg-background-50 dark:bg-primary-600 border border-background-200 rounded-xl p-4">
@@ -28,8 +31,14 @@ export function AccountPreview({
         Account Preview
       </h4>
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-primary-100 dark:bg-background-100 rounded-lg flex items-center justify-center text-xl">
-          {selectedType?.icon}
+        <div className="w-10 h-10 bg-primary-100 dark:bg-background-100 rounded-lg flex items-center justify-center">
+          {selectedType?.icon &&
+            (() => {
+              const Icon = getRemixIcon(selectedType.icon);
+              return Icon ? (
+                <Icon className="w-5 h-5 text-primary-700 dark:text-primary-800" />
+              ) : null;
+            })()}
         </div>
         <div>
           <p className="font-medium text-background-900 dark:text-background-100">

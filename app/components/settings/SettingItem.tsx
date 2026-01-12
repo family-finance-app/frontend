@@ -1,4 +1,4 @@
-import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
+import { jetbrainsMono } from '@/assets/fonts/fonts';
 import { SettingItem } from '@/utils/settings';
 
 interface SettingItemProps {

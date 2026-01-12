@@ -1,5 +1,5 @@
 import { Transaction } from '../types';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 
 // enriches transactions with account and category data
 export default function enrichTransactionsWithData(

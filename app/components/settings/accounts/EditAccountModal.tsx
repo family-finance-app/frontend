@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { roboto } from '@/assets/fonts/fonts';
 import Button from '@/components/ui/Button_financial';
-import { ACCOUNT_TYPES, type AccountType } from '@/utils/accounts';
+import {
+  ACCOUNT_TYPES,
+  type AccountType,
+} from '@/(main layout)/accounts/types';
 
 interface EditAccountModalProps {
   account: Account | null;
@@ -57,7 +60,6 @@ export function EditAccountModal({
     setIsLoading(true);
 
     try {
-      // Validate form data
       if (!formData.name.trim()) {
         setError('Account name is required');
         setIsLoading(false);
@@ -70,10 +72,8 @@ export function EditAccountModal({
         return;
       }
 
-      // Call API through parent component
       await onSave(account.id, formData);
 
-      // Close modal on success
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save account');
@@ -85,7 +85,6 @@ export function EditAccountModal({
   return (
     <div className="fixed inset-0 bg-background-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in border border-background-200">
-        {/* Header */}
         <div className="border-b border-background-100 p-6">
           <h2
             className={`${roboto.className} text-2xl font-bold text-background-900`}
@@ -97,16 +96,13 @@ export function EditAccountModal({
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Error Message */}
           {error && (
             <div className="bg-danger-50 border border-danger-200 rounded-lg p-3">
               <p className="text-danger-700 text-sm font-medium">{error}</p>
             </div>
           )}
 
-          {/* Account Name */}
           <div>
             <label
               htmlFor="name"
@@ -126,7 +122,6 @@ export function EditAccountModal({
             />
           </div>
 
-          {/* Account Type */}
           <div>
             <label
               htmlFor="type"
@@ -150,7 +145,6 @@ export function EditAccountModal({
             </select>
           </div>
 
-          {/* Currency */}
           <div>
             <label
               htmlFor="currency"
@@ -171,7 +165,6 @@ export function EditAccountModal({
             />
           </div>
 
-          {/* Description */}
           <div>
             <label
               htmlFor="description"
@@ -191,7 +184,6 @@ export function EditAccountModal({
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex items-center space-x-3 pt-4 border-t border-background-100">
             <Button
               text="Cancel"

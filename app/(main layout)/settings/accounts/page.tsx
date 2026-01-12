@@ -6,7 +6,7 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useMyTransactions } from '@/api/transactions/queries';
 import { useUpdateAccount, useDeleteAccount } from '@/api/accounts/mutations';
 import { useCategories } from '@/api/categories/queries';
-import { getAccountTypeName } from '@/utils/accounts';
+import { accountTypeName } from '@/(main layout)/accounts/utils';
 import { formatCurrencyAmount } from '@/utils/formatters';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTotalBalanceInUAH } from '@/hooks';
@@ -15,7 +15,7 @@ import {
   AccountsList,
   DeleteAccountModal,
 } from '@/components/settings/accounts';
-import { Account, EditAccountFormData } from '@/types/account';
+import { Account, EditAccountFormData } from '@/(main layout)/accounts/types';
 import { gridClassname } from '@/assets/globalClassnames';
 import SearchInput from '@/components/ui/SearchInput';
 
@@ -46,7 +46,7 @@ export default function AccountSettings() {
   const filteredAccounts = accounts.filter(
     (account) =>
       account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getAccountTypeName(account.type)
+      accountTypeName(account.type)
         .toLowerCase()
         .includes(searchQuery.toLowerCase())
   );

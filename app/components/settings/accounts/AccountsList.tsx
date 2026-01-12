@@ -1,9 +1,9 @@
 'use client';
 
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { jetbrainsMono } from '@/assets/fonts/fonts';
 import { Transaction } from '@/(main layout)/transactions/types';
-import { getAccountTypeName } from '@/utils/accounts';
+import { accountTypeName } from '@/(main layout)/accounts/utils';
 import { formatCurrencyAmount } from '@/utils/formatters';
 
 interface AccountsListProps {
@@ -52,7 +52,7 @@ export function AccountsList({
                   {account.name}
                 </p>
                 <p className="text-xs text-background-500 dark:text-primary-700 mt-0.5">
-                  {getAccountTypeName(account.type)} • {accountTxCount}{' '}
+                  {accountTypeName(account.type)} • {accountTxCount}{' '}
                   transactions
                 </p>
                 <p

@@ -1,20 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import CreateAccountForm from '@/components/accounts/CreateAccountForm';
-import FinancialCard from '@/(main layout)/dashboard/cards/FinancialCard';
+import { CreateAccountForm, AccountsGridSection } from './components/index';
+import { FinancialCard } from '@/components/shared';
 import Button from '@/components/ui/Button_financial';
 import { roboto } from '@/assets/fonts/fonts';
 import { useMyAccounts } from '@/api/accounts/queries';
-import {
-  PersonalAccountsSection,
-  FamilyAccountsSection,
-} from '@/components/accounts';
-import {
-  getPersonalAccounts,
-  getFamilyAccounts,
-  calculateAccountStats,
-} from '@/utils/accounts';
+import { accountStatsByGroup } from './utils';
+import { RiGroupLine, RiUserLine } from '@remixicon/react';
+import SuccessMessage from '@/components/ui/SuccessMessage';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function Accounts() {
   const { data: accounts = [] } = useMyAccounts();
@@ -22,48 +17,41 @@ export default function Accounts() {
   const [lastCreatedAccount, setLastCreatedAccount] = useState<string | null>(
     null
   );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<'personal' | 'family'>(
+    'personal'
+  );
 
   const showSuccessMessage = (accountName: string) => {
     setShowCreateForm(false);
     setLastCreatedAccount(accountName);
-    setTimeout(() => setLastCreatedAccount(null), 3000);
+    setErrorMessage(null);
+    setTimeout(() => setLastCreatedAccount(null), 5000);
   };
 
-  const personalAccounts = getPersonalAccounts(accounts);
-  const familyAccounts = getFamilyAccounts(accounts);
+  const showErrorMessage = (error: string) => {
+    setErrorMessage(error);
+    setTimeout(() => setErrorMessage(null), 5000);
+  };
 
-  const personalStats = calculateAccountStats(personalAccounts);
-  const familyStats = calculateAccountStats(familyAccounts);
+  const personalAccounts = accountStatsByGroup(accounts, 'personal');
+  const familyAccounts = accountStatsByGroup(accounts, 'family');
 
   return (
     <div className="space-y-12">
       {lastCreatedAccount && (
-        <div
-          role="status"
-          className="bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded-xl animate-fade-in"
-        >
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            <span className="font-medium">
-              Account "{lastCreatedAccount}" successfully created!
-            </span>
-          </div>
+        <div role="status">
+          <SuccessMessage
+            message={`Account "${lastCreatedAccount}" successfully created!`}
+          />
         </div>
       )}
 
-      {/* Page Header */}
+      {errorMessage && (
+        <div role="alert">
+          <ErrorMessage message={errorMessage} />
+        </div>
+      )}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1
@@ -97,54 +85,43 @@ export default function Accounts() {
       </div>
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FinancialCard
-          title="Personal Accounts"
-          value={personalStats.totalCount.toString()}
-          description="Your accounts"
-          size="md"
-          className="h-full"
-          icon={
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
-            </svg>
-          }
-        />
+        <button
+          onClick={() => setActiveSection('personal')}
+          className={`text-left transition-all ${
+            activeSection === 'personal'
+              ? 'ring-3 ring-primary-300 dark:ring-primary-600 rounded-2xl'
+              : ''
+          }`}
+        >
+          <FinancialCard
+            title="Personal Accounts"
+            value={personalAccounts.totalCount.toString()}
+            description="Your accounts"
+            size="md"
+            className="h-full cursor-pointer"
+            icon={<RiUserLine />}
+          />
+        </button>
 
-        <FinancialCard
-          title="Family Accounts"
-          value={familyStats.totalCount.toString()}
-          description="Shared accounts"
-          size="md"
-          className="h-full"
-          icon={
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          }
-        />
+        <button
+          onClick={() => setActiveSection('family')}
+          className={`text-left transition-all ${
+            activeSection === 'family'
+              ? 'ring-3 ring-primary-300 dark:ring-primary-600 rounded-2xl'
+              : ''
+          }`}
+        >
+          <FinancialCard
+            title="Family Accounts"
+            value={familyAccounts.totalCount.toString()}
+            description="Shared accounts"
+            size="md"
+            className="h-full cursor-pointer"
+            icon={<RiGroupLine />}
+          />
+        </button>
       </section>
 
-      {/* Create Account Form */}
       {showCreateForm && (
         <div className="bg-white dark:bg-background-100 rounded-2xl shadow-financial border border-background-100 p-6 animate-scale-in">
           <div className="flex justify-between">
@@ -153,30 +130,36 @@ export default function Accounts() {
             >
               Create New Account
             </h3>
-            <p className="text-sm dark:text-stack-600">* required fields</p>
           </div>
           <CreateAccountForm
             onSuccess={showSuccessMessage}
+            onError={showErrorMessage}
             onCancel={() => setShowCreateForm(false)}
           />
         </div>
       )}
 
-      {personalAccounts.length > 0 && (
+      {personalAccounts.totalCount > 0 && activeSection === 'personal' && (
         <section aria-labelledby="personal-accounts">
           <h2 id="personal-accounts" className="sr-only">
             Personal Accounts
           </h2>
-          <PersonalAccountsSection accounts={personalAccounts} />
+          <AccountsGridSection
+            accounts={personalAccounts.accounts}
+            onClick={() => setShowCreateForm(true)}
+          />
         </section>
       )}
 
-      {familyAccounts.length > 0 && (
+      {familyAccounts.totalCount > 0 && activeSection === 'family' && (
         <section aria-labelledby="family-accounts">
           <h2 id="family-accounts" className="sr-only">
             Family Accounts
           </h2>
-          <FamilyAccountsSection accounts={familyAccounts} />
+          <AccountsGridSection
+            accounts={familyAccounts.accounts}
+            onClick={() => setShowCreateForm(true)}
+          />
         </section>
       )}
     </div>

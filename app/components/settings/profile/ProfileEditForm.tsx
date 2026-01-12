@@ -66,7 +66,6 @@ export function ProfileEditForm({
         Personal Information
       </h2>
 
-      {/* Success Message */}
       {showSuccess && (
         <div className="mb-6 p-4 bg-green-50  dark:bg-background-100 border border-green-200 dark:border-primary-500 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
           <div className="shrink-0">
@@ -91,7 +90,6 @@ export function ProfileEditForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Full Name */}
         <div>
           <label
             htmlFor="name"
@@ -110,7 +108,6 @@ export function ProfileEditForm({
           />
         </div>
 
-        {/* Date of Birth */}
         <div>
           <label
             htmlFor="dateOfBirth"
@@ -129,7 +126,6 @@ export function ProfileEditForm({
           />
         </div>
 
-        {/* Submit Button */}
         <div className="flex gap-3 pt-4">
           <Button
             text={isSubmitting || isLoading ? 'Saving...' : 'Save Changes'}

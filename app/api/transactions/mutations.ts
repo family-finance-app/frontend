@@ -10,7 +10,7 @@ import {
   TransactionResponse,
   UpdateTransactionFormData,
 } from '@/(main layout)/transactions/types';
-import type { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { getAuthToken } from '@/utils/token';
 
 export const useCreateTransaction = () => {

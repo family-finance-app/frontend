@@ -1,8 +1,8 @@
 'use client';
 
-import { Account } from '@/types/account';
+import { Account } from '@/(main layout)/accounts/types';
 import { roboto } from '@/assets/fonts/fonts';
-import { getAccountTypeName } from '@/utils/accounts';
+import { accountTypeName } from '@/(main layout)/accounts/utils/index';
 
 interface LinkedResourcesProps {
   familyGroups?: Array<{
@@ -70,7 +70,7 @@ export function LinkedResources({
                     {account.name}
                   </p>
                   <p className="text-xs text-background-500 mt-1">
-                    {getAccountTypeName(account.type as Account['type'])}
+                    {accountTypeName(account.type as Account['type'])}
                   </p>
                 </div>
                 <div className="text-right shrink-0 ml-2">
