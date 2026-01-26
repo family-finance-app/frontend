@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import Logo_dark from './Logo_dark';
-import Logo_light from './Logo_light';
 
 export default function Footer() {
   return (
@@ -18,7 +16,6 @@ export default function Footer() {
           </div>
 
           <div className="flex gap-16">
-            {/* Company */}
             <div>
               <h3 className="font-semibold text-white mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
@@ -43,7 +40,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Legal */}
             <div>
               <h3 className="font-semibold text-white mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
@@ -77,7 +73,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="pt-8 border-t border-primary-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-300 text-sm">
             © 2025 FamilyFinance. All rights reserved.

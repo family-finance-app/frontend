@@ -1,6 +1,7 @@
-// centralized API client for all backend requests that handles authentication, error handling and request configuration
+// requests configuration
 
-import { ApiError } from '@/types/auth';
+import { ApiError } from 'next/dist/server/api-utils';
+import { getAuthToken, setAuthToken, clearAuthToken } from '@/utils';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -15,10 +16,9 @@ class APIClient {
     this.baseURL = baseURL;
   }
 
-  // generic request method that handles all HTTP calls
   private async request<T>(
     endpoint: string,
-    config: RequestConfig = {}
+    config: RequestConfig = {},
   ): Promise<T> {
     const { token, headers, ...restConfig } = config;
 
@@ -28,8 +28,9 @@ class APIClient {
       'Content-Type': 'application/json',
     };
 
-    if (token) {
-      defaultHeaders['Authorization'] = `Bearer ${token}`;
+    const resolvedToken = token || getAuthToken();
+    if (resolvedToken) {
+      defaultHeaders['Authorization'] = `Bearer ${resolvedToken}`;
     }
 
     const response = await fetch(url, {
@@ -38,7 +39,55 @@ class APIClient {
         ...defaultHeaders,
         ...headers,
       },
+      credentials: 'include',
     });
+
+    if (response.status === 401) {
+      // attempt refresh
+      try {
+        const refreshUrl = `${this.baseURL}/auth/refresh`;
+        const refreshResp = await fetch(refreshUrl, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (refreshResp.ok) {
+          const refreshData = await refreshResp.json();
+          const newAccess =
+            (refreshData?.data as any)?.accessToken ||
+            (refreshData as any)?.accessToken;
+          if (newAccess) {
+            setAuthToken(newAccess);
+
+            const retryHeaders: HeadersInit = {
+              ...defaultHeaders,
+              Authorization: `Bearer ${newAccess}`,
+              ...headers,
+            };
+
+            const retryResp = await fetch(url, {
+              ...restConfig,
+              headers: retryHeaders,
+            });
+
+            if (retryResp.status === 204) return {} as T;
+            const retryData = await retryResp.json();
+            if (!retryResp.ok) {
+              throw { status: retryResp.status, ...retryData } as ApiError & {
+                status: number;
+              };
+            }
+            return retryData as T;
+          }
+        }
+      } catch (e) {}
+
+      clearAuthToken();
+      throw { status: 401, message: 'Unauthorized' } as ApiError & {
+        status: number;
+      };
+    }
 
     if (response.status === 204) {
       return {} as T;
@@ -53,32 +102,19 @@ class APIClient {
       } as ApiError & { status: number };
     }
 
-    if (
-      responseData &&
-      typeof responseData === 'object' &&
-      'data' in responseData &&
-      'status' in responseData
-    ) {
-      return responseData.data as T;
-    }
-
     return responseData as T;
   }
 
-  // GET
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
   }
 
-  // external GET for absolute URLs (bypass baseURL) for third-party APIs (NBU, etc.)
+  // external api GET request
   async externalGet<T>(
     absoluteUrl: string,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> {
     const { token, headers, ...restConfig } = config || {};
-
-    // For external APIs, don't set Content-Type by default (some APIs reject it due to CORS)
-    // Only add headers if explicitly provided
     const defaultHeaders: HeadersInit = {};
 
     if (token) {
@@ -98,24 +134,17 @@ class APIClient {
       return {} as T;
     }
 
-    // Check status before trying to parse JSON
-    if (!response.ok) {
-      console.error(
-        `External request failed: ${response.status} ${response.statusText}`
-      );
-      throw new Error(`External request failed: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
 
     const responseData = await response.json();
 
     return responseData as T;
   }
 
-  // POST
   async post<T>(
     endpoint: string,
     body?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> {
     return this.request<T>(endpoint, {
       ...config,
@@ -124,11 +153,10 @@ class APIClient {
     });
   }
 
-  // PUT
   async put<T>(
     endpoint: string,
     body?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> {
     return this.request<T>(endpoint, {
       ...config,
@@ -137,11 +165,10 @@ class APIClient {
     });
   }
 
-  // PATCH
   async patch<T>(
     endpoint: string,
     body?: unknown,
-    config?: RequestConfig
+    config?: RequestConfig,
   ): Promise<T> {
     return this.request<T>(endpoint, {
       ...config,
@@ -150,7 +177,6 @@ class APIClient {
     });
   }
 
-  // DELETE
   async delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     return this.request<T>(endpoint, { ...config, method: 'DELETE' });
   }

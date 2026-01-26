@@ -1,4 +1,4 @@
-import { roboto, jetbrainsMono } from '@/assets/fonts/fonts';
+import { roboto } from '@/assets/fonts/fonts';
 
 export default function Logo_dark() {
   return (

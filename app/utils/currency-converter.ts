@@ -1,37 +1,32 @@
 import { Account } from '@/(main layout)/accounts/types';
-import type { ExchangeRate } from '@/api/exchangeRate/cache';
-import { DEFAULT_RATES } from '@/api/exchangeRate/cache';
 
-// converts amount from one currency to UAH
+import { ExchangeRateMap } from '@/api/exchangeRate/queries';
+
+// converts amount from one currency to UAH using backend-provided rates
 export function convertToUAH(
   amount: number,
   fromCurrency: string,
-  rates: ExchangeRate
+  rates: ExchangeRateMap | undefined,
 ): number {
-  const currency = fromCurrency.toUpperCase();
+  const currency = (fromCurrency || 'UAH').toUpperCase();
 
   if (currency === 'UAH') {
     return amount;
   }
 
-  const rate = rates[currency];
+  const rate = rates?.[currency];
   if (!rate) {
-    console.warn(
-      `⚠️ Exchange rate for ${currency} not found, using default rates`
-    );
-    const defaultRate = DEFAULT_RATES[currency] || 1;
-    const converted = amount * defaultRate;
-    return converted;
+    console.warn(`Exchange rate for ${currency} not found, falling back to 1`);
+    return amount;
   }
 
-  const converted = amount * rate;
-  return converted;
+  return amount * rate;
 }
 
 // calculate total balance in UAH from accounts with different currencies, uses provided rates from useExchangeRates hook
 export function calculateTotalBalanceInUAH(
-  accounts: Account[] | undefined,
-  rates: ExchangeRate
+  accounts: Account[],
+  rates: ExchangeRateMap | undefined,
 ): number {
   if (!accounts || accounts.length === 0) {
     return 0;
@@ -50,7 +45,7 @@ export function calculateTotalBalanceInUAH(
 
 // calculate total balance without currency conversion (only use if all accounts are in same currency)
 export function calculateSimpleTotalBalance(
-  accounts: Account[] | undefined
+  accounts: Account[] | undefined,
 ): number {
   return (
     accounts?.reduce((sum, account) => {

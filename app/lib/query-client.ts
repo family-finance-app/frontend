@@ -1,13 +1,12 @@
-// central configuration for all API queries and mutations
+// cache and refetch management
 
 import { QueryClient } from '@tanstack/react-query';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 10,
-      retry: 1,
+      staleTime: 0,
+      gcTime: 0,
       refetchOnWindowFocus: process.env.NODE_ENV === 'production',
     },
     mutations: {
@@ -16,31 +15,24 @@ export const queryClient = new QueryClient({
   },
 });
 
-// query keys for cache management
 export const queryKeys = {
   auth: {
-    currentUser: ['auth', 'current-user'] as const,
+    all: ['auth'] as const,
   },
   accounts: {
     all: ['accounts'] as const,
-    my: ['accounts', 'my'] as const,
-    detail: (id: number) => ['accounts', id] as const,
-    byUser: (userId: number) => ['accounts', 'user', userId] as const,
   },
   transactions: {
     all: ['transactions'] as const,
-    my: ['transactions', 'my'] as const,
-    detail: (id: string) => ['transactions', id] as const,
-    byAccount: (accountId: string) =>
-      ['transactions', 'account', accountId] as const,
-    family: ['transactions', 'family'] as const,
   },
   categories: {
     all: ['categories'] as const,
   },
+  exchangeRate: {
+    all: ['exchangeRates'] as const,
+  },
   familyGroup: {
-    detail: ['family-group'] as const,
-    members: ['family-group', 'members'] as const,
+    all: ['family-group'] as const,
   },
   profile: {
     all: ['profile'] as const,

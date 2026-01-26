@@ -1,5 +1,4 @@
 // Tremor DonutChart [v1.0.0]
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
 
@@ -74,9 +73,8 @@ const ChartTooltip = ({
       <div
         className={cx(
           // base
-          'rounded-md border text-sm shadow-md',
-          // border color
-          'border-gray-200 dark:border-gray-800',
+          'rounded-md text-sm shadow-md',
+
           // background color
           'bg-white dark:bg-gray-950'
         )}
@@ -276,7 +274,11 @@ const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
     return (
       <div
         ref={containerRef}
-        className={cx('h-40 w-40', className)}
+        className={cx(
+          'h-[42] w-[42]',
+          '[&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none', // border
+          className
+        )}
         tremor-id="tremor-raw"
         {...other}
       >
@@ -292,7 +294,7 @@ const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
                   }
                 : undefined
             }
-            margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
+            margin={{ top: 1, left: 0, right: 0, bottom: 1 }}
           >
             {showLabel && isDonut && (
               <text

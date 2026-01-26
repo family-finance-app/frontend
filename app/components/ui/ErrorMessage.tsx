@@ -1,4 +1,4 @@
-import { RiCloseFill, RiErrorWarningFill } from '@remixicon/react';
+import { RiCloseFill } from '@remixicon/react';
 
 interface ErrorMessageProps {
   message: string;

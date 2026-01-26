@@ -1,7 +1,8 @@
 'use client';
 
 import { useCurrentUser } from '@/api/auth/queries';
-import { hasAuthToken } from '@/utils/token';
+
+import { hasAuthToken } from '@/utils';
 
 export const useAuth = () => {
   const { data: user, isLoading, isError } = useCurrentUser();

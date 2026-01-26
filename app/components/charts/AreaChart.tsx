@@ -1,5 +1,4 @@
 // Tremor AreaChart [v1.0.0]
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
 
@@ -255,7 +254,7 @@ const Legend = React.forwardRef<HTMLOListElement, LegendProps>((props, ref) => {
   return (
     <ol
       ref={ref}
-      className={cx('relative overflow-hidden', className)}
+      className={cx('relative overflow-hidden z-10', className)}
       {...other}
     >
       <div
@@ -565,7 +564,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
       };
     }, []); //
     const CustomTooltip = customTooltip;
-    const paddingValue =
+    const basePaddingValue =
       (!showXAxis && !showYAxis) || (startEndOnly && !showYAxis) ? 0 : 20;
     const [legendHeight, setLegendHeight] = React.useState(60);
     const [activeDot, setActiveDot] = React.useState<ActiveDot | undefined>(
@@ -575,6 +574,15 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
       undefined
     );
     const categoryColors = constructCategoryColors(categories, colors);
+    const isCompact = containerSize.width > 0 && containerSize.width < 640; // narrow viewports
+    const resolvedPaddingValue = isCompact
+      ? Math.min(basePaddingValue, 12)
+      : basePaddingValue;
+    const resolvedTickGap = isCompact ? Math.max(tickGap, 12) : tickGap;
+    const resolvedYAxisWidth = isCompact
+      ? Math.min(yAxisWidth, 64)
+      : yAxisWidth;
+    const shouldEnableLegendSlider = enableLegendSlider || isCompact;
 
     const yAxisDomain = getYAxisDomain(autoMinValue, minValue, maxValue);
     const hasOnValueChange = !!onValueChange;
@@ -693,10 +701,29 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
       setActiveDot(undefined);
     }
 
+    const hasCustomHeight =
+      typeof className === 'string' &&
+      /(\b!?min-h-)|(\b!?h-)|h\[/u.test(className);
+
     return (
       <div
         ref={containerRef}
-        className={cx('h-80 w-full', className)}
+        className={cx(
+          'w-full',
+          !hasCustomHeight && 'h-[260px] sm:h-80',
+          [
+            '[&_.recharts-wrapper]:outline-none',
+            '[&_.recharts-wrapper:focus]:outline-none',
+            '[&_.recharts-wrapper:focus-visible]:outline-none',
+            '[&_.recharts-surface]:outline-none',
+            '[&_.recharts-surface:focus]:outline-none',
+            '[&_.recharts-surface:focus-visible]:outline-none',
+            '[&_.recharts-surface]:ring-0',
+            '[&_.recharts-surface:focus]:ring-0',
+            '[&_.recharts-surface:focus-visible]:ring-0',
+          ].join(' '),
+          className
+        )}
         tremor-id="tremor-raw"
         {...other}
       >
@@ -732,7 +759,10 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
               />
             ) : null}
             <XAxis
-              padding={{ left: paddingValue, right: paddingValue }}
+              padding={{
+                left: resolvedPaddingValue,
+                right: resolvedPaddingValue,
+              }}
               hide={!showXAxis}
               dataKey={index}
               interval={startEndOnly ? 'preserveStartEnd' : intervalType}
@@ -749,27 +779,30 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
               stroke=""
               className={cx(
                 // base
-                'text-xs',
+                'text-[8px] lg:text-sm md:text-[10px]',
                 // text fill
                 'fill-gray-500 dark:fill-gray-500'
               )}
               tickLine={false}
               axisLine={false}
-              minTickGap={tickGap}
+              minTickGap={resolvedTickGap}
             >
               {xAxisLabel && (
                 <Label
                   position="insideBottom"
                   offset={-20}
-                  className="text-sm font-medium"
-                  style={{ fill: axisLabelColor }}
+                  className="text-xs font-medium sm:text-sm"
+                  style={{
+                    fill: axisLabelColor,
+                    fontSize: isCompact ? '0.75rem' : undefined,
+                  }}
                 >
                   {xAxisLabel}
                 </Label>
               )}
             </XAxis>
             <YAxis
-              width={yAxisWidth}
+              width={resolvedYAxisWidth}
               hide={!showYAxis}
               axisLine={false}
               tickLine={false}
@@ -783,7 +816,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
               stroke=""
               className={cx(
                 // base
-                'text-xs',
+                'text-[10px] sm:text-xs',
                 // text fill
                 'fill-gray-500 dark:fill-gray-500'
               )}
@@ -798,14 +831,14 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
                   style={{ textAnchor: 'middle', fill: axisLabelColor }}
                   angle={-90}
                   offset={-15}
-                  className="text-sm font-medium"
+                  className="text-xs font-medium sm:text-sm"
                 >
                   {yAxisLabel}
                 </Label>
               )}
             </YAxis>
             <Tooltip
-              wrapperStyle={{ outline: 'none' }}
+              wrapperStyle={{ outline: 'none', zIndex: 30 }}
               isAnimationActive={true}
               animationDuration={100}
               cursor={{ stroke: '#d1d5db', strokeWidth: 1 }}
@@ -886,9 +919,9 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
                       ? (clickedLegendItem: string) =>
                           onCategoryClick(clickedLegendItem)
                       : undefined,
-                    enableLegendSlider,
+                    shouldEnableLegendSlider,
                     legendPosition,
-                    yAxisWidth
+                    resolvedYAxisWidth
                   )
                 }
               />

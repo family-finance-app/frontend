@@ -126,7 +126,9 @@ const LegendItem = ({
           'text-gray-700 dark:text-background-50',
           hasOnValueChange &&
             'group-hover:text-gray-900 dark:group-hover:text-gray-50',
-          activeLegend && activeLegend !== name ? 'opacity-40' : 'opacity-100'
+          activeLegend && activeLegend !== name
+            ? 'opacity-40 outline-0'
+            : 'opacity-100'
         )}
       >
         {name}
@@ -663,7 +665,21 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
     return (
       <div
         ref={containerRef}
-        className={cx('h-80 w-full', className)}
+        className={cx(
+          'h-80 w-full',
+          [
+            '[&_.recharts-wrapper]:outline-none',
+            '[&_.recharts-wrapper:focus]:outline-none',
+            '[&_.recharts-wrapper:focus-visible]:outline-none',
+            '[&_.recharts-surface]:outline-none',
+            '[&_.recharts-surface:focus]:outline-none',
+            '[&_.recharts-surface:focus-visible]:outline-none',
+            '[&_.recharts-surface]:ring-0',
+            '[&_.recharts-surface:focus]:ring-0',
+            '[&_.recharts-surface:focus-visible]:ring-0',
+          ].join(' '),
+          className
+        )}
         {...other}
       >
         {containerSize.width > 0 && containerSize.height > 0 ? (
@@ -790,7 +806,7 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
               )}
             </YAxis>
             <Tooltip
-              wrapperStyle={{ outline: 'none' }}
+              wrapperStyle={{ outline: 'none', zIndex: 10 }}
               isAnimationActive={true}
               animationDuration={100}
               cursor={{ fill: '#d1d5db', opacity: '0.15' }}

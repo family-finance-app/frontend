@@ -1,4 +1,6 @@
-export { default as PageHeader } from './PageHeader';
-export { default as PageSection } from './PageSection';
-export { default as EmptyState } from './EmptyState';
-export { default as PageLoadingState } from './PageLoadingState';
+export { SidebarMenu } from './SidebarMenu';
+export { SidebarBalanceWidget } from './SidebarBalanceWidget';
+export { SidebarExchangeRatesWidget } from './SidebarExchangeRatesWidget';
+export { default as Sidebar } from './Sidebar';
+export { default as Navigation } from './Navigation';
+export { default as Footer } from './Footer';

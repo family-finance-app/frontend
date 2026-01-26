@@ -1,5 +1,7 @@
 import * as RemixIcon from '@remixicon/react';
 
+// reverts name of icon into RemixIcon component
+
 export const getRemixIcon = (iconName?: string) => {
   if (!iconName || !iconName.startsWith('ri-')) return null;
 

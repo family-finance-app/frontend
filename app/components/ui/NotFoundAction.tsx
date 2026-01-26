@@ -1,6 +1,5 @@
 import { roboto } from '@/assets/fonts/fonts';
-import { RiQuestionAnswerLine, RiQuestionLine } from '@remixicon/react';
-import { Label } from 'recharts';
+import { RiQuestionLine } from '@remixicon/react';
 
 interface NotFoundActionProps {
   header: string;
