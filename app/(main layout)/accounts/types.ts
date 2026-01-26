@@ -1,3 +1,22 @@
+export interface Account {
+  id: number;
+  name: string;
+  type:
+    | 'DEBIT'
+    | 'CREDIT'
+    | 'CASH'
+    | 'BANK'
+    | 'INVESTMENT'
+    | 'DEPOSIT'
+    | 'DIGITAL'
+    | 'SAVINGS';
+  balance: number;
+  currency: 'UAH' | 'USD' | 'EUR';
+  ownerId: number;
+  createdAt: string;
+  groupId?: number;
+}
+
 export interface CreateAccountFormData {
   name: string;
   type:
@@ -18,26 +37,14 @@ export interface EditAccountFormData {
   type: Account['type'];
   currency: Account['currency'];
 }
-export interface Account {
-  id: number;
-  name: string;
-  type:
-    | 'DEBIT'
-    | 'CREDIT'
-    | 'CASH'
-    | 'BANK'
-    | 'INVESTMENT'
-    | 'DEPOSIT'
-    | 'DIGITAL'
-    | 'SAVINGS';
-  balance: number;
-  currency: 'UAH' | 'USD' | 'EUR';
-  description?: string;
-  groupId?: number;
-  userId: number;
-  createdBy: number;
-  createdAt: string;
+
+export interface NewAccount extends Account {}
+export interface UserAccounts extends Account {}
+export interface UpdatedAccount extends Account {
   updatedAt: string;
+}
+export interface DeletedAccount {
+  id: number;
 }
 
 export type AccountType = Account['type'] | 'all';
@@ -52,18 +59,13 @@ export const ACCOUNT_TYPES: Account['type'][] = [
   'SAVINGS',
 ];
 
-export interface AccountResponse {
-  message: string;
-  account: Account;
-}
-
 export interface AccountsListResponse {
   message: string;
   accounts: Account[];
 }
 
-export interface CreateAccountResponse extends AccountResponse {}
-export interface UpdateAccountResponse extends AccountResponse {}
+export interface CreateAccountResponse extends Account {}
+export interface UpdateAccountResponse extends Account {}
 
 export interface DeleteAccountResponse {
   message: string;

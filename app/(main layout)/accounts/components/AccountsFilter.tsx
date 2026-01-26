@@ -1,7 +1,7 @@
 'use client';
 
-import { roboto } from '@/assets/fonts/fonts';
-import { accountTypeName } from '../utils';
+import { accountTypeName } from '../index';
+
 import { Account, ACCOUNT_TYPES } from '../types';
 
 interface AccountsFilterProps {
@@ -18,31 +18,22 @@ export default function AccountsFilter({
   totalCount,
 }: AccountsFilterProps) {
   return (
-    <div className="bg-white dark:bg-stack-100 rounded-2xl shadow-financial border border-background-100 p-6">
+    <div className="p-2">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h3
-            className={`${roboto.className} text-lg font-semibold text-background-900 mb-2`}
-          >
-            Accounts
-          </h3>
-          <p className="text-background-600 text-sm">
-            {accountsCount} of {totalCount} accounts shown
-          </p>
-        </div>
+        <div></div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <span className="text-sm font-medium text-background-700">
             Filter by type:
           </span>
 
-          <div className="sm:hidden w-full">
+          <div className="lg:hidden w-full sm:w-1/3">
             <label htmlFor="accounts-type" className="sr-only">
               Account type
             </label>
             <select
               id="accounts-type"
-              className="w-full rounded-xl border border-background-200 bg-white px-4 py-2 text-sm font-medium text-background-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full rounded-xl border border-background-200 bg-white dark:bg-background-100 px-4 py-2 text-sm font-medium text-background-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={filterType}
               onChange={(event) =>
                 onFilterChange(event.target.value as Account['type'] | 'all')
@@ -57,7 +48,7 @@ export default function AccountsFilter({
             </select>
           </div>
 
-          <div className="hidden sm:flex flex-wrap gap-2 bg-background-100 dark:bg-background-300 rounded-xl p-2 sm:p-1">
+          <div className="hidden lg:flex flex-wrap gap-2 bg-background-100 dark:bg-background-300 rounded-xl p-2 sm:p-1">
             <button
               onClick={() => onFilterChange('all')}
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${

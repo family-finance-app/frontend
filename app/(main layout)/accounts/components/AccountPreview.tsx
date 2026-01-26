@@ -1,9 +1,10 @@
 'use client';
 
-import { roboto } from '@/assets/fonts/fonts';
-import { SELECT_ACCOUNT_TYPES } from '@/(main layout)/accounts/types';
-import { currencyList } from '@/(main layout)/accounts/types';
+import { SELECT_ACCOUNT_TYPES, currencyList } from '../types';
+
 import { getRemixIcon } from '@/utils/getRemixIcon';
+
+import { roboto } from '@/assets/fonts/fonts';
 
 interface AccountPreviewProps {
   name: string;

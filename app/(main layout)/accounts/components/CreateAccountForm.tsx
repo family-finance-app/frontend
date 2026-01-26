@@ -1,21 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import { RiErrorWarningLine } from '@remixicon/react';
+
 import {
   CreateAccountFormData,
   currencyList,
   SELECT_ACCOUNT_TYPES,
-} from '@/(main layout)/accounts/types';
+} from '../types';
+
 import { useCreateAccount } from '@/api/accounts/mutations';
-import { useAccountForm } from '@/hooks/useAccountForm';
+
 import {
+  useAccountForm,
   validateCreateAccountForm,
   handleCreateAccountErrors,
-} from '@/(main layout)/accounts/utils/validation';
-import { FormActions, FormInput, FormSelectList } from '@/components/shared';
-import AccountPreview from './AccountPreview';
-import { RiErrorWarningLine } from '@remixicon/react';
-import FormSelectGrid from '../../../components/shared/forms/FormSelectGrid';
+  AccountPreview,
+} from '../index';
+
+import {
+  FormActions,
+  FormInput,
+  FormSelectList,
+  FormSelectGrid,
+} from '@/components';
 
 interface CreateAccountFormProps {
   onSuccess?: (accountName: string) => void;
@@ -33,7 +41,7 @@ export default function CreateAccountForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const selectedCurrency = currencyList.find(
-    (curr) => curr.value === formData.currency
+    (curr) => curr.value === formData.currency,
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,10 +77,6 @@ export default function CreateAccountForm({
     } catch (error) {
       const createAccountErrors = handleCreateAccountErrors(error);
       setErrors(createAccountErrors);
-
-      const errorMessage =
-        createAccountErrors.submit || 'Failed to create account';
-      onError?.(errorMessage);
     }
   };
 
@@ -116,18 +120,17 @@ export default function CreateAccountForm({
           }
           error={errors.balance}
           placeholder="0.00"
-          required
           classname="internal"
         />
 
         <FormSelectList
-          label="Currency"
+          label={{ type: 'currency', text: 'Currency' }}
           name="currency"
           value={formData.currency}
-          onChange={(currency) =>
+          onChange={(e) =>
             setFormField(
               'currency',
-              currency as CreateAccountFormData['currency']
+              e.target.value as CreateAccountFormData['currency'],
             )
           }
           options={currencyList}
