@@ -1,61 +1,32 @@
 'use client';
 
-// get data from FINANCIAL accounts
+import { useState } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
+
 import { Account } from '@/(main layout)/accounts/types';
-import { getAuthToken } from '@/utils/token';
-import { useEffect, useState } from 'react';
 
-// get all accounts (MOCK ROUTE, DO NOT USE)
-export const useAccounts = () => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
+import { getAuthToken } from '@/utils';
+import { ApiError, ApiSuccess } from '../types';
+import { error } from 'console';
 
-  return useQuery({
-    queryKey: queryKeys.accounts.all,
-    queryFn: async (): Promise<Account[]> => {
-      return apiClient.get<Account[]>('/accounts', {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token,
-  });
-};
-
-// get account by id
-export const useAccount = (id: number) => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
-
-  return useQuery({
-    queryKey: queryKeys.accounts.detail(id),
-    queryFn: async (): Promise<Account> => {
-      return apiClient.get<Account>(`/accounts/${id}`, {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token && !!id,
-  });
-};
-
-// get current user's accounts (backend extracts token from query parameters)
+// get all user accounts info
 export const useMyAccounts = () => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
+  const token = getAuthToken();
 
-  return useQuery({
-    queryKey: queryKeys.accounts.my,
-    queryFn: async (): Promise<Account[]> => {
-      return apiClient.get<Account[]>('/accounts/my', {
-        token: token || undefined,
-      });
+  const query = useQuery<ApiSuccess<Account[]>, ApiError>({
+    queryKey: queryKeys.accounts.all,
+
+    queryFn: async () => {
+      const response =
+        await apiClient.get<ApiSuccess<Account[]>>('/accounts/my');
+      return response;
     },
     enabled: !!token,
   });
+
+  return { accounts: query.data?.data || [], ...query };
 };

@@ -1,47 +1,51 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
-import { queryKeys } from '@/lib/query-client';
-import { getAuthToken } from '@/utils/token';
+
+import { getAuthToken } from '@/utils';
+
 import {
-  EmailChangeFormData,
-  PasswordChangeFormData,
-  SecurityUpdateResponse,
-} from '@/types/security';
+  ChangeEmailFormData,
+  ChangePasswordFormData,
+  UpdatedEmail,
+  UpdatedPassword,
+} from '@/(main layout)/settings/security/types';
+import { ApiError, ApiSuccess } from '../types';
+import { User } from '@/(main layout)/settings/profile/types';
+import { queryClient } from '@/lib/query-client';
 
 export const useUpdateUserPassword = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (
-      formData: PasswordChangeFormData
-    ): Promise<SecurityUpdateResponse> => {
-      const token = getAuthToken();
-      return apiClient.put<SecurityUpdateResponse>('/user/password', formData, {
-        token: token || undefined,
-      });
+  return useMutation<
+    ApiSuccess<UpdatedPassword>,
+    ApiError,
+    ChangePasswordFormData
+  >({
+    mutationFn: async (data) => {
+      return apiClient.put<ApiSuccess<UpdatedPassword>>('/user/password', data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    onSuccess: (resposne) => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      return resposne.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };
 
 export const useUpdateUserEmail = () => {
-  const queryCLient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (
-      formData: EmailChangeFormData
-    ): Promise<SecurityUpdateResponse> => {
-      const token = getAuthToken();
-      return apiClient.put<SecurityUpdateResponse>('/user/email', formData, {
-        token: token || undefined,
-      });
+  return useMutation<ApiSuccess<UpdatedEmail>, ApiError, ChangeEmailFormData>({
+    mutationFn: async (data) => {
+      return apiClient.put<ApiSuccess<UpdatedEmail>>('/user/email', data);
     },
-    onSuccess() {
-      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };

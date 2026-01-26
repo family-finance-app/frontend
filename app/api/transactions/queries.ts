@@ -1,115 +1,44 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
+
 import { Transaction } from '@/(main layout)/transactions/types';
-import { getAuthToken } from '@/utils/token';
-import { useState } from 'react';
 
-const queryKeys = {
-  transactions: {
-    all: ['transactions'],
-    lists: () => [...queryKeys.transactions.all, 'list'],
-    list: (filters: Record<string, any>) => [
-      ...queryKeys.transactions.lists(),
-      filters,
-    ],
-    details: () => [...queryKeys.transactions.all, 'detail'],
-    detail: (id: string) => [...queryKeys.transactions.details(), id],
-    byAccount: (accountId: string) => [
-      ...queryKeys.transactions.lists(),
-      'byAccount',
-      accountId,
-    ],
-    my: ['transactions', 'my'],
-    family: ['transactions', 'family'],
-  },
-};
+import { getAuthToken } from '@/utils';
+import { ApiError, ApiSuccess } from '../types';
+import { queryKeys } from '@/lib/query-client';
 
-// get all transactions
+const token = getAuthToken();
+
+// get all transactions of a current user
 export const useTransactions = () => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
-
-  return useQuery({
+  const query = useQuery<ApiSuccess<Transaction[]>, ApiError>({
     queryKey: queryKeys.transactions.all,
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/transactions', {
-        token: token || undefined,
-      });
+    queryFn: async () => {
+      const response =
+        await apiClient.get<ApiSuccess<Transaction[]>>('/transactions/all');
+      return response;
     },
     enabled: !!token,
   });
+
+  return { transactions: query.data?.data || [], ...query };
 };
 
 // get a transaction by id
 export const useTransaction = (id: string) => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
-
-  return useQuery({
-    queryKey: queryKeys.transactions.detail(id),
-    queryFn: async (): Promise<Transaction> => {
-      return apiClient.get<Transaction>(`/transactions/${id}`, {
-        token: token || undefined,
-      });
+  const query = useQuery<ApiSuccess<Transaction>, ApiError>({
+    queryKey: queryKeys.transactions.all,
+    queryFn: async () => {
+      const response = (await apiClient.get)<ApiSuccess<Transaction>>(
+        '/transactions',
+      );
+      return response;
     },
     enabled: !!token && !!id,
   });
-};
 
-/**
- * Get transactions by account ID
- */
-export const useTransactionsByAccount = (accountId: string) => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
-
-  return useQuery({
-    queryKey: queryKeys.transactions.byAccount(accountId),
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>(
-        `/transactions?accountId=${accountId}`,
-        { token: token || undefined }
-      );
-    },
-    enabled: !!token && !!accountId,
-  });
-};
-
-// get the current user's transactions
-export const useMyTransactions = () => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
-
-  return useQuery({
-    queryKey: queryKeys.transactions.my,
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/transactions/all', {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token,
-  });
-};
-
-// get family transactions
-export const useFamilyTransactions = () => {
-  const [token] = useState<string | null>(() =>
-    typeof window !== 'undefined' ? getAuthToken() : null
-  );
-
-  return useQuery({
-    queryKey: queryKeys.transactions.family,
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/transactions/family', {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token,
-  });
+  return { transaction: query.data?.data };
 };

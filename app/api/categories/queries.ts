@@ -1,26 +1,29 @@
 'use client';
 
-// get categories list for different purposes
-
 import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import { Category } from '@/types/category';
-import { getAuthToken } from '@/utils/token';
-import { useEffect, useState } from 'react';
+
+import { Category } from '@/(main layout)/transactions/types';
+
+import { getAuthToken } from '@/utils';
+import { ApiSuccess, ApiError } from '../types';
 
 // get all categories
 export const useCategories = () => {
   const token = getAuthToken();
 
-  return useQuery({
+  const query = useQuery<ApiSuccess<Category[]>, ApiError>({
     queryKey: queryKeys.categories.all,
-    queryFn: async (): Promise<Category[]> => {
-      return apiClient.get<Category[]>('/categories', {
-        token: token || undefined,
-      });
+
+    queryFn: async () => {
+      const resposne =
+        await apiClient.get<ApiSuccess<Category[]>>('/categories');
+      return resposne;
     },
     enabled: !!token,
-    staleTime: 1000 * 60 * 5, // 5min
   });
+
+  return { categories: query.data?.data || [], ...query };
 };

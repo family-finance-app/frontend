@@ -1,79 +1,67 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
-import { queryKeys } from '@/lib/query-client';
-import { SignUpFormData, SignInFormData, AuthResponse } from '@/types/auth';
-import { getAuthToken, setAuthToken, clearAuthToken } from '@/utils/token';
 
-// sign up, returns AuthResponse type with token
+import { SignUpFormData, SignInFormData, NewUser, Login } from '@/(auth)/types';
+import { User } from '@/(main layout)/settings/profile/types';
+
+import { clearAuthToken, setAuthToken } from '@/utils';
+import { ApiError, ApiSuccess } from '../types';
+import { queryClient } from '@/lib/query-client';
+
 export const useSignUp = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (
-      formData: Partial<SignUpFormData>
-    ): Promise<AuthResponse> => {
-      return apiClient.post<AuthResponse>('/auth/signup', {
-        email: formData.email,
-        password: formData.password,
-        terms: formData.terms,
-        role: 'MEMBER',
+  return useMutation<ApiSuccess<NewUser>, ApiError, Partial<SignUpFormData>>({
+    mutationFn: async (data: Partial<SignUpFormData>) => {
+      return apiClient.post<ApiSuccess<NewUser>>('/auth/signup', {
+        data,
       });
     },
-    onSuccess: (data) => {
-      if (data.accessToken) {
-        setAuthToken(data.accessToken);
+    onSuccess: (response) => {
+      if (response.data && response.data.accessToken) {
+        setAuthToken(response.data.accessToken);
       }
-      queryClient.clear();
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      return response.message;
     },
     onError: (error) => {
-      console.error('Sign up failed:', error);
+      return error.message;
     },
   });
 };
 
-// login
 export const useSignIn = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (formData: SignInFormData): Promise<AuthResponse> => {
-      return apiClient.post<AuthResponse>('/auth/login', {
-        email: formData.email,
-        password: formData.password,
-      });
+  return useMutation<ApiSuccess<Login>, ApiError, SignInFormData>({
+    mutationFn: async (data: SignInFormData) => {
+      return await apiClient.post<ApiSuccess<Login>>('/auth/login', data);
     },
-    onSuccess: (data) => {
-      if (data.accessToken) {
-        setAuthToken(data.accessToken);
+    onSuccess: (response) => {
+      if (response.data && response.data.accessToken) {
+        setAuthToken(response.data.accessToken);
       }
-      queryClient.clear();
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      return response.message;
     },
     onError: (error) => {
-      console.error('Sign in failed:', error);
+      return error.message;
     },
   });
 };
 
-// log out
+// logout
 export const useSignOut = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (): Promise<void> => {
-      const token = getAuthToken();
-      await apiClient.post<void>(
-        '/auth/logout',
-        {},
-        {
-          token: token || undefined,
-        }
-      );
-      clearAuthToken();
+  return useMutation<ApiSuccess<null>, ApiError>({
+    mutationFn: async () => {
+      return apiClient.post<ApiSuccess<null>>('/auth/logout');
     },
-    onSuccess: () => {
-      queryClient.clear();
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      clearAuthToken();
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };

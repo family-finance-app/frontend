@@ -1,100 +1,40 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
-import {
-  getCachedRates,
-  setCachedRates,
-  ExchangeRate,
-  DEFAULT_RATES,
-} from '@/api/exchangeRate/cache';
+import { getAuthToken } from '@/utils';
+import { queryKeys } from '@/lib/query-client';
+import { ApiSuccess } from '../types';
+import { ApiError } from 'next/dist/server/api-utils';
 
-export interface CurrencyRateResponse {
-  currencyCodeA: number;
-  currencyCodeB: number;
-  date: number;
-  rateSell: number;
-  rateBuy: number;
-  rateCross: number;
+export interface ExchangeRateMap {
+  [code: string]: number;
 }
 
-const MONO_EXCHANGE_API_URL = process.env.NEXT_PUBLIC_MONO_EXCHANGE_API_URL;
-
-async function fetchExchangeRates(
-  cachedRates: ExchangeRate | null
-): Promise<ExchangeRate> {
-  try {
-    const data = await apiClient.externalGet<CurrencyRateResponse[]>(
-      MONO_EXCHANGE_API_URL || 'https://api.monobank.ua/bank/currency'
-    );
-
-    const rates: ExchangeRate = { UAH: 1 };
-
-    data.forEach((item) => {
-      if (item.currencyCodeA === 840 && item.currencyCodeB === 980) {
-        rates.USD = item.rateCross || item.rateSell;
-      } else if (item.currencyCodeA === 978 && item.currencyCodeB === 980) {
-        rates.EUR = item.rateCross || item.rateSell;
-      }
-    });
-
-    return rates;
-  } catch (error) {
-    if (cachedRates) {
-      console.warn('API request failed, using cached exchange rates');
-      return cachedRates;
-    }
-    console.warn(
-      'Using fallback exchange rates (API unavailable and no cache)'
-    );
-    return DEFAULT_RATES;
-  }
+export interface ExchangeRatesResponse {
+  rates: ExchangeRateMap;
+  fetchedAt: string;
 }
 
+// get exchange rates from backend; also supplies defaults
 export const useExchangeRates = () => {
-  const queryClient = useQueryClient();
+  const token = getAuthToken();
 
-  const query = useQuery({
-    queryKey: ['exchange-rates'],
-    queryFn: async (): Promise<ExchangeRate> => {
-      const cached = getCachedRates();
-      if (cached) {
-        return cached;
-      }
-      const rates = await fetchExchangeRates(cached);
-      setCachedRates(rates);
-      return rates;
+  const query = useQuery<ApiSuccess<ExchangeRatesResponse>, ApiError>({
+    queryKey: queryKeys.exchangeRate.all,
+
+    queryFn: async () => {
+      const response =
+        await apiClient.get<ApiSuccess<ExchangeRatesResponse>>('/currency');
+      return response;
     },
-    staleTime: 1000 * 60 * 60 * 24,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    enabled: !!token,
   });
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    function scheduleNext() {
-      const ms = 2 * 60 * 60 * 1000;
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(async () => {
-        try {
-          await queryClient.invalidateQueries({ queryKey: ['exchange-rates'] });
-        } catch (e) {
-          console.warn('Failed to invalidate exchange-rates query', e);
-        }
-        scheduleNext();
-      }, ms);
-    }
-
-    scheduleNext();
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [queryClient]);
-
-  return query;
+  return {
+    exchangeRates: query.data?.data.rates,
+    lastUpdated: query.data?.data.fetchedAt,
+    ...query,
+  };
 };

@@ -1,82 +1,73 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
+
+import { apiClient } from '@/lib/api-client';
+
+import {
+  Account,
+  CreateAccountFormData,
+  DeletedAccount,
+  EditAccountFormData,
+  NewAccount,
+  UpdatedAccount,
+} from '@/(main layout)/accounts/types';
+import { ApiSuccess, ApiError } from '../types';
+
+import { getAuthToken } from '@/utils';
+import { queryClient } from '@/lib/query-client';
+
 // create, update, or delete FINANCIAL accounts
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
-import { queryKeys } from '@/lib/query-client';
-import { Account, CreateAccountFormData } from '@/(main layout)/accounts/types';
-import { getAuthToken } from '@/utils/token';
-
-// create new account (card, cash etc)
 export const useCreateAccount = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (formData: CreateAccountFormData): Promise<Account> => {
+  return useMutation<ApiSuccess<NewAccount>, ApiError, CreateAccountFormData>({
+    mutationFn: async (data) => {
       const token = getAuthToken();
-      return apiClient.post<Account>(
-        '/accounts/create',
-        {
-          name: formData.name,
-          type: formData.type,
-          balance: formData.balance,
-          currency: formData.currency,
-        },
-        { token: token || undefined }
-      );
+      return apiClient.post<ApiSuccess<NewAccount>>('/accounts/create', data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      return response.message;
+    },
+
+    onError: (error) => {
+      return error.message;
     },
   });
 };
 
-// update account
 export const useUpdateAccount = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<CreateAccountFormData>;
-    }): Promise<Account> => {
+  return useMutation<
+    ApiSuccess<UpdatedAccount>,
+    ApiError,
+    { id: number; data: Partial<EditAccountFormData> }
+  >({
+    mutationFn: async ({ id, data }) => {
       const token = getAuthToken();
-      return apiClient.put<Account>(`/accounts/${id}`, data, {
-        token: token || undefined,
-      });
+      return apiClient.put<ApiSuccess<UpdatedAccount>>(`/accounts/${id}`, data);
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.accounts.detail(variables.id),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };
 
-// delete account
 export const useDeleteAccount = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: number): Promise<void> => {
+  return useMutation<ApiSuccess<DeletedAccount>, ApiError, { id: number }>({
+    mutationFn: async ({ id }) => {
       const token = getAuthToken();
-      return apiClient.delete<void>(`/accounts/${id}`, {
-        token: token || undefined,
-      });
+      return apiClient.delete<ApiSuccess<DeletedAccount>>(`/accounts/${id}`);
     },
-    onSuccess: (_, id) => {
-      queryClient.removeQueries({
-        queryKey: queryKeys.accounts.detail(id),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };
