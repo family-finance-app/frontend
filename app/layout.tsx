@@ -59,7 +59,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${inter.className} font-sans antialiased bg-background-50 text-background-900`}
+        className={`${inter.className} font-sans antialiased bg-primary-700/95 dark:bg-primary-800 text-background-900`}
       >
         <Providers>{children}</Providers>
       </body>
