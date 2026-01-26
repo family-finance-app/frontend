@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Sidebar from '../components/Sidebar';
-import Navigation from '../components/Navigation';
+import Sidebar from '../components/layout/Sidebar';
+import Navigation from '../components/layout/Navigation';
 
 export const metadata: Metadata = {
   title: 'Dashboard - FamilyFinance',
