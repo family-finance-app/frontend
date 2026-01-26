@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 import { useQuery } from '@tanstack/react-query';
 
 import { apiClient } from '@/lib/api-client';
@@ -11,7 +9,6 @@ import { Account } from '@/(main layout)/accounts/types';
 
 import { getAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
-import { error } from 'console';
 
 // get all user accounts info
 export const useMyAccounts = () => {

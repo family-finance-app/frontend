@@ -96,6 +96,19 @@ export default function Dashboard() {
     exchangeRates,
   );
 
+  if (accountsLoading || transactionsLoading || categoriesLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-pulse flex flex-col items-center gap-3">
+          <div className="w-10 h-10 bg-background-200 dark:bg-background-700 rounded-full"></div>
+          <p className="text-background-500 dark:text-background-400">
+            Loading dashboard...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* timeframe select for large screens */}

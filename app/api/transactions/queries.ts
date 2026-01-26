@@ -10,10 +10,9 @@ import { getAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
 import { queryKeys } from '@/lib/query-client';
 
-const token = getAuthToken();
-
 // get all transactions of a current user
 export const useTransactions = () => {
+  const token = getAuthToken();
   const query = useQuery<ApiSuccess<Transaction[]>, ApiError>({
     queryKey: queryKeys.transactions.all,
     queryFn: async () => {
@@ -29,6 +28,7 @@ export const useTransactions = () => {
 
 // get a transaction by id
 export const useTransaction = (id: string) => {
+  const token = getAuthToken();
   const query = useQuery<ApiSuccess<Transaction>, ApiError>({
     queryKey: queryKeys.transactions.all,
     queryFn: async () => {
