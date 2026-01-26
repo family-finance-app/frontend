@@ -1,28 +1,27 @@
 'use client';
 
-import { useState } from 'react';
 import { roboto } from '@/assets/fonts/fonts';
-import Button from '@/components/ui/Button_financial';
+import Button from '@/components/ui/Button';
 import { useCurrentUser } from '@/api/auth/queries';
-import { useUpdatePassword } from '@/hooks/useUpdatePassword';
-import { useUpdateEmail } from '@/hooks/useUpdateEmail';
+import { useUpdatePassword } from '@/(main layout)/settings/hooks/useUpdatePassword';
+import { useUpdateEmail } from '@/(main layout)/settings/hooks/useUpdateEmail';
 import {
   ChangePassword,
   ChangeEmail,
   TwoFactorAuth,
-} from '@/components/settings/security';
-import { PasswordChangeFormData, EmailChangeFormData } from '@/types/security';
+} from '@/(main layout)/settings/security';
+import { ChangePasswordFormData, ChangeEmailFormData } from './types';
 
 export default function SecuritySettings() {
-  const { data: user, isLoading: userLoading } = useCurrentUser();
+  const { user, isLoading: userLoading } = useCurrentUser();
   const { handleSubmit, isLoading: isUpdating } = useUpdatePassword();
   const { handleSubmitEmail, isLoading: isLoading } = useUpdateEmail();
 
-  const handlePasswordChange = async (formData: PasswordChangeFormData) => {
+  const handlePasswordChange = async (formData: ChangePasswordFormData) => {
     await handleSubmit(formData);
   };
 
-  const handleEmailChange = async (formData: EmailChangeFormData) => {
+  const handleEmailChange = async (formData: ChangeEmailFormData) => {
     await handleSubmitEmail(formData);
   };
 
@@ -36,7 +35,6 @@ export default function SecuritySettings() {
 
   return (
     <div className="space-y-8">
-      {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1
@@ -60,15 +58,12 @@ export default function SecuritySettings() {
         </div>
       </div>
 
-      {/* Security Forms */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Change Password */}
         <ChangePassword
           onSubmit={handlePasswordChange}
           isLoading={isUpdating}
         />
 
-        {/* Change Email */}
         <ChangeEmail
           currentEmail={user.email}
           onSubmit={handleEmailChange}
@@ -76,7 +71,6 @@ export default function SecuritySettings() {
         />
       </div>
 
-      {/* Two-Factor Authentication */}
       <div>
         <TwoFactorAuth isEnabled={false} />
       </div>
