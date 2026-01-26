@@ -1,14 +1,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { SignInFormData, AuthResponse } from '@/types/auth';
-import { useLogin } from '@/hooks/useSignIn';
-import SignInForm from '@/components/authentication/SignInForm';
 import Link from 'next/link';
+
+import { Login, SignInFormData } from '@/(auth)/types';
+import { useLogin, SignInForm } from '../index';
+
 import { useColorTheme } from '@/hooks/useColorTheme';
-import Logo_dark from '@/components/ui/Logo_dark';
-import Logo_light from '@/components/ui/Logo_light';
+
+import { Logo_light, Logo_dark } from '@/components';
+
 import { roboto } from '@/assets/fonts/fonts';
+import { ApiSuccess } from '@/api/types';
 
 export default function SignIn() {
   const router = useRouter();
@@ -17,9 +20,9 @@ export default function SignIn() {
   const { handleSubmit, isLoading, isError, isSuccess, error, errorMessage } =
     useLogin();
 
-  const handleSingIn = async (
-    signInData: SignInFormData
-  ): Promise<AuthResponse> => {
+  const handleSignIn = async (
+    signInData: SignInFormData,
+  ): Promise<ApiSuccess<Login>> => {
     const result = await handleSubmit(signInData);
     if (result) {
       router.push('/dashboard');
@@ -42,7 +45,7 @@ export default function SignIn() {
         </h2>
       </div>
       <SignInForm
-        onSubmit={handleSingIn}
+        onSubmit={handleSignIn}
         isLoading={isLoading}
         isSuccess={isSuccess}
         isError={isError}

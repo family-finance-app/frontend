@@ -1,14 +1,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSignup } from '@/hooks/useSignUp';
-import { SignUpFormData, AuthResponse } from '@/types/auth';
-import SignUpForm from '@/components/authentication/SignUpForm';
 import Link from 'next/link';
-import Logo_dark from '@/components/ui/Logo_dark';
-import Logo_light from '@/components/ui/Logo_light';
+
+import { useSignup, SignUpForm } from '../index';
+import { NewUser, SignUpFormData } from '@/(auth)/types';
+
+import { Logo_light, Logo_dark } from '@/components';
 import { useColorTheme } from '@/hooks/useColorTheme';
+
 import { roboto } from '@/assets/fonts/fonts';
+import { ApiSuccess } from '@/api/types';
+import { User } from '@/(main layout)/settings/profile/types';
 
 export default function SignUp() {
   const router = useRouter();
@@ -19,8 +22,8 @@ export default function SignUp() {
     useSignup();
 
   const handleSignUp = async (
-    signUpData: Partial<SignUpFormData>
-  ): Promise<AuthResponse> => {
+    signUpData: SignUpFormData,
+  ): Promise<ApiSuccess<NewUser>> => {
     const result = await handleSubmit({
       email: signUpData.email,
       password: signUpData.password,

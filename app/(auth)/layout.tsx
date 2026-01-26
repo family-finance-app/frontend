@@ -1,9 +1,5 @@
-import Logo_dark from '@/components/ui/Logo_dark';
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useColorTheme } from '@/hooks/useColorTheme';
-import Logo_light from '@/components/ui/Logo_light';
 
 export const metadata: Metadata = {
   title: 'Authentication - FamilyFinance',
