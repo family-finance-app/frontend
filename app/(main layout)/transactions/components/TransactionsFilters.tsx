@@ -1,10 +1,8 @@
 interface TransactionsFiltersProps {
   filterType: 'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER';
-  timeRange: 'week' | 'month' | 'quarter' | 'year' | 'all';
+  timeRange: 'week' | 'month' | 'year' | 'all';
   onFilterTypeChange: (type: 'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER') => void;
-  onTimeRangeChange: (
-    range: 'week' | 'month' | 'quarter' | 'year' | 'all'
-  ) => void;
+  onTimeRangeChange: (range: 'week' | 'month' | 'year' | 'all') => void;
 }
 
 export default function TransactionsFilters({
@@ -81,45 +79,36 @@ export default function TransactionsFilters({
               value={timeRange}
               onChange={(event) =>
                 onTimeRangeChange(
-                  event.target.value as
-                    | 'week'
-                    | 'month'
-                    | 'quarter'
-                    | 'year'
-                    | 'all'
+                  event.target.value as 'week' | 'month' | 'year' | 'all'
                 )
               }
             >
-              {(['all', 'week', 'month', 'quarter', 'year'] as const).map(
-                (range) => (
-                  <option key={range} value={range}>
-                    {range === 'all'
-                      ? 'All time'
-                      : range.charAt(0).toUpperCase() + range.slice(1)}
-                  </option>
-                )
-              )}
+              {(['all', 'week', 'month', 'year'] as const).map((range) => (
+                <option key={range} value={range}>
+                  {range === 'all'
+                    ? 'All time'
+                    : range.charAt(0).toUpperCase() + range.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="hidden sm:flex bg-background-100 dark:bg-background-300 rounded-xl p-1 flex-wrap gap-2 overflow-x-auto sm:overflow-visible">
-            {(['all', 'week', 'month', 'quarter', 'year'] as const).map(
-              (range) => (
-                <button
-                  key={range}
-                  onClick={() => onTimeRangeChange(range)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shrink-0 ${
-                    timeRange === range
-                      ? 'bg-white text-primary-800 dark:bg-background-50 shadow-sm'
-                      : 'text-background-600 dark:text-stack-600 hover:text-stack-700'
-                  }`}
-                >
-                  {range === 'all'
-                    ? 'All time'
-                    : range.charAt(0).toUpperCase() + range.slice(1)}
-                </button>
-              )
-            )}
+            {(['all', 'week', 'month', 'year'] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => onTimeRangeChange(range)}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shrink-0 ${
+                  timeRange === range
+                    ? 'bg-white text-primary-800 dark:bg-background-50 shadow-sm'
+                    : 'text-background-600 dark:text-stack-600 hover:text-stack-700'
+                }`}
+              >
+                {range === 'all'
+                  ? 'All time'
+                  : range.charAt(0).toUpperCase() + range.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
       </div>

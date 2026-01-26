@@ -1,59 +1,195 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { queryClient } from '@/lib/query-client';
+import { showGlobalSuccess, showGlobalError } from '@/lib/global-alerts';
 
-import { useMyTransactions } from '@/api/transactions/queries';
+import { useTransactions } from '@/api/transactions/queries';
 import { useMyAccounts } from '@/api/accounts/queries';
 import { useCategories } from '@/api/categories/queries';
 import {
+  useUpdateTransaction,
+  useDeleteTransaction,
+} from '@/api/transactions/mutations';
+import {
   TransactionList,
-  EditTransactionModal,
   TransactionsFilters,
   filterTransactions,
   enrichTransactions,
   formatTransactions,
 } from './index';
-import { Transaction } from './types';
+import { Category, Transaction } from './types';
+import { EditModal, DeleteModal, type FormField } from '@/components';
+
+interface EditTransactionFormData {
+  type: string;
+  amount: string;
+  date: string;
+  categoryId: string;
+  description: string;
+}
 
 export default function MyTransactions() {
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deletingTransactionId, setDeletingTransactionId] = useState<
+    number | null
+  >(null);
   const [filterType, setFilterType] = useState<
     'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER'
   >('all');
-  const [timeRange, setTimeRange] = useState<
-    'week' | 'month' | 'quarter' | 'year' | 'all'
-  >('all');
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year' | 'all'>(
+    'all',
+  );
 
-  const { data: transactions, isLoading: transactionsLoading } =
-    useMyTransactions();
-  const { data: accounts, isLoading: accountsLoading } = useMyAccounts();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { transactions, isLoading: transactionsLoading } = useTransactions();
+
+  const { accounts, isLoading: accountsLoading } = useMyAccounts();
+  const { categories, isLoading: categoriesLoading } = useCategories();
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
 
   const formattedTransactions = formatTransactions(transactions || []);
 
   const enrichedTransactions = enrichTransactions(
     formattedTransactions,
-    accounts || [],
-    categories || []
+    accounts,
+    categories,
   );
 
   const filteredTransactions = filterTransactions(
     enrichedTransactions,
     filterType,
-    timeRange
+    timeRange,
   );
 
+  const transactionTypes = [
+    { value: 'INCOME', label: 'Income' },
+    { value: 'EXPENSE', label: 'Expense' },
+    { value: 'TRANSFER', label: 'Transfer' },
+  ];
+
+  const filteredCategories = useMemo(() => {
+    if (!editingTransaction || !categories) return [];
+    return categories.filter(
+      (category: Category) => category.type === editingTransaction.type,
+    );
+  }, [categories, editingTransaction]);
+
+  const categoryOptions = filteredCategories.map((category: Category) => ({
+    value: category.id.toString(),
+    label: category.name,
+  }));
+
+  const transactionFormFields: FormField[] = editingTransaction
+    ? [
+        {
+          name: 'type',
+          label: 'Type',
+          type: 'select',
+          required: true,
+          options: transactionTypes,
+        },
+        {
+          name: 'amount',
+          label: 'Amount',
+          type: 'number',
+          required: true,
+          placeholder: '0.00',
+        },
+        {
+          name: 'date',
+          label: 'Date',
+          type: 'date',
+          required: true,
+        },
+        {
+          name: 'categoryId',
+          label: 'Category',
+          type: 'select',
+          required: true,
+          options: categoryOptions,
+        },
+        {
+          name: 'description',
+          label: 'Description (Optional)',
+          type: 'textarea',
+          placeholder: 'Add a description to this transaction...',
+        },
+      ]
+    : [];
+
+  const validateTransactionForm = (
+    data: EditTransactionFormData,
+  ): Partial<Record<keyof EditTransactionFormData, string>> => {
+    const errors: Partial<Record<keyof EditTransactionFormData, string>> = {};
+
+    if (!data.amount) {
+      errors.amount = 'Amount is required';
+    }
+
+    if (!data.date) {
+      errors.date = 'Date is required';
+    }
+
+    if (!data.categoryId) {
+      errors.categoryId = 'Category is required';
+    }
+
+    return errors;
+  };
+
+  const handleSaveTransaction = async (data: EditTransactionFormData) => {
+    if (!editingTransaction) return;
+
+    await updateTransaction.mutateAsync({
+      id: editingTransaction.id,
+      data: {
+        amount: parseFloat(data.amount) as any,
+        date: data.date,
+        categoryId: parseInt(data.categoryId) as any,
+        description: data.description || undefined,
+      },
+    });
+  };
+
   const handleEditTransaction = (transaction: Transaction) => {
+    console.log('Opening edit modal for transaction:', transaction);
     setEditingTransaction(transaction);
     setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
+    console.log('Closing edit modal');
     setIsEditModalOpen(false);
     setEditingTransaction(null);
   };
+
+  const handleDeleteTransaction = (transactionId: number) => {
+    setDeletingTransactionId(transactionId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTransactionId) return;
+    try {
+      await deleteTransaction.mutateAsync(deletingTransactionId);
+      setDeletingTransactionId(null);
+      showGlobalSuccess(`${deletingItemName} deleted`);
+    } catch (err: any) {
+      setDeletingTransactionId(null);
+      showGlobalError(err?.message || 'Failed to delete transaction');
+    }
+  };
+
+  const deletingTransaction = filteredTransactions.find(
+    (t) => t.id === deletingTransactionId,
+  );
+
+  const deletingItemName =
+    deletingTransaction?.description ||
+    deletingTransaction?.type ||
+    'Transaction';
 
   return (
     <div className="space-y-6">
@@ -90,6 +226,7 @@ export default function MyTransactions() {
           accounts={accounts || []}
           categories={categories || []}
           onEditTransaction={handleEditTransaction}
+          onDeleteTransaction={handleDeleteTransaction}
           actions={
             <div className="flex items-center space-x-3">
               <span className="text-sm text-background-600 dark:text-background-100">
@@ -100,10 +237,37 @@ export default function MyTransactions() {
         />
       )}
 
-      <EditTransactionModal
-        transaction={editingTransaction}
-        isOpen={isEditModalOpen}
-        onClose={handleCloseEditModal}
+      {editingTransaction && (
+        <EditModal<EditTransactionFormData>
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          onSubmit={handleSaveTransaction}
+          title="Edit Transaction"
+          fields={transactionFormFields}
+          initialData={{
+            type: editingTransaction.type,
+            amount: editingTransaction.amount.toString(),
+            date:
+              typeof editingTransaction.date === 'string' &&
+              editingTransaction.date.match(/^\d{4}-\d{2}-\d{2}/)
+                ? editingTransaction.date.split('T')[0]
+                : new Date(editingTransaction.date).toISOString().split('T')[0],
+            categoryId: editingTransaction.categoryId.toString(),
+            description: editingTransaction.description || '',
+          }}
+          validateForm={validateTransactionForm}
+          isLoading={updateTransaction.isPending}
+        />
+      )}
+
+      <DeleteModal
+        isOpen={!!deletingTransactionId}
+        title="Delete Transaction"
+        itemName={deletingItemName}
+        isLoading={deleteTransaction.isPending}
+        warningMessage={`This transaction will be permanently deleted.`}
+        onClose={() => setDeletingTransactionId(null)}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

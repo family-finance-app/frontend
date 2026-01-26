@@ -5,7 +5,7 @@ import { Account } from '@/(main layout)/accounts/types';
 export default function enrichTransactionsWithData(
   transactions: Transaction[],
   accounts: Account[],
-  categories: any[]
+  categories: any[],
 ): any[] {
   return transactions.map((transaction) => {
     const account = accounts.find((acc) => acc.id === transaction.accountId);
@@ -13,7 +13,7 @@ export default function enrichTransactionsWithData(
       ? accounts.find((acc) => acc.id === transaction.accountRecipientId)
       : undefined;
     const category = categories.find(
-      (cat) => cat.id === transaction.categoryId
+      (cat) => cat.id === transaction.categoryId,
     );
 
     return {
@@ -35,7 +35,7 @@ export default function enrichTransactionsWithData(
           }
         : undefined,
       category:
-        transaction.category ||
+        transaction.categoryId ||
         (category
           ? {
               id: category.id,

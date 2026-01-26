@@ -4,7 +4,7 @@ import { Transaction } from '../types';
 export default function filterTransactions(
   transactions: Transaction[],
   filterType: 'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER',
-  timeRange: 'week' | 'month' | 'quarter' | 'year' | 'all'
+  timeRange: 'week' | 'month' | 'year' | 'all'
 ): Transaction[] {
   return transactions.filter((transaction) => {
     if (filterType !== 'all' && transaction.type !== filterType) return false;
@@ -21,9 +21,6 @@ export default function filterTransactions(
         break;
       case 'month':
         startDate.setMonth(now.getMonth() - 1);
-        break;
-      case 'quarter':
-        startDate.setMonth(now.getMonth() - 3);
         break;
       case 'year':
         startDate.setFullYear(now.getFullYear() - 1);

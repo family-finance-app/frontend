@@ -1,8 +1,12 @@
 import { useState, useMemo } from 'react';
 import * as RemixIcon from '@remixicon/react';
-import TransactionActionModal from '../modals/TransactionActionModal';
+
 import { Transaction } from '../types';
-import { formatCurrencyAmount } from '@/utils/formatters';
+
+import { formatCurrencyAmount, transactionFormatters } from '@/utils';
+
+import { ActionModal } from '@/components';
+
 import { jetbrainsMono } from '../../../assets/fonts/fonts';
 
 interface TransactionItemProps {
@@ -23,6 +27,7 @@ interface TransactionItemProps {
     currency: string;
   }>;
   onEdit?: (transaction: Transaction) => void;
+  onDelete?: (transactionId: number) => void;
 }
 
 export default function TransactionItem({
@@ -32,6 +37,7 @@ export default function TransactionItem({
   categories = [],
   accounts = [],
   onEdit,
+  onDelete,
 }: TransactionItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -61,8 +67,8 @@ export default function TransactionItem({
     typeConfig.EXPENSE;
 
   const category = categories.find((cat) => cat.id === transaction.categoryId);
-  const categoryName = transaction.category?.name || category?.name || 'Other';
-  const categoryIcon = transaction.category?.icon || category?.icon;
+  const categoryName = transaction.categoryName || category?.name || 'Other';
+  const categoryIcon = category?.icon;
 
   const transactionTitle = transaction.description || categoryName;
 
@@ -75,10 +81,8 @@ export default function TransactionItem({
     return (RemixIcon as any)[pascalCase] || null;
   }, [categoryIcon]);
 
-  const accountData =
-    transaction.account ||
-    accounts.find((acc) => acc.id === transaction.accountId);
-  const accountTitle = (accountData as any)?.name || 'Account';
+  const accountData = accounts.find((acc) => acc.id === transaction.accountId);
+  const accountTitle = accountData?.name || 'Account';
 
   return (
     <div
@@ -103,12 +107,12 @@ export default function TransactionItem({
               {transactionTitle !== 'Other'
                 ? transactionTitle
                 : transaction.type === 'INCOME'
-                ? 'Income'
-                : transaction.type === 'EXPENSE'
-                ? 'Expense'
-                : transaction.type === 'TRANSFER'
-                ? 'Transfer'
-                : 'Transaction'}
+                  ? 'Income'
+                  : transaction.type === 'EXPENSE'
+                    ? 'Expense'
+                    : transaction.type === 'TRANSFER'
+                      ? 'Transfer'
+                      : 'Transaction'}
             </p>
           </div>
           <div
@@ -118,17 +122,53 @@ export default function TransactionItem({
           >
             {accountData && (
               <>
-                <p className="text-background-500 dark:text-primary-300 font-medium">
-                  {accountTitle}
-                </p>
-                <span className="text-background-300">•</span>
+                <div
+                  className="flex justify-between items-start w-full lg:hidden md:hidden"
+                  id="mobile"
+                >
+                  <div className="flex flex-col">
+                    <p className="text-background-500 dark:text-primary-300 font-medium text-sm">
+                      {accountTitle}
+                    </p>
+                    <p className="text-background-500 dark:text-background-400 text-xs mt-0.5">
+                      {new Date(transaction.date).toLocaleDateString('uk-UA', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-end">
+                    <p
+                      className={`${jetbrainsMono.className} font-mono ${config.color} text-sm whitespace-nowrap`}
+                    >
+                      {config.prefix}
+                      {formatCurrencyAmount(transaction.amount)}{' '}
+                      {transaction.currency || 'UAH'}
+                    </p>
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className="p-1 mt-0.5 hover:bg-background-100 dark:hover:bg-background-600 rounded-lg transition-colors duration-200"
+                      title="Edit or delete transaction"
+                    >
+                      <span className="dark:text-background-100 text-base">
+                        ⋯
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </>
             )}
-            <p className="text-background-500 dark:text-background-200">
+            <p className="hidden md:block text-background-500 dark:text-primary-300 font-medium text-sm">
+              {accountTitle}
+            </p>
+            <span className="hidden md:block text-background-300">•</span>
+            <p className="hidden md:block text-background-500 dark:text-background-200">
               {categoryName}
             </p>
-            <span className="text-background-300">•</span>
-            <p className="text-background-500 dark:text-background-400">
+            <span className="hidden md:block text-background-300">•</span>
+            <p className="hidden md:block text-background-500 dark:text-background-400">
               {new Date(transaction.date).toLocaleDateString('uk-UA', {
                 day: '2-digit',
                 month: '2-digit',
@@ -139,7 +179,7 @@ export default function TransactionItem({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 justify-between w-full sm:w-auto sm:justify-end">
+      <div className="hidden md:flex items-center gap-3 justify-between w-full sm:w-auto sm:justify-end">
         <div
           className={`${jetbrainsMono.className} font-mono ${
             compact ? 'text-sm' : 'text-base'
@@ -147,7 +187,7 @@ export default function TransactionItem({
         >
           {config.prefix}
           {`${formatCurrencyAmount(transaction.amount)} `}
-          {transaction.account?.currency || 'UAH'}
+          {transaction.currency || 'UAH'}
         </div>
 
         <button
@@ -159,12 +199,63 @@ export default function TransactionItem({
         </button>
       </div>
 
-      {/* Modal */}
-      <TransactionActionModal
-        transaction={transaction}
-        isOpen={isModalOpen}
+      <ActionModal
+        modalTitle="Transaction Actions"
+        data={
+          <>
+            <div className="rounded-xl  bg-background-50 dark:bg-stack-200">
+              <div className="flex">
+                <h3 className="text-lg font-semibold text-primary-700 mr-1.5">
+                  {transaction.type === 'EXPENSE' && (
+                    <span className="text-danger-700">
+                      -{formatCurrencyAmount(transaction.amount)}{' '}
+                      {transaction.currency || 'UAH'}{' '}
+                    </span>
+                  )}
+                  {transaction.type === 'INCOME' && (
+                    <span className="text-success-700">
+                      +{formatCurrencyAmount(transaction.amount)}{' '}
+                      {transaction.currency || 'UAH'}{' '}
+                    </span>
+                  )}
+                  {transaction.type === 'TRANSFER' && (
+                    <span className="text-primary-00">
+                      {formatCurrencyAmount(transaction.amount)}{' '}
+                      {transaction.currency || 'UAH'}{' '}
+                    </span>
+                  )}
+                </h3>
+                <p className="text-sm text-background-500 dark:text-primary-700 mt-1">
+                  {accountTitle || 'Account'}
+                </p>
+              </div>
+
+              <h4 className="text-background-600">
+                {transaction.description ||
+                  transactionFormatters.typeLabel(transaction.type)}
+              </h4>
+            </div>
+          </>
+        }
+        actionButtons={[
+          {
+            text: 'Edit Transaction',
+            type: 'button',
+            variant: 'primary',
+            action: () => onEdit?.(transaction),
+          },
+          {
+            text: 'Delete Transaction',
+            type: 'button',
+            variant: 'danger',
+            action: () => {
+              setIsModalOpen(false);
+              onDelete?.(transaction.id);
+            },
+          },
+        ]}
         onClose={() => setIsModalOpen(false)}
-        onEdit={onEdit}
+        isOpen={isModalOpen}
       />
     </div>
   );

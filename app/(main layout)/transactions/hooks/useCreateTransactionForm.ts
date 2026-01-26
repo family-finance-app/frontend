@@ -1,7 +1,10 @@
 import { useState, useCallback, useMemo } from 'react';
+
 import type { Transaction, CreateTransactionFormData } from '../types';
+
 import { useCreateTransaction } from '@/api/transactions/mutations';
-import { dateFormatters } from '@/utils/formatters';
+
+import { dateFormatters } from '@/utils';
 
 interface UseCreateTransactionFormReturn {
   formData: CreateTransactionFormData;
@@ -67,7 +70,7 @@ export default function useCreateTransactionForm(
 
       try {
         const result = await createMutation.mutateAsync(formData);
-        onSuccess?.(result);
+        onSuccess?.(result.data);
         setFormData(initialFormData);
       } catch (error) {
         if (error && typeof error === 'object' && 'details' in error) {

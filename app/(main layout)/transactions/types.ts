@@ -1,5 +1,3 @@
-import { Category } from '@/types/category';
-
 export interface CreateTransactionFormData {
   type: TransactionType;
   amount: number;
@@ -41,64 +39,48 @@ export enum TransactionType {
   TRANSFER = 'TRANSFER',
 }
 
-export interface Transaction {
+export interface NewTransaction {
   id: number;
   accountId: number;
   userId: number;
-  groupId?: number;
   categoryId: number;
   amount: number;
   currency: CurrencyType;
-  description?: string;
+  description: string;
   date: string;
-  createdAt: string;
-  updatedAt: string;
-  type: string;
-  accountRecipientId: number | null;
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  account?: {
-    id: number;
-    name: string;
-    type: string;
-    currency: string;
-    balance: number;
-  };
-  category: {
-    id: number;
-    name: string;
-    type: string;
-    icon?: string;
-    color?: string;
-  };
-  group?: {
-    id: number;
-    name: string;
-  };
+  type: TransactionType;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface TransactionResponse {
-  message: string;
-  transaction: Transaction;
+export interface Transaction {
+  id: number; //
+  accountId: number; //
+  accountBalance?: number;
+  userId: number; //
+  groupId?: number; //
+  categoryId: number; //
+  categoryName?: string;
+  amount: number; //
+  currency: CurrencyType; //
+  description: string; //
+  date: string; //
+  type: TransactionType; //
+  accountRecipientId?: number; //
+  createdAt?: string; //
+  updatedAt?: string;
 }
 
-export interface TransactionsListResponse {
-  message: string;
-  transactions: Transaction[];
-}
-
-export interface CreateTransactionResponse extends TransactionResponse {}
-export interface UpdateTransactionResponse extends TransactionResponse {}
-
-export interface DeleteTransactionResponse {
-  message: string;
+export interface UpdatedTransaction extends NewTransaction {}
+export interface DeletedTransaction {
   id: number;
 }
 
-export interface CategoriesListResponse {
-  message: string;
-  categories: Category[];
+export interface NewTransfer extends Transaction {}
+export interface Category {
+  id: number;
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
 }

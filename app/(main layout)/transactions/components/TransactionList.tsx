@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { Transaction } from '../types';
+
 import TransactionItem from './TransactionItem';
 
 interface TransactionListProps {
@@ -27,6 +28,7 @@ interface TransactionListProps {
     color?: string;
   }>;
   onEditTransaction?: (transaction: Transaction) => void;
+  onDeleteTransaction?: (transactionId: number) => void;
 }
 
 export default function TransactionList({
@@ -41,6 +43,7 @@ export default function TransactionList({
   accounts = [],
   categories = [],
   onEditTransaction,
+  onDeleteTransaction,
 }: TransactionListProps) {
   const sortedTransactions = [...transactions].sort((a, b) => {
     const dateA = new Date(a.createdAt || 0).getTime();
@@ -59,15 +62,11 @@ export default function TransactionList({
   return (
     <div className="bg-white dark:bg-primary-800 rounded-2xl shadow-financial border border-background-100 dark:border-background-700">
       {showHeader && (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-background-100">
-          <h3 className="text-lg font-semibold text-background-900 dark:text-stack-100">
+        <div className="flex flex-row items-center justify-between gap-3 p-4 sm:p-6 border-b border-background-100">
+          <h3 className="text-base sm:text-lg font-semibold text-background-900 dark:text-stack-100 shrink-0">
             {title}
           </h3>
-          {actions && (
-            <div className="w-full sm:w-auto flex justify-between sm:justify-end">
-              {actions}
-            </div>
-          )}
+          {actions && <div className="shrink-0">{actions}</div>}
         </div>
       )}
 
@@ -88,6 +87,7 @@ export default function TransactionList({
                 categories={categories}
                 accounts={accounts}
                 onEdit={onEditTransaction}
+                onDelete={onDeleteTransaction}
               />
             ))}
           </div>
