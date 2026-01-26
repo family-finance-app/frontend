@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useMyAccounts } from '@/api/accounts/queries';
-import { useMyTransactions } from '@/api/transactions/queries';
+import { useTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
+import { useExchangeRates } from '@/api/exchangeRate/queries';
+
 import {
   DashboardHeader,
   DashboardBalanceSection,
   DashboardStatsSection,
   DashboardTransactionsSection,
   DashboardExpensesSection,
-} from './index';
-import {
   periodStats,
   monthlyExpensesByCategory,
   incomeChange,
@@ -20,56 +21,79 @@ import {
   periodIncomeChartData,
   periodSavingsChartData,
   formatAccountsForDashboardWidget,
-} from './utils/index';
-import { enrichTransactions, formatTransactions } from '../transactions';
+} from './index';
+
+import {
+  enrichTransactions,
+  formatTransactions,
+} from '@/(main layout)/transactions';
+
 import { useTotalBalanceInUAH } from '@/hooks';
 
 export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>(
-    'month'
+    'month',
   );
-  const { data: accounts = [], isLoading: accountsLoading } = useMyAccounts();
-  const { data: transactions = [], isLoading: transactionsLoading } =
-    useMyTransactions();
-  const { data: categories = [], isLoading: categoriesLoading } =
-    useCategories();
+  const { accounts, isLoading: accountsLoading } = useMyAccounts();
+  const { transactions, isLoading: transactionsLoading } = useTransactions();
+  const { categories, isLoading: categoriesLoading } = useCategories();
+
+  const { exchangeRates } = useExchangeRates();
 
   const { totalBalance } = useTotalBalanceInUAH(accounts);
 
-  const formattedAccounts = formatAccountsForDashboardWidget(accounts || []);
+  const formattedAccounts = formatAccountsForDashboardWidget(accounts);
 
-  const formattedTransactions = formatTransactions(transactions || []);
+  const formattedTransactions = formatTransactions(transactions);
 
   const enrichedTransactions = enrichTransactions(
     formattedTransactions,
     accounts,
-    categories
+    categories,
   );
 
-  const period = periodStats(enrichedTransactions, timeframe, accounts);
+  const period = periodStats(
+    enrichedTransactions,
+    timeframe,
+    accounts,
+    exchangeRates,
+  );
 
+  // console.log(period);
   const incomeChangeStats = incomeChange(
     period.income,
     enrichedTransactions,
-    timeframe
+    timeframe,
+    accounts,
+    exchangeRates,
   );
   const expensesChangeStats = expensesChange(
     period.expenses,
     enrichedTransactions,
-    timeframe
+    timeframe,
+    accounts,
+    exchangeRates,
   );
 
-  const periodIncomeComparison = periodIncomeChartData(transactions, timeframe);
+  const periodIncomeComparison = periodIncomeChartData(
+    transactions,
+    timeframe,
+    exchangeRates,
+    accounts,
+  );
 
   const periodExpensesComparison = periodExpenseChartData(
     transactions,
-    timeframe
+    timeframe,
+    exchangeRates,
+    accounts,
   );
 
   const periodSavingsComparison = periodSavingsChartData(
     transactions,
     accounts,
-    timeframe
+    timeframe,
+    exchangeRates,
   );
 
   return (
@@ -135,7 +159,9 @@ export default function Dashboard() {
           <DashboardExpensesSection
             expensesByCategory={monthlyExpensesByCategory(
               enrichedTransactions,
-              categories
+              categories,
+              accounts,
+              exchangeRates,
             )}
             isLoading={categoriesLoading || transactionsLoading}
           />

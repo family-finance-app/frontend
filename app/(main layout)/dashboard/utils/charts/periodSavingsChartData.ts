@@ -1,16 +1,21 @@
-import { DashboardChartDataProps } from '../../types';
-import { PeriodType } from '@/types/utilities';
+import { DashboardChartDataProps, PeriodType } from '../../types';
+
 import {
   Transaction,
   TransactionType,
 } from '@/(main layout)/transactions/types';
+
 import { Account } from '@/(main layout)/accounts/types';
+
+import { ExchangeRateMap } from '@/api/exchangeRate/queries';
+import { convertToUAH } from '@/utils';
 
 // calculate total savings balance per priod for last three periods (cumulative balance of all SAVINGS accounts at end of each period)
 export default function getPeriodSavingsComparison(
   transactions: Transaction[],
   accounts: Account[] = [],
-  period: PeriodType = 'month'
+  period: PeriodType = 'month',
+  rates: ExchangeRateMap | undefined,
 ): DashboardChartDataProps[] {
   const now = new Date();
 
@@ -20,26 +25,50 @@ export default function getPeriodSavingsComparison(
 
   const results: DashboardChartDataProps[] = [];
 
+  const getTransactionCurrency = (t: Transaction): string => {
+    const accountCurrency = accounts.find(
+      (a) => a.id === t.accountId,
+    )?.currency;
+    return (accountCurrency || t.currency || 'UAH').toString().toUpperCase();
+  };
+
   const calculatePeriodSavings = (startDate: Date, endDate: Date): number => {
     const periodTransactions = transactions.filter((t) => {
       const transactionDate = new Date(t.date);
       return transactionDate >= startDate && transactionDate <= endDate;
     });
 
+    // inflows: любые поступления на savings-счета
     const savingsInflows = periodTransactions
       .filter(
         (t) =>
-          t.type === TransactionType.TRANSFER && t.category?.name === 'Savings'
+          typeof t.accountRecipientId === 'number' &&
+          savingsAccountIds.includes(t.accountRecipientId),
       )
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+      .reduce((sum, t) => {
+        const amountUAH = convertToUAH(
+          Number(t.amount),
+          getTransactionCurrency(t),
+          rates,
+        );
+        return sum + amountUAH;
+      }, 0);
 
+    // outflows: любые списания с savings-счетов
     const savingsOutflows = periodTransactions
       .filter(
         (t) =>
-          t.type === TransactionType.EXPENSE &&
-          savingsAccountIds.includes(t.accountId)
+          typeof t.accountId === 'number' &&
+          savingsAccountIds.includes(t.accountId),
       )
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+      .reduce((sum, t) => {
+        const amountUAH = convertToUAH(
+          Number(t.amount),
+          getTransactionCurrency(t),
+          rates,
+        );
+        return sum + amountUAH;
+      }, 0);
 
     return savingsInflows - savingsOutflows;
   };
@@ -47,7 +76,7 @@ export default function getPeriodSavingsComparison(
   const getPeriodLabel = (
     start: Date,
     end: Date,
-    periodType: PeriodType
+    periodType: PeriodType,
   ): string => {
     if (periodType === 'week') {
       return start.toLocaleDateString('en-US', {
@@ -100,7 +129,7 @@ export default function getPeriodSavingsComparison(
       periodEnd = new Date(
         periodStart.getFullYear(),
         periodStart.getMonth() + 1,
-        0
+        0,
       );
       periodEnd.setHours(23, 59, 59, 999);
 

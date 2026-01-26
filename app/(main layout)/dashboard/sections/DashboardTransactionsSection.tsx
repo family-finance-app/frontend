@@ -1,12 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import Button from '@/components/ui/Button_financial';
-import TransactionList from '../../transactions/components/TransactionList';
-import EditTransactionModal from '@/(main layout)/transactions/modals/EditTransactionModal';
-import { Transaction } from '@/(main layout)/transactions/types';
-import { Account } from '@/(main layout)/accounts/types';
 import { useRouter } from 'next/navigation';
+
+import { TransactionList } from '@/(main layout)/transactions/index';
+
+import { Transaction } from '@/(main layout)/transactions/types';
+
+import {
+  useUpdateTransaction,
+  useDeleteTransaction,
+} from '@/api/transactions/mutations';
+import { queryClient } from '@/lib/query-client';
+
+import { Button, EditModal, DeleteModal, type FormField } from '@/components';
+
+import { Account } from '@/(main layout)/accounts/types';
 
 interface Category {
   id: number;
@@ -23,6 +32,14 @@ interface DashboardTransactionsSectionProps {
   isLoading: boolean;
 }
 
+interface EditTransactionFormData {
+  type: string;
+  amount: string;
+  date: string;
+  categoryId: string;
+  description: string;
+}
+
 export default function DashboardTransactionsSection({
   transactions,
   accounts,
@@ -32,17 +49,114 @@ export default function DashboardTransactionsSection({
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
+  const [deletingTransactionId, setDeletingTransactionId] = useState<
+    number | null
+  >(null);
+
+  const handleDeleteTransaction = (transactionId: number) => {
+    setDeletingTransactionId(transactionId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTransactionId) return;
+    await deleteTransaction.mutateAsync(deletingTransactionId);
+    setDeletingTransactionId(null);
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+  };
 
   const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setIsEditModalOpen(true);
   };
 
-  const handleEditCancel = () => {
+  const handleCloseEditModal = () => {
+    setEditingTransaction(null);
     setIsEditModalOpen(false);
   };
 
   const router = useRouter();
+
+  const categoryOptions = categories.map((category) => ({
+    value: category.id.toString(),
+    label: category.name,
+  }));
+
+  const transactionTypes = [
+    { value: 'INCOME', label: 'Income' },
+    { value: 'EXPENSE', label: 'Expense' },
+    { value: 'TRANSFER', label: 'Transfer' },
+  ];
+
+  const transactionFormFields: FormField[] = editingTransaction
+    ? [
+        {
+          name: 'type',
+          label: 'Type',
+          type: 'select',
+          required: true,
+          options: transactionTypes,
+        },
+        {
+          name: 'amount',
+          label: 'Amount',
+          type: 'number',
+          required: true,
+          placeholder: '0.00',
+        },
+        {
+          name: 'date',
+          label: 'Date',
+          type: 'date',
+          required: true,
+        },
+        {
+          name: 'categoryId',
+          label: 'Category',
+          type: 'select',
+          required: true,
+          options: categoryOptions,
+        },
+        {
+          name: 'description',
+          label: 'Description (Optional)',
+          type: 'textarea',
+          placeholder: 'Add a description to this transaction...',
+        },
+      ]
+    : [];
+
+  const validateTransactionForm = (
+    data: EditTransactionFormData,
+  ): Partial<Record<keyof EditTransactionFormData, string>> => {
+    const errors: Partial<Record<keyof EditTransactionFormData, string>> = {};
+    if (!data.amount) {
+      errors.amount = 'Amount is required';
+    }
+    if (!data.date) {
+      errors.date = 'Date is required';
+    }
+    if (!data.categoryId) {
+      errors.categoryId = 'Category is required';
+    }
+    return errors;
+  };
+
+  const handleSaveTransaction = async (data: EditTransactionFormData) => {
+    if (!editingTransaction) return;
+    await updateTransaction.mutateAsync({
+      id: editingTransaction.id,
+      data: {
+        amount: parseFloat(data.amount),
+        date: data.date,
+        categoryId: parseInt(data.categoryId),
+        description: data.description,
+      },
+    });
+    handleCloseEditModal();
+  };
 
   if (isLoading) {
     return (
@@ -76,6 +190,7 @@ export default function DashboardTransactionsSection({
         accounts={accounts}
         categories={categories}
         onEditTransaction={handleEditTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
         actions={
           <Button
             text="View All"
@@ -87,13 +202,39 @@ export default function DashboardTransactionsSection({
         }
       />
 
-      <EditTransactionModal
-        transaction={editingTransaction}
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setEditingTransaction(null);
-        }}
+      {editingTransaction && (
+        <EditModal<EditTransactionFormData>
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          onSubmit={handleSaveTransaction}
+          title="Edit Transaction"
+          fields={transactionFormFields}
+          initialData={{
+            type: editingTransaction.type,
+            amount: editingTransaction.amount.toString(),
+            date:
+              typeof editingTransaction.date === 'string' &&
+              editingTransaction.date.match(/^\d{4}-\d{2}-\d{2}/)
+                ? editingTransaction.date.split('T')[0]
+                : new Date(editingTransaction.date).toISOString().split('T')[0],
+            categoryId: editingTransaction.categoryId.toString(),
+            description: editingTransaction.description || '',
+          }}
+          validateForm={validateTransactionForm}
+          isLoading={updateTransaction.isPending}
+        />
+      )}
+      <DeleteModal
+        isOpen={!!deletingTransactionId}
+        title="Delete Transaction"
+        itemName={
+          transactions.find((t) => t.id === deletingTransactionId)
+            ?.description || 'Transaction'
+        }
+        isLoading={deleteTransaction.isPending}
+        warningMessage={`This transaction will be permanently deleted.`}
+        onClose={() => setDeletingTransactionId(null)}
+        onConfirm={handleConfirmDelete}
       />
     </>
   );

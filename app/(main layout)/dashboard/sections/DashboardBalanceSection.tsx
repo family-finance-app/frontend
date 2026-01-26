@@ -1,7 +1,8 @@
 'use client';
 
-import BalanceWidget from '../widgets/BalanceWidget';
-import { formatCurrencyAmount } from '@/utils/formatters';
+import { BalanceWidget } from '../index';
+
+import { formatCurrencyAmount } from '@/utils';
 
 interface DashboardBalanceSectionProps {
   totalBalance: number;

@@ -1,6 +1,6 @@
 'use client';
 
-import StatsCard from '../cards/StatsCard';
+import { StatsCard } from '../index';
 
 interface DashboardExpensesSectionProps {
   expensesByCategory: Array<{ label: string; value: number }>;

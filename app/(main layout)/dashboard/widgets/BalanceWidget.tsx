@@ -49,12 +49,14 @@ export default function BalanceWidget({
     <div
       className={`bg-linear-to-br from-primary-600 to-primary-700 rounded-3xl p-8 text-white relative overflow-hidden ${className}`}
     >
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
-        <Image src="/background.svg" fill alt="balance widget background" />
+        <Image
+          src="/background.svg"
+          fill
+          alt="balance widget background"
+          loading="eager"
+        />
       </div>
-
-      {/* Main Balance Section */}
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -92,13 +94,11 @@ export default function BalanceWidget({
             </h2>
           </div>
 
-          {/* Balance Icon */}
           <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm">
             UAH
           </div>
         </div>
 
-        {/* Account Breakdown */}
         <div className="space-y-3">
           <p
             className={`${roboto.className} text-primary-100 text-sm uppercase tracking-wider font-medium mb-4`}
@@ -106,20 +106,22 @@ export default function BalanceWidget({
             From your accounts
           </p>
 
-          {accounts.map((account) => (
+          {accounts.slice(0, 3).map((account) => (
             <div
               key={account.id}
-              className="flex items-center justify-between py-3 px-4 bg-white/10 rounded-xl backdrop-blur-sm"
+              className="flex items-center justify-between py-3 px-4 bg-white/10 rounded-xl backdrop-blur-sm gap-2"
             >
-              <div className="flex items-center space-x-3">
-                <div>
-                  <p className="font-medium text-white">{account.name}</p>
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-white wrap-break-words max-w-[140px] sm:max-w-none">
+                    {account.name}
+                  </p>
                   <p className="text-xs text-primary-100">{account.type}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 shrink-0">
                 <div>
-                  <p className="font-medium text-white">
+                  <p className="font-medium lg:text-lg md:text-lg text-white whitespace-nowrap">
                     {account.balance} {account.currency}
                   </p>
                 </div>
@@ -135,7 +137,6 @@ export default function BalanceWidget({
         </div>
       </div>
 
-      {/* Decorative Elements */}
       <div className="absolute top-4 right-4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-4 left-4 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
     </div>

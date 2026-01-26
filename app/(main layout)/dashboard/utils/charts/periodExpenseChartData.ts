@@ -1,21 +1,35 @@
-import { DashboardChartDataProps } from '../../types';
-import { PeriodType } from '@/types/utilities';
+import { DashboardChartDataProps, PeriodType } from '../../types';
+
 import {
   Transaction,
   TransactionType,
 } from '@/(main layout)/transactions/types';
 
+import { Account } from '@/(main layout)/accounts/types';
+
+import { ExchangeRateMap } from '@/api/exchangeRate/queries';
+import { convertToUAH } from '@/utils';
+
 // calculate total expenses per period for last three periods for dashboard stats expense section chart
 export default function getPeriodExpenseComparison(
   transactions: Transaction[],
-  period: PeriodType = 'month'
+  period: PeriodType = 'month',
+  rates: ExchangeRateMap | undefined,
+  accounts: Account[] = [],
 ): DashboardChartDataProps[] {
   const now = new Date();
   const expenseTransactions = transactions.filter(
-    (t) => t.type === TransactionType.EXPENSE
+    (t) => t.type === TransactionType.EXPENSE,
   );
 
   const results: DashboardChartDataProps[] = [];
+
+  const getTransactionCurrency = (t: Transaction): string => {
+    const accountCurrency = accounts.find(
+      (a) => a.id === t.accountId,
+    )?.currency;
+    return (accountCurrency || t.currency || 'UAH').toString().toUpperCase();
+  };
 
   const calculatePeriodExpense = (startDate: Date, endDate: Date): number => {
     return expenseTransactions
@@ -23,13 +37,20 @@ export default function getPeriodExpenseComparison(
         const transactionDate = new Date(t.date);
         return transactionDate >= startDate && transactionDate <= endDate;
       })
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+      .reduce((sum, t) => {
+        const amountUAH = convertToUAH(
+          Number(t.amount),
+          getTransactionCurrency(t),
+          rates,
+        );
+        return sum + amountUAH;
+      }, 0);
   };
 
   const getPeriodLabel = (
     start: Date,
     end: Date,
-    periodType: PeriodType
+    periodType: PeriodType,
   ): string => {
     if (periodType === 'week') {
       return start.toLocaleDateString('en-US', {
@@ -82,7 +103,7 @@ export default function getPeriodExpenseComparison(
       periodEnd = new Date(
         periodStart.getFullYear(),
         periodStart.getMonth() + 1,
-        0
+        0,
       );
       periodEnd.setHours(23, 59, 59, 999);
 

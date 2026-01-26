@@ -1,7 +1,8 @@
 import { jetbrainsMono, roboto } from '@/assets/fonts/fonts';
-import { formatCurrencyAmount } from '@/utils/formatters';
-import SimpleBarChart from '@/components/charts/SimpleBarChart';
-import ProgressBar from '@/components/charts/ProgressBar';
+
+import { formatCurrencyAmount } from '@/utils';
+
+import { SimpleBarChart, ProgressBar } from '@/components';
 
 interface ChartData {
   label: string;
@@ -97,7 +98,7 @@ export default function StatsCard({
                         <p
                           className={`${jetbrainsMono.className} text-sm text-background-600 dark:text-white`}
                         >
-                          {formatCurrencyAmount(item.value)}
+                          {`${formatCurrencyAmount(item.value)} UAH`}
                         </p>
                         <span className="text-sm text-background-500 dark:text-background-100">
                           ({percentage}%)

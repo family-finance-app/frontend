@@ -1,8 +1,11 @@
 'use client';
 
-import { FinancialCard } from '@/components/shared';
-import { formatCurrencyAmount } from '@/utils/formatters';
+import { FinancialCard } from '@/components';
+
+import { formatCurrencyAmount } from '@/utils';
+
 import { DashboardChartDataProps } from '../types';
+import { RiArrowDownLine, RiArrowUpLine, RiWalletLine } from '@remixicon/react';
 
 export interface DashboardStatsSectionProps {
   income: number;
@@ -24,54 +27,6 @@ export interface DashboardStatsSectionProps {
   expensesComparison?: DashboardChartDataProps[];
   savingsComparison?: DashboardChartDataProps[];
 }
-
-const INCOME_ICON = (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M7 11l5-5m0 0l5 5m-5-5v12"
-    />
-  </svg>
-);
-
-const EXPENSES_ICON = (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M17 13l-5 5m0 0l-5-5m5 5V6"
-    />
-  </svg>
-);
-
-const SAVINGS_ICON = (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-    />
-  </svg>
-);
 
 export default function DashboardStatsSection({
   income,
@@ -121,7 +76,7 @@ export default function DashboardStatsSection({
       <div>
         <FinancialCard
           title={labels.income}
-          value={formatCurrencyAmount(income)}
+          value={`${formatCurrencyAmount(income)} UAH`}
           change={
             incomeChange
               ? {
@@ -133,7 +88,7 @@ export default function DashboardStatsSection({
           }
           description={`All income sources ${labels.description}`}
           size="md"
-          icon={INCOME_ICON}
+          icon={<RiArrowUpLine />}
           chartData={incomeComparison}
           chartColor="moss"
         />
@@ -142,7 +97,7 @@ export default function DashboardStatsSection({
       <div>
         <FinancialCard
           title={labels.expenses}
-          value={formatCurrencyAmount(expenses)}
+          value={`${formatCurrencyAmount(expenses)} UAH`}
           change={
             expensesChange
               ? {
@@ -154,7 +109,7 @@ export default function DashboardStatsSection({
           }
           description={`All spending ${labels.description}`}
           size="md"
-          icon={EXPENSES_ICON}
+          icon={<RiArrowDownLine />}
           chartData={expensesComparison}
           chartColor="salmon"
         />
@@ -162,7 +117,7 @@ export default function DashboardStatsSection({
       <div>
         <FinancialCard
           title={labels.savings}
-          value={formatCurrencyAmount(savings)}
+          value={`${formatCurrencyAmount(savings)} UAH`}
           change={{
             value: `${savingsRate.toFixed(1)}%`,
             type: 'neutral',
@@ -170,7 +125,7 @@ export default function DashboardStatsSection({
           }}
           description={`All savings ${labels.description}`}
           size="md"
-          icon={SAVINGS_ICON}
+          icon={<RiWalletLine />}
           chartData={savingsComparison}
           chartColor="kashmir"
         />
