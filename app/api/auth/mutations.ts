@@ -6,13 +6,13 @@ import { apiClient } from '@/lib/api-client';
 
 import { SignUpFormData, SignInFormData, NewUser, Login } from '@/(auth)/types';
 
-import { clearAuthToken, getAuthToken, setAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
-import { queryClient } from '@/lib/query-client';
+import { queryKeys } from '@/lib/query-client';
 import { useAuth } from '@/components/guards/AuthContext';
 
 export const useSignUp = () => {
   const queryClient = useQueryClient();
+  const { setToken } = useAuth();
 
   return useMutation<ApiSuccess<NewUser>, ApiError, Partial<SignUpFormData>>({
     mutationFn: async (data: Partial<SignUpFormData>) => {
@@ -20,11 +20,15 @@ export const useSignUp = () => {
         data,
       });
     },
-    onSuccess: (response) => {
-      if (response.data && response.data.accessToken) {
-        setAuthToken(response.data.accessToken);
+    onSuccess: async (response) => {
+      if (response.data?.accessToken) {
+        setToken(response.data.accessToken);
+        await Promise.resolve();
       }
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
+      });
       return response.message;
     },
     onError: (error) => {
@@ -35,21 +39,23 @@ export const useSignUp = () => {
 
 export const useSignIn = () => {
   const queryClient = useQueryClient();
+  const { setToken } = useAuth();
 
   return useMutation<ApiSuccess<Login>, ApiError, SignInFormData>({
     mutationFn: async (data: SignInFormData) => {
       return await apiClient.post<ApiSuccess<Login>>('/auth/login', data);
     },
-    onSuccess: (response) => {
-      if (response.data && response.data.accessToken) {
-        setAuthToken(response.data.accessToken);
-
-        if (!response.data.accessToken) {
-          console.error(' No token in login response!', response);
-          return;
-        }
+    onSuccess: async (response) => {
+      if (response.data?.accessToken) {
+        setToken(response.data.accessToken);
+        await Promise.resolve();
+      } else {
+        console.error('No token in login response!', response);
       }
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
+      });
 
       return response.message;
     },
@@ -62,12 +68,15 @@ export const useSignIn = () => {
 // logout
 export const useSignOut = () => {
   const { clearToken } = useAuth();
+  const queryClient = useQueryClient();
   return useMutation<ApiSuccess<null>, ApiError>({
     mutationFn: async () => {
       return apiClient.post<ApiSuccess<null>>('/auth/logout');
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
+      });
       clearToken();
       queryClient.clear();
       return response.message;

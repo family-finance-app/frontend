@@ -28,7 +28,7 @@ export const queryKeys = {
     byUser: (userId: number) => ['accounts', 'user', userId] as const,
   },
   transactions: {
-    all: ['transactions', ['all']] as const,
+    all: ['transactions', 'all'] as const,
     my: ['transactions', 'my'] as const,
     detail: (id: string) => ['transactions', 'detail', id] as const,
     byAccount: (accountId: string) =>

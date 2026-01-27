@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { queryClient } from '@/lib/query-client';
+import { queryClient, queryKeys } from '@/lib/query-client';
 import { showGlobalSuccess, showGlobalError } from '@/lib/global-alerts';
 
 import { useTransactions } from '@/api/transactions/queries';
@@ -154,8 +154,12 @@ export default function MyTransactions() {
         },
       });
       showGlobalSuccess('Transaction updated');
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
     } catch (err: any) {
       showGlobalError(err?.message || 'Failed to update transaction');
     }

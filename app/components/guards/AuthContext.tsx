@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useCallback,
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -29,15 +30,21 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(() => getAuthToken());
   const queryClient = useQueryClient();
 
+  const invalidateProtectedData = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
+    queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.exchangeRate.all });
+  }, [queryClient]);
+
   const setToken = (newToken: string) => {
     console.log('🔐 AuthContext: Setting new token');
     saveToken(newToken);
     setTokenState(newToken);
 
-    // КРИТИЧНО: инвалидируем currentUser при смене токена
-    queryClient.invalidateQueries({
-      queryKey: queryKeys.auth.currentUser,
-    });
+    invalidateProtectedData();
   };
 
   const clearToken = () => {
@@ -57,9 +64,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         setTokenState(e.newValue);
 
         if (e.newValue) {
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.auth.currentUser,
-          });
+          invalidateProtectedData();
         } else {
           queryClient.clear();
         }
@@ -72,9 +77,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       setTokenState(currentToken);
 
       if (currentToken) {
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.auth.currentUser,
-        });
+        invalidateProtectedData();
       } else {
         queryClient.clear();
       }
@@ -87,7 +90,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('authChanged', handleAuthChange);
     };
-  }, [queryClient]);
+  }, [queryClient, invalidateProtectedData]);
 
   useEffect(() => {
     const handleLogout = () => {

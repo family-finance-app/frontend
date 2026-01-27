@@ -13,6 +13,7 @@ import {
 } from '@/(main layout)/transactions/types';
 
 import { ApiError, ApiSuccess } from '../types';
+import { queryKeys } from '@/lib/query-client';
 
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
@@ -28,12 +29,12 @@ export const useCreateTransaction = () => {
         data,
       );
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({
-        queryKey: ['transactions'],
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
       });
-      queryClient.invalidateQueries({
-        queryKey: ['accounts'],
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
       });
 
       return response.message;
@@ -61,9 +62,13 @@ export const useUpdateTransaction = () => {
         },
       );
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
 
       return response.message;
     },
@@ -82,12 +87,12 @@ export const useDeleteTransaction = () => {
         `/transactions/delete/${id}`,
       );
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({
-        queryKey: ['transactions'],
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
       });
-      queryClient.invalidateQueries({
-        queryKey: ['accounts'],
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
       });
 
       return response.message;
@@ -109,12 +114,12 @@ export const useCreateTransfer = () => {
           data,
         );
       },
-      onSuccess: (response) => {
-        queryClient.invalidateQueries({
-          queryKey: ['transactions'],
+      onSuccess: async (response) => {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.transactions.all,
         });
-        queryClient.invalidateQueries({
-          queryKey: ['accounts'],
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.accounts.all,
         });
 
         return response.message;
