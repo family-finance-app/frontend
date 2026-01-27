@@ -6,13 +6,13 @@ import { apiClient } from '@/lib/api-client';
 
 import { Transaction } from '@/(main layout)/transactions/types';
 
-import { getAuthToken } from '@/utils';
+import { useAuth } from '@/components/guards/AuthContext';
 import { ApiError, ApiSuccess } from '../types';
 import { queryKeys } from '@/lib/query-client';
 
 // get all transactions of a current user
 export const useTransactions = () => {
-  const token = getAuthToken();
+  const { token } = useAuth();
 
   const query = useQuery<ApiSuccess<Transaction[]>, ApiError>({
     queryKey: queryKeys.transactions.all,

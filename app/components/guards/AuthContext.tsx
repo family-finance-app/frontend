@@ -47,14 +47,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     invalidateProtectedData();
   };
 
-  const clearToken = () => {
+  const clearToken = useCallback(() => {
     console.log('🔐 AuthContext: Clearing token');
     removeToken();
     setTokenState(null);
 
     // КРИТИЧНО: полностью очищаем весь кеш
     queryClient.clear();
-  };
+  }, [queryClient]);
 
   // Слушаем изменения токена из других вкладок/источников
   useEffect(() => {

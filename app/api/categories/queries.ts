@@ -7,12 +7,12 @@ import { queryKeys } from '@/lib/query-client';
 
 import { Category } from '@/(main layout)/transactions/types';
 
-import { getAuthToken } from '@/utils';
+import { useAuth } from '@/components/guards/AuthContext';
 import { ApiSuccess, ApiError } from '../types';
 
 // get all categories
 export const useCategories = () => {
-  const token = getAuthToken();
+  const { token } = useAuth();
 
   const query = useQuery<ApiSuccess<Category[]>, ApiError>({
     queryKey: queryKeys.categories.all,

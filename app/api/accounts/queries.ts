@@ -7,12 +7,12 @@ import { queryKeys } from '@/lib/query-client';
 
 import { Account } from '@/(main layout)/accounts/types';
 
-import { getAuthToken } from '@/utils';
+import { useAuth } from '@/components/guards/AuthContext';
 import { ApiError, ApiSuccess } from '../types';
 
 // get all user accounts info
 export const useMyAccounts = () => {
-  const token = getAuthToken();
+  const { token } = useAuth();
 
   const query = useQuery<ApiSuccess<Account[]>, ApiError>({
     queryKey: queryKeys.accounts.all,

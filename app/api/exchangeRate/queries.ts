@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { apiClient } from '@/lib/api-client';
-import { getAuthToken } from '@/utils';
+import { useAuth } from '@/components/guards/AuthContext';
 import { queryKeys } from '@/lib/query-client';
 import { ApiSuccess } from '../types';
 import { ApiError } from 'next/dist/server/api-utils';
@@ -19,7 +19,7 @@ export interface ExchangeRatesResponse {
 
 // get exchange rates from backend; also supplies defaults
 export const useExchangeRates = () => {
-  const token = getAuthToken();
+  const { token } = useAuth();
 
   const query = useQuery<ApiSuccess<ExchangeRatesResponse>, ApiError>({
     queryKey: queryKeys.exchangeRate.all,
