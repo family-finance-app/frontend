@@ -17,11 +17,13 @@ import {
 
 import { getAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
-import { queryClient } from '@/lib/query-client';
+import { queryClient, queryKeys } from '@/lib/query-client';
 
 const token = getAuthToken();
 
 export const useCreateTransaction = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<
     ApiSuccess<NewTransaction>,
     ApiError,
@@ -34,7 +36,9 @@ export const useCreateTransaction = () => {
       );
     },
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
       return response.message;
     },
     onError: (error) => {

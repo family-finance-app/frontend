@@ -15,7 +15,7 @@ export const useCurrentUser = (options = {}) => {
   // const token = getAuthToken();
 
   const query = useQuery<ApiSuccess<CurrentUser>, ApiError>({
-    queryKey: queryKeys.auth.user,
+    queryKey: queryKeys.auth.currentUser,
     queryFn: async () => {
       const response = await apiClient.get<ApiSuccess<CurrentUser>>('/auth/me');
       return response;

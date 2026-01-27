@@ -79,17 +79,13 @@ class APIClient {
     const { token, headers, ...restConfig } = config;
     const url = `${this.baseURL}${endpoint}`;
 
-    console.log(`📤 REQUEST: ${config.method || 'GET'} ${endpoint}`);
+    console.log(`📤 ${config.method || 'GET'} ${endpoint}`);
 
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
     const resolvedToken = token || getAuthToken();
-    console.log(
-      `🔑 Token present: ${!!resolvedToken}`,
-      resolvedToken ? resolvedToken.substring(0, 20) + '...' : 'none',
-    );
 
     if (resolvedToken) {
       defaultHeaders['Authorization'] = `Bearer ${resolvedToken}`;
@@ -104,16 +100,14 @@ class APIClient {
       credentials: 'include',
     });
 
-    console.log(`📥 RESPONSE: ${endpoint} - ${response.status}`);
+    console.log(`📥 ${endpoint} - ${response.status}`);
 
     // Обработка 401
     if (response.status === 401) {
       const hadToken = !!resolvedToken;
-      console.log(`⚠️ 401 detected. Had token: ${hadToken}`);
 
-      // Если токена не было изначально - не пытаемся refresh
       if (!hadToken) {
-        console.log('❌ No token present, not attempting refresh');
+        console.log('❌ 401: No token present');
         const responseData = await response.json();
         throw {
           status: 401,
@@ -121,37 +115,56 @@ class APIClient {
         } as ApiError & { status: number };
       }
 
-      console.log('🔄 Attempting token refresh...');
-      // Токен был, пытаемся обновить
+      console.log('🔄 401: Attempting refresh...');
       const newToken = await this.refreshToken();
 
       if (!newToken) {
-        console.log('❌ Refresh failed, throwing 401');
+        console.log('❌ Refresh failed');
         throw { status: 401, message: 'Unauthorized' } as ApiError & {
           status: number;
         };
       }
 
-      console.log('✅ Refresh successful, retrying original request');
-      // Повторяем запрос с новым токеном
+      console.log('✅ Refresh successful, retrying with new token');
+
+      // КРИТИЧНО: делаем НОВЫЙ fetch с новым токеном
+      // Не переиспользуем старый response!
       const retryHeaders: HeadersInit = {
         ...defaultHeaders,
         ...headers,
         Authorization: `Bearer ${newToken}`,
       };
 
-      response = await fetch(url, {
+      // НОВЫЙ fetch запрос
+      const retryResponse = await fetch(url, {
         ...restConfig,
         headers: retryHeaders,
         credentials: 'include',
       });
 
-      console.log(`📥 RETRY RESPONSE: ${endpoint} - ${response.status}`);
+      console.log(`📥 RETRY ${endpoint} - ${retryResponse.status}`);
+
+      // Обработка retry response
+      if (retryResponse.status === 204) {
+        return {} as T;
+      }
+
+      const retryData = await retryResponse.json();
+
+      if (!retryResponse.ok) {
+        console.log('❌ Retry failed:', retryResponse.status, retryData);
+        throw {
+          status: retryResponse.status,
+          ...retryData,
+        } as ApiError & { status: number };
+      }
+
+      console.log('✅ Retry successful');
+      return retryData as T;
     }
 
     // Обработка 204 No Content
     if (response.status === 204) {
-      console.log('✅ 204 No Content');
       return {} as T;
     }
 
@@ -172,6 +185,38 @@ class APIClient {
 
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
+  }
+
+  async externalGet<T>(
+    absoluteUrl: string,
+    config?: RequestConfig,
+  ): Promise<T> {
+    const { token, headers, ...restConfig } = config || {};
+    const defaultHeaders: HeadersInit = {};
+
+    if (token) {
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(absoluteUrl, {
+      ...restConfig,
+      method: 'GET',
+      headers: {
+        ...defaultHeaders,
+        ...headers,
+      },
+    });
+
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    return responseData as T;
   }
 
   async post<T>(
