@@ -1,25 +1,18 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 import { apiClient } from '@/lib/api-client';
-
 import {
   CreateTransactionFormData,
   CreateTransferFormData,
   DeletedTransaction,
   NewTransaction,
   NewTransfer,
-  Transaction,
   UpdatedTransaction,
   UpdateTransactionFormData,
 } from '@/(main layout)/transactions/types';
 
-import { getAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
-import { queryClient, queryKeys } from '@/lib/query-client';
-
-const token = getAuthToken();
 
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
@@ -36,9 +29,13 @@ export const useCreateTransaction = () => {
       );
     },
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
+      queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+      });
+
       return response.message;
     },
     onError: (error) => {
@@ -48,12 +45,14 @@ export const useCreateTransaction = () => {
 };
 
 export const useUpdateTransaction = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<
     ApiSuccess<UpdatedTransaction>,
     ApiError,
     { id: number; data: UpdateTransactionFormData }
   >({
-    mutationFn: async (id, data) => {
+    mutationFn: async ({ id, data }) => {
       return apiClient.put<ApiSuccess<UpdatedTransaction>>(
         `/transactions/update`,
         {
@@ -64,6 +63,8 @@ export const useUpdateTransaction = () => {
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+
       return response.message;
     },
     onError: (error) => {
@@ -73,6 +74,8 @@ export const useUpdateTransaction = () => {
 };
 
 export const useDeleteTransaction = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<ApiSuccess<DeletedTransaction>, ApiError, number>({
     mutationFn: async (id: number) => {
       return apiClient.delete<ApiSuccess<DeletedTransaction>>(
@@ -80,7 +83,13 @@ export const useDeleteTransaction = () => {
       );
     },
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+      });
+
       return response.message;
     },
     onError: (error) => {
@@ -90,6 +99,8 @@ export const useDeleteTransaction = () => {
 };
 
 export const useCreateTransfer = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<ApiSuccess<NewTransfer>, ApiError, CreateTransferFormData>(
     {
       mutationFn: async (data) => {
@@ -99,7 +110,13 @@ export const useCreateTransfer = () => {
         );
       },
       onSuccess: (response) => {
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        queryClient.invalidateQueries({
+          queryKey: ['transactions'],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['accounts'],
+        });
+
         return response.message;
       },
       onError: (error) => {

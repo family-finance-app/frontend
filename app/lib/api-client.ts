@@ -56,12 +56,23 @@ class APIClient {
           }
         }
 
-        console.log('❌ refreshToken: failed to get token');
+        console.log('❌ refreshToken: failed to get token, triggering logout');
         clearAuthToken();
+
+        // КРИТИЧНО: dispatch события для logout
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:logout'));
+        }
+
         return null;
       } catch (e) {
         console.error('❌ refreshToken: error', e);
         clearAuthToken();
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:logout'));
+        }
+
         return null;
       } finally {
         console.log('🔄 refreshToken: clearing promise');

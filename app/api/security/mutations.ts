@@ -1,11 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 import { apiClient } from '@/lib/api-client';
-
-import { getAuthToken } from '@/utils';
-
 import {
   ChangeEmailFormData,
   ChangePasswordFormData,
@@ -13,8 +9,6 @@ import {
   UpdatedPassword,
 } from '@/(main layout)/settings/security/types';
 import { ApiError, ApiSuccess } from '../types';
-import { User } from '@/(main layout)/settings/profile/types';
-import { queryClient, queryKeys } from '@/lib/query-client';
 
 export const useUpdateUserPassword = () => {
   const queryCLient = useQueryClient();
@@ -28,7 +22,7 @@ export const useUpdateUserPassword = () => {
       return apiClient.put<ApiSuccess<UpdatedPassword>>('/user/password', data);
     },
     onSuccess: (resposne) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      queryCLient.invalidateQueries({ queryKey: ['profile'] });
       return resposne.message;
     },
     onError: (error) => {
@@ -45,7 +39,7 @@ export const useUpdateUserEmail = () => {
       return apiClient.put<ApiSuccess<UpdatedEmail>>('/user/email', data);
     },
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      queryCLient.invalidateQueries({ queryKey: ['profile'] });
       return response.message;
     },
     onError: (error) => {

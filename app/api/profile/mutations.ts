@@ -7,7 +7,6 @@ import { apiClient } from '@/lib/api-client';
 import {
   ChangeProfileFormData,
   UpdatedUser,
-  User,
 } from '@/(main layout)/settings/profile/types';
 
 import { getAuthToken } from '@/utils';

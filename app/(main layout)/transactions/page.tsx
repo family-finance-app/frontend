@@ -143,15 +143,22 @@ export default function MyTransactions() {
   const handleSaveTransaction = async (data: EditTransactionFormData) => {
     if (!editingTransaction) return;
 
-    await updateTransaction.mutateAsync({
-      id: editingTransaction.id,
-      data: {
-        amount: parseFloat(data.amount) as any,
-        date: data.date,
-        categoryId: parseInt(data.categoryId) as any,
-        description: data.description || undefined,
-      },
-    });
+    try {
+      await updateTransaction.mutateAsync({
+        id: editingTransaction.id,
+        data: {
+          amount: parseFloat(data.amount),
+          date: data.date,
+          categoryId: parseInt(data.categoryId, 10),
+          description: data.description || '',
+        },
+      });
+      showGlobalSuccess('Transaction updated');
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    } catch (err: any) {
+      showGlobalError(err?.message || 'Failed to update transaction');
+    }
   };
 
   const handleEditTransaction = (transaction: Transaction) => {

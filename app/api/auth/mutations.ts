@@ -1,17 +1,19 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiClient } from '@/lib/api-client';
 
 import { SignUpFormData, SignInFormData, NewUser, Login } from '@/(auth)/types';
-import { User } from '@/(main layout)/settings/profile/types';
 
 import { clearAuthToken, getAuthToken, setAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
-import { queryClient, queryKeys } from '@/lib/query-client';
+import { queryClient } from '@/lib/query-client';
+import { useAuth } from '@/components/guards/AuthContext';
 
 export const useSignUp = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<ApiSuccess<NewUser>, ApiError, Partial<SignUpFormData>>({
     mutationFn: async (data: Partial<SignUpFormData>) => {
       return apiClient.post<ApiSuccess<NewUser>>('/auth/signup', {
@@ -32,26 +34,22 @@ export const useSignUp = () => {
 };
 
 export const useSignIn = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<ApiSuccess<Login>, ApiError, SignInFormData>({
     mutationFn: async (data: SignInFormData) => {
       return await apiClient.post<ApiSuccess<Login>>('/auth/login', data);
     },
     onSuccess: (response) => {
       if (response.data && response.data.accessToken) {
-        console.log('🔐 Login response:', response);
         setAuthToken(response.data.accessToken);
+
         if (!response.data.accessToken) {
-          console.error('❌ No token in login response!', response);
+          console.error(' No token in login response!', response);
           return;
         }
-        console.log(
-          '🔐 Setting token from login:',
-          response.data.accessToken.substring(0, 20) + '...',
-        );
-
-        const savedToken = getAuthToken();
-        console.log('🔐 Verified saved token:', savedToken ? 'OK' : 'FAILED');
       }
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
 
       return response.message;
     },
@@ -63,13 +61,14 @@ export const useSignIn = () => {
 
 // logout
 export const useSignOut = () => {
+  const { clearToken } = useAuth();
   return useMutation<ApiSuccess<null>, ApiError>({
     mutationFn: async () => {
       return apiClient.post<ApiSuccess<null>>('/auth/logout');
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['auth'] });
-      clearAuthToken();
+      clearToken();
       queryClient.clear();
       return response.message;
     },

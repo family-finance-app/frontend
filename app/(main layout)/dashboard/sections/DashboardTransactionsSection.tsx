@@ -146,16 +146,22 @@ export default function DashboardTransactionsSection({
 
   const handleSaveTransaction = async (data: EditTransactionFormData) => {
     if (!editingTransaction) return;
-    await updateTransaction.mutateAsync({
-      id: editingTransaction.id,
-      data: {
-        amount: parseFloat(data.amount),
-        date: data.date,
-        categoryId: parseInt(data.categoryId),
-        description: data.description,
-      },
-    });
-    handleCloseEditModal();
+    try {
+      await updateTransaction.mutateAsync({
+        id: editingTransaction.id,
+        data: {
+          amount: parseFloat(data.amount),
+          date: data.date,
+          categoryId: parseInt(data.categoryId, 10),
+          description: data.description || '',
+        },
+      });
+      handleCloseEditModal();
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    } catch (err: any) {
+      console.error('Failed to update transaction', err);
+    }
   };
 
   if (isLoading) {

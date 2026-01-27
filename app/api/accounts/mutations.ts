@@ -1,11 +1,10 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiClient } from '@/lib/api-client';
 
 import {
-  Account,
   CreateAccountFormData,
   DeletedAccount,
   EditAccountFormData,
@@ -20,6 +19,8 @@ import { queryClient } from '@/lib/query-client';
 // create, update, or delete FINANCIAL accounts
 
 export const useCreateAccount = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<ApiSuccess<NewAccount>, ApiError, CreateAccountFormData>({
     mutationFn: async (data) => {
       const token = getAuthToken();
@@ -37,6 +38,8 @@ export const useCreateAccount = () => {
 };
 
 export const useUpdateAccount = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<
     ApiSuccess<UpdatedAccount>,
     ApiError,
@@ -48,6 +51,9 @@ export const useUpdateAccount = () => {
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+      });
       return response.message;
     },
     onError: (error) => {
@@ -57,6 +63,8 @@ export const useUpdateAccount = () => {
 };
 
 export const useDeleteAccount = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<ApiSuccess<DeletedAccount>, ApiError, { id: number }>({
     mutationFn: async ({ id }) => {
       const token = getAuthToken();
@@ -64,6 +72,9 @@ export const useDeleteAccount = () => {
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+      });
       return response.message;
     },
     onError: (error) => {

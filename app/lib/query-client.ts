@@ -5,9 +5,11 @@ import { QueryClient } from '@tanstack/react-query';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0,
-      gcTime: 0,
-      refetchOnWindowFocus: process.env.NODE_ENV === 'production',
+      staleTime: 1000 * 60, // data is considered fresh during 1 min
+      gcTime: 1000 * 60 * 5, // time in cache
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      retry: 1,
     },
     mutations: {
       retry: 1,
@@ -26,9 +28,9 @@ export const queryKeys = {
     byUser: (userId: number) => ['accounts', 'user', userId] as const,
   },
   transactions: {
-    all: ['transactions'] as const,
+    all: ['transactions', ['all']] as const,
     my: ['transactions', 'my'] as const,
-    detail: (id: string) => ['transactions', id] as const,
+    detail: (id: string) => ['transactions', 'detail', id] as const,
     byAccount: (accountId: string) =>
       ['transactions', 'account', accountId] as const,
     family: ['transactions', 'family'] as const,
@@ -44,6 +46,6 @@ export const queryKeys = {
     all: ['profile'] as const,
   },
   exchangeRate: {
-    all: ['exchangeRate'],
+    all: ['exchangeRate'] as const,
   },
 } as const;

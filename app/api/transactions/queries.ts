@@ -26,21 +26,3 @@ export const useTransactions = () => {
 
   return { transactions: query.data?.data || [], ...query };
 };
-
-// get a transaction by id
-export const useTransaction = (id: string) => {
-  const token = getAuthToken();
-
-  const query = useQuery<ApiSuccess<Transaction>, ApiError>({
-    queryKey: queryKeys.transactions.all,
-    queryFn: async () => {
-      const response = (await apiClient.get)<ApiSuccess<Transaction>>(
-        '/transactions',
-      );
-      return response;
-    },
-    enabled: !!token && !!id,
-  });
-
-  return { transaction: query.data?.data };
-};

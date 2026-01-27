@@ -23,12 +23,7 @@ export default function SignIn() {
   const handleSignIn = async (
     signInData: SignInFormData,
   ): Promise<ApiSuccess<Login>> => {
-    const result = await handleSubmit(signInData);
-    if (result) {
-      await Promise.resolve();
-      router.push('/dashboard');
-    }
-    return result;
+    return await handleSubmit(signInData);
   };
 
   return (
