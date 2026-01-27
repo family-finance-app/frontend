@@ -18,6 +18,7 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   auth: {
     all: ['auth'] as const,
+    user: ['currentUser'] as const,
   },
   accounts: {
     all: ['accounts'] as const,

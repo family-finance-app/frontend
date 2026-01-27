@@ -21,7 +21,11 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
 
   const token = hasAuthToken();
-  const { user, isLoading, isError } = useCurrentUser();
+
+  const shouldFetchUser = !!token;
+  const { user, isLoading, isError } = useCurrentUser({
+    enabled: shouldFetchUser,
+  });
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -77,7 +81,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     tokenChanged,
   ]);
 
-  if (!isMounted || isLoading) {
+  if (!isMounted || (token && isLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg text-gray-600">Loading...</div>

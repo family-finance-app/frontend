@@ -8,18 +8,22 @@ import { queryKeys } from '@/lib/query-client';
 import { getAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
 import { CurrentUser } from '@/(auth)/types';
+import { hasAuthToken } from '@/utils';
 
 // get current authenticated user
-export const useCurrentUser = () => {
-  const token = getAuthToken();
+export const useCurrentUser = (options = {}) => {
+  // const token = getAuthToken();
 
   const query = useQuery<ApiSuccess<CurrentUser>, ApiError>({
-    queryKey: queryKeys.auth.all,
+    queryKey: queryKeys.auth.user,
     queryFn: async () => {
       const response = await apiClient.get<ApiSuccess<CurrentUser>>('/auth/me');
       return response;
     },
-    enabled: !!token,
+    enabled: hasAuthToken(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+    ...options,
   });
 
   return { user: query.data?.data ?? undefined, ...query };
