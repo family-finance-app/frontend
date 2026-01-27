@@ -43,4 +43,7 @@ export const queryKeys = {
   profile: {
     all: ['profile'] as const,
   },
+  exchangeRate: {
+    all: ['exchangeRate'],
+  },
 } as const;
