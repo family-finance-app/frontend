@@ -25,6 +25,7 @@ export default function SignIn() {
   ): Promise<ApiSuccess<Login>> => {
     const result = await handleSubmit(signInData);
     if (result) {
+      await Promise.resolve();
       router.push('/dashboard');
     }
     return result;

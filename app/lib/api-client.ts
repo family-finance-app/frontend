@@ -21,38 +21,33 @@ class APIClient {
     if (this.refreshPromise) {
       return this.refreshPromise;
     }
-
-    // this.refreshPromise = (async () => {
-    //   try {
-    //     const refreshUrl = `${this.baseURL}/auth/refresh`;
-    //     const refreshResp = await fetch(refreshUrl, {
-    //       method: 'POST',
-    //       credentials: 'include',
-    //       headers: { 'Content-Type': 'application/json' },
-    //     });
-
-    //     if (refreshResp.ok) {
-    //       const refreshData = await refreshResp.json();
-    //       const newAccess =
-    //         (refreshData?.data as any)?.accessToken ||
-    //         (refreshData as any)?.accessToken;
-
-    //       if (newAccess) {
-    //         setAuthToken(newAccess);
-    //         return newAccess;
-    //       }
-    //     }
-
-    //     clearAuthToken();
-    //     return null;
-    //   } catch (e) {
-    //     clearAuthToken();
-    //     return null;
-    //   } finally {
-    //     this.refreshPromise = null;
-    //   }
-    // })();
-
+    this.refreshPromise = (async () => {
+      try {
+        const refreshUrl = `${this.baseURL}/auth/refresh`;
+        const refreshResp = await fetch(refreshUrl, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (refreshResp.ok) {
+          const refreshData = await refreshResp.json();
+          const newAccess =
+            (refreshData?.data as any)?.accessToken ||
+            (refreshData as any)?.accessToken;
+          if (newAccess) {
+            setAuthToken(newAccess);
+            return newAccess;
+          }
+        }
+        clearAuthToken();
+        return null;
+      } catch (e) {
+        clearAuthToken();
+        return null;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
     return this.refreshPromise;
   }
 
@@ -84,7 +79,6 @@ class APIClient {
     if (response.status === 401) {
       const hadToken = !!resolvedToken;
 
-      // Если токена не было изначально - не пытаемся refresh
       if (!hadToken) {
         const responseData = await response.json();
         throw {

@@ -6,6 +6,7 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
 import { useExchangeRates } from '@/api/exchangeRate/queries';
+import { useAuth } from '@/hooks/useAuth';
 
 import {
   DashboardHeader,
@@ -29,6 +30,7 @@ import {
 } from '@/(main layout)/transactions';
 
 import { useTotalBalanceInUAH } from '@/hooks';
+import Loader from '@/components/Loader';
 
 export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>(
@@ -39,6 +41,7 @@ export default function Dashboard() {
   const { categories, isLoading: categoriesLoading } = useCategories();
 
   const { exchangeRates } = useExchangeRates();
+  const { isLoading: userLoading } = useAuth();
 
   const { totalBalance } = useTotalBalanceInUAH(accounts);
 
@@ -59,7 +62,6 @@ export default function Dashboard() {
     exchangeRates,
   );
 
-  // console.log(period);
   const incomeChangeStats = incomeChange(
     period.income,
     enrichedTransactions,
@@ -96,17 +98,13 @@ export default function Dashboard() {
     exchangeRates,
   );
 
-  if (accountsLoading || transactionsLoading || categoriesLoading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="w-10 h-10 bg-background-200 dark:bg-background-700 rounded-full"></div>
-          <p className="text-background-500 dark:text-background-400">
-            Loading dashboard...
-          </p>
-        </div>
-      </div>
-    );
+  if (
+    userLoading ||
+    accountsLoading ||
+    transactionsLoading ||
+    categoriesLoading
+  ) {
+    return <Loader message="Loading dashboard..." />;
   }
 
   return (
