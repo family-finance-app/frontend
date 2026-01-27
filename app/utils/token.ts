@@ -1,44 +1,35 @@
 // token utilities for api client
 
-// check if we're in browser (for local development, nodejs25 issues)
-const isBrowser = (): boolean => {
-  return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+export const setAuthToken = (token: string) => {
+  console.log('💾 setAuthToken called:', token.substring(0, 20) + '...');
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('authToken', token);
+    console.log('💾 Token saved to localStorage');
+  }
 };
 
 export const getAuthToken = (): string | null => {
-  if (!isBrowser()) {
-    return null;
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('authToken');
+    console.log(
+      '🔑 getAuthToken called:',
+      token ? token.substring(0, 20) + '...' : 'null',
+    );
+    return token;
   }
-  try {
-    return localStorage.getItem('authToken');
-  } catch (e) {
-    console.warn('Failed to access localStorage:', e);
-    return null;
-  }
+  return null;
 };
 
-export const setAuthToken = (token: string): void => {
-  if (!isBrowser()) {
-    return;
-  }
-  try {
-    localStorage.setItem('authToken', token);
-  } catch (e) {
-    console.warn('Failed to set token in localStorage:', e);
-  }
-};
-
-export const clearAuthToken = (): void => {
-  if (!isBrowser()) {
-    return;
-  }
-  try {
+export const clearAuthToken = () => {
+  console.log('🗑️ clearAuthToken called');
+  if (typeof window !== 'undefined') {
     localStorage.removeItem('authToken');
-  } catch (e) {
-    console.warn('Failed to clear token from localStorage:', e);
+    console.log('🗑️ Token removed from localStorage');
   }
 };
 
 export const hasAuthToken = (): boolean => {
-  return !!getAuthToken();
+  const has = !!getAuthToken();
+  console.log('❓ hasAuthToken:', has);
+  return has;
 };

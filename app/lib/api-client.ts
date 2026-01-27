@@ -18,46 +18,57 @@ class APIClient {
   }
 
   private async refreshToken(): Promise<string | null> {
+    console.log('🔄 refreshToken: starting refresh...');
+
     if (this.refreshPromise) {
+      console.log('🔄 refreshToken: reusing existing promise');
       return this.refreshPromise;
     }
+
     this.refreshPromise = (async () => {
       try {
-        console.debug('[api-client] starting refresh');
         const refreshUrl = `${this.baseURL}/auth/refresh`;
+        console.log('🔄 refreshToken: calling', refreshUrl);
+
         const refreshResp = await fetch(refreshUrl, {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
         });
-        console.debug('[api-client] refresh response status', {
-          status: refreshResp.status,
-        });
+
+        console.log('🔄 refreshToken: response status', refreshResp.status);
+
         if (refreshResp.ok) {
           const refreshData = await refreshResp.json();
+          console.log('🔄 refreshToken: response data', refreshData);
+
           const newAccess =
             (refreshData?.data as any)?.accessToken ||
             (refreshData as any)?.accessToken;
-          console.debug('[api-client] refresh response data', {
-            accessToken: newAccess
-              ? `${String(newAccess).slice(0, 10)}...`
-              : null,
-          });
+
           if (newAccess) {
+            console.log(
+              '✅ refreshToken: got new token',
+              newAccess.substring(0, 20) + '...',
+            );
             setAuthToken(newAccess);
             return newAccess;
           }
         }
+
+        console.log('❌ refreshToken: failed to get token');
         clearAuthToken();
         return null;
       } catch (e) {
-        console.debug('[api-client] refresh error', e);
+        console.error('❌ refreshToken: error', e);
         clearAuthToken();
         return null;
       } finally {
+        console.log('🔄 refreshToken: clearing promise');
         this.refreshPromise = null;
       }
     })();
+
     return this.refreshPromise;
   }
 
@@ -68,20 +79,21 @@ class APIClient {
     const { token, headers, ...restConfig } = config;
     const url = `${this.baseURL}${endpoint}`;
 
+    console.log(`📤 REQUEST: ${config.method || 'GET'} ${endpoint}`);
+
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
     const resolvedToken = token || getAuthToken();
+    console.log(
+      `🔑 Token present: ${!!resolvedToken}`,
+      resolvedToken ? resolvedToken.substring(0, 20) + '...' : 'none',
+    );
+
     if (resolvedToken) {
       defaultHeaders['Authorization'] = `Bearer ${resolvedToken}`;
     }
-
-    console.debug('[api-client] Request', {
-      endpoint,
-      token: resolvedToken ? `${String(resolvedToken).slice(0, 10)}...` : null,
-      method: restConfig.method || 'GET',
-    });
 
     let response = await fetch(url, {
       ...restConfig,
@@ -92,22 +104,16 @@ class APIClient {
       credentials: 'include',
     });
 
-    // debug: log response status for tracing
-    console.debug('[api-client] Response', {
-      endpoint,
-      status: response.status,
-    });
+    console.log(`📥 RESPONSE: ${endpoint} - ${response.status}`);
 
+    // Обработка 401
     if (response.status === 401) {
-      console.debug('[api-client] 401 received', {
-        endpoint,
-        token: resolvedToken
-          ? `${String(resolvedToken).slice(0, 10)}...`
-          : null,
-      });
       const hadToken = !!resolvedToken;
+      console.log(`⚠️ 401 detected. Had token: ${hadToken}`);
 
+      // Если токена не было изначально - не пытаемся refresh
       if (!hadToken) {
+        console.log('❌ No token present, not attempting refresh');
         const responseData = await response.json();
         throw {
           status: 401,
@@ -115,18 +121,19 @@ class APIClient {
         } as ApiError & { status: number };
       }
 
+      console.log('🔄 Attempting token refresh...');
+      // Токен был, пытаемся обновить
       const newToken = await this.refreshToken();
-      console.debug('[api-client] refresh result', {
-        endpoint,
-        newToken: newToken ? `${String(newToken).slice(0, 10)}...` : null,
-      });
 
       if (!newToken) {
+        console.log('❌ Refresh failed, throwing 401');
         throw { status: 401, message: 'Unauthorized' } as ApiError & {
           status: number;
         };
       }
 
+      console.log('✅ Refresh successful, retrying original request');
+      // Повторяем запрос с новым токеном
       const retryHeaders: HeadersInit = {
         ...defaultHeaders,
         ...headers,
@@ -138,58 +145,33 @@ class APIClient {
         headers: retryHeaders,
         credentials: 'include',
       });
+
+      console.log(`📥 RETRY RESPONSE: ${endpoint} - ${response.status}`);
     }
 
+    // Обработка 204 No Content
     if (response.status === 204) {
+      console.log('✅ 204 No Content');
       return {} as T;
     }
 
+    // Обработка всех остальных ответов
     const responseData = await response.json();
 
     if (!response.ok) {
+      console.log('❌ Request failed:', response.status, responseData);
       throw {
         status: response.status,
         ...responseData,
       } as ApiError & { status: number };
     }
 
+    console.log('✅ Request successful');
     return responseData as T;
   }
 
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
-  }
-
-  async externalGet<T>(
-    absoluteUrl: string,
-    config?: RequestConfig,
-  ): Promise<T> {
-    const { token, headers, ...restConfig } = config || {};
-    const defaultHeaders: HeadersInit = {};
-
-    if (token) {
-      defaultHeaders['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(absoluteUrl, {
-      ...restConfig,
-      method: 'GET',
-      headers: {
-        ...defaultHeaders,
-        ...headers,
-      },
-    });
-
-    if (response.status === 204) {
-      return {} as T;
-    }
-
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-    return responseData as T;
   }
 
   async post<T>(

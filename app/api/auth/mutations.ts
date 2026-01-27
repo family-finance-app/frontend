@@ -7,9 +7,9 @@ import { apiClient } from '@/lib/api-client';
 import { SignUpFormData, SignInFormData, NewUser, Login } from '@/(auth)/types';
 import { User } from '@/(main layout)/settings/profile/types';
 
-import { clearAuthToken, setAuthToken } from '@/utils';
+import { clearAuthToken, getAuthToken, setAuthToken } from '@/utils';
 import { ApiError, ApiSuccess } from '../types';
-import { queryClient } from '@/lib/query-client';
+import { queryClient, queryKeys } from '@/lib/query-client';
 
 export const useSignUp = () => {
   return useMutation<ApiSuccess<NewUser>, ApiError, Partial<SignUpFormData>>({
@@ -38,9 +38,21 @@ export const useSignIn = () => {
     },
     onSuccess: (response) => {
       if (response.data && response.data.accessToken) {
+        console.log('🔐 Login response:', response);
         setAuthToken(response.data.accessToken);
+        if (!response.data.accessToken) {
+          console.error('❌ No token in login response!', response);
+          return;
+        }
+        console.log(
+          '🔐 Setting token from login:',
+          response.data.accessToken.substring(0, 20) + '...',
+        );
+
+        const savedToken = getAuthToken();
+        console.log('🔐 Verified saved token:', savedToken ? 'OK' : 'FAILED');
       }
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+
       return response.message;
     },
     onError: (error) => {
@@ -58,6 +70,7 @@ export const useSignOut = () => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       clearAuthToken();
+      queryClient.clear();
       return response.message;
     },
     onError: (error) => {
