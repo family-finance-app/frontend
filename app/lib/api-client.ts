@@ -1,5 +1,6 @@
 // requests configuration
 
+// TODO: FIX LOGIc OF REFRESH REQUEST
 import { ApiError } from 'next/dist/server/api-utils';
 import { getAuthToken, setAuthToken, clearAuthToken } from '@/utils';
 
@@ -8,6 +9,8 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export interface RequestConfig extends RequestInit {
   token?: string;
 }
+
+let refreshPromise: Promise<string | null> | null = null;
 
 class APIClient {
   private baseURL: string | undefined;
@@ -62,8 +65,8 @@ class APIClient {
 
             const retryHeaders: HeadersInit = {
               ...defaultHeaders,
-              Authorization: `Bearer ${newAccess}`,
               ...headers,
+              Authorization: `Bearer ${newAccess}`,
             };
 
             const retryResp = await fetch(url, {
@@ -95,14 +98,66 @@ class APIClient {
 
     const responseData = await response.json();
 
-    if (!response.ok) {
-      throw {
-        status: response.status,
-        ...responseData,
-      } as ApiError & { status: number };
+    if (response.status === 401) {
+      if (!refreshPromise) {
+        refreshPromise = (async () => {
+          try {
+            const refreshUrl = `${this.baseURL}/auth/refresh`;
+            const refreshResp = await fetch(refreshUrl, {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+            });
+            if (refreshResp.ok) {
+              const refreshData = await refreshResp.json();
+              const newAccess =
+                (refreshData?.data as any)?.accessToken ||
+                (refreshData as any)?.accessToken;
+              if (newAccess) {
+                setAuthToken(newAccess);
+                return newAccess;
+              }
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        })();
+      }
+      const newAccess = await refreshPromise;
+      refreshPromise = null;
+      if (newAccess) {
+        const retryHeaders: HeadersInit = {
+          ...defaultHeaders,
+          ...headers,
+          Authorization: `Bearer ${newAccess}`,
+        };
+        const retryResp = await fetch(url, {
+          ...restConfig,
+          headers: retryHeaders,
+          credentials: 'include',
+        });
+        if (retryResp.status === 204) return {} as T;
+        const retryData = await retryResp.json();
+        if (!retryResp.ok) {
+          throw { status: retryResp.status, ...retryData } as ApiError & {
+            status: number;
+          };
+        }
+        return retryData as T;
+      }
+      clearAuthToken();
+      throw { status: 401, message: 'Unauthorized' } as ApiError & {
+        status: number;
+      };
     }
 
-    return responseData as T;
+    throw {
+      status: 500,
+      message: 'Unexpected error in APIClient.request',
+    } as ApiError & {
+      status: number;
+    };
   }
 
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
@@ -116,11 +171,9 @@ class APIClient {
   ): Promise<T> {
     const { token, headers, ...restConfig } = config || {};
     const defaultHeaders: HeadersInit = {};
-
     if (token) {
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
-
     const response = await fetch(absoluteUrl, {
       ...restConfig,
       method: 'GET',
@@ -129,15 +182,11 @@ class APIClient {
         ...headers,
       },
     });
-
     if (response.status === 204) {
       return {} as T;
     }
-
     if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-
     const responseData = await response.json();
-
     return responseData as T;
   }
 
