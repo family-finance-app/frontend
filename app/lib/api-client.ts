@@ -82,6 +82,16 @@ class APIClient {
     });
 
     if (response.status === 401) {
+      const hadToken = !!resolvedToken;
+
+      if (!hadToken) {
+        const responseData = await response.json();
+        throw {
+          status: 401,
+          ...responseData,
+        } as ApiError & { status: number };
+      }
+
       const newToken = await this.refreshToken();
 
       if (!newToken) {
@@ -99,22 +109,25 @@ class APIClient {
       const retryResp = await fetch(url, {
         ...restConfig,
         headers: retryHeaders,
+        credentials: 'include',
       });
 
       if (retryResp.status === 204) return {} as T;
-      const retryData = await retryResp.json();
 
       if (!retryResp.ok) {
+        const retryData = await retryResp.json();
         throw { status: retryResp.status, ...retryData } as ApiError & {
           status: number;
         };
       }
 
+      const retryData = await retryResp.json();
       return retryData as T;
     }
 
-    if (response.status === 204) return {} as T;
-
+    if (response.status === 204) {
+      return {} as T;
+    }
     const responseData = await response.json();
 
     if (!response.ok) {
@@ -131,7 +144,6 @@ class APIClient {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
   }
 
-  // external api GET request
   async externalGet<T>(
     absoluteUrl: string,
     config?: RequestConfig,
@@ -156,10 +168,11 @@ class APIClient {
       return {} as T;
     }
 
-    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
 
     const responseData = await response.json();
-
     return responseData as T;
   }
 
