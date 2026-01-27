@@ -72,7 +72,7 @@ class APIClient {
       defaultHeaders['Authorization'] = `Bearer ${resolvedToken}`;
     }
 
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       ...restConfig,
       headers: {
         ...defaultHeaders,
@@ -84,6 +84,7 @@ class APIClient {
     if (response.status === 401) {
       const hadToken = !!resolvedToken;
 
+      // Если токена не было изначально - не пытаемся refresh
       if (!hadToken) {
         const responseData = await response.json();
         throw {
@@ -106,28 +107,17 @@ class APIClient {
         Authorization: `Bearer ${newToken}`,
       };
 
-      const retryResp = await fetch(url, {
+      response = await fetch(url, {
         ...restConfig,
         headers: retryHeaders,
         credentials: 'include',
       });
-
-      if (retryResp.status === 204) return {} as T;
-
-      if (!retryResp.ok) {
-        const retryData = await retryResp.json();
-        throw { status: retryResp.status, ...retryData } as ApiError & {
-          status: number;
-        };
-      }
-
-      const retryData = await retryResp.json();
-      return retryData as T;
     }
 
     if (response.status === 204) {
       return {} as T;
     }
+
     const responseData = await response.json();
 
     if (!response.ok) {
