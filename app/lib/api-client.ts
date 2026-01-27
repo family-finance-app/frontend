@@ -23,17 +23,26 @@ class APIClient {
     }
     this.refreshPromise = (async () => {
       try {
+        console.debug('[api-client] starting refresh');
         const refreshUrl = `${this.baseURL}/auth/refresh`;
         const refreshResp = await fetch(refreshUrl, {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
         });
+        console.debug('[api-client] refresh response status', {
+          status: refreshResp.status,
+        });
         if (refreshResp.ok) {
           const refreshData = await refreshResp.json();
           const newAccess =
             (refreshData?.data as any)?.accessToken ||
             (refreshData as any)?.accessToken;
+          console.debug('[api-client] refresh response data', {
+            accessToken: newAccess
+              ? `${String(newAccess).slice(0, 10)}...`
+              : null,
+          });
           if (newAccess) {
             setAuthToken(newAccess);
             return newAccess;
@@ -42,6 +51,7 @@ class APIClient {
         clearAuthToken();
         return null;
       } catch (e) {
+        console.debug('[api-client] refresh error', e);
         clearAuthToken();
         return null;
       } finally {
@@ -67,6 +77,12 @@ class APIClient {
       defaultHeaders['Authorization'] = `Bearer ${resolvedToken}`;
     }
 
+    console.debug('[api-client] Request', {
+      endpoint,
+      token: resolvedToken ? `${String(resolvedToken).slice(0, 10)}...` : null,
+      method: restConfig.method || 'GET',
+    });
+
     let response = await fetch(url, {
       ...restConfig,
       headers: {
@@ -76,7 +92,19 @@ class APIClient {
       credentials: 'include',
     });
 
+    // debug: log response status for tracing
+    console.debug('[api-client] Response', {
+      endpoint,
+      status: response.status,
+    });
+
     if (response.status === 401) {
+      console.debug('[api-client] 401 received', {
+        endpoint,
+        token: resolvedToken
+          ? `${String(resolvedToken).slice(0, 10)}...`
+          : null,
+      });
       const hadToken = !!resolvedToken;
 
       if (!hadToken) {
@@ -88,6 +116,10 @@ class APIClient {
       }
 
       const newToken = await this.refreshToken();
+      console.debug('[api-client] refresh result', {
+        endpoint,
+        newToken: newToken ? `${String(newToken).slice(0, 10)}...` : null,
+      });
 
       if (!newToken) {
         throw { status: 401, message: 'Unauthorized' } as ApiError & {
