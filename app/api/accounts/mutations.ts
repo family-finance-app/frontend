@@ -24,8 +24,9 @@ export const useCreateAccount = () => {
       return apiClient.post<ApiSuccess<NewAccount>>('/accounts/create', data);
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.accounts.all,
+        type: 'active',
       });
       return response.message;
     },
@@ -48,11 +49,13 @@ export const useUpdateAccount = () => {
       return apiClient.put<ApiSuccess<UpdatedAccount>>(`/accounts/${id}`, data);
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.accounts.all,
+        type: 'active',
       });
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.transactions.all,
+        type: 'active',
       });
       return response.message;
     },
@@ -70,11 +73,13 @@ export const useDeleteAccount = () => {
       return apiClient.delete<ApiSuccess<DeletedAccount>>(`/accounts/${id}`);
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.accounts.all,
+        type: 'active',
       });
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.transactions.all,
+        type: 'active',
       });
       return response.message;
     },

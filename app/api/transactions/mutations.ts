@@ -30,11 +30,13 @@ export const useCreateTransaction = () => {
       );
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.transactions.all,
+        type: 'active',
       });
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.accounts.all,
+        type: 'active',
       });
 
       return response.message;
@@ -63,11 +65,13 @@ export const useUpdateTransaction = () => {
       );
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.transactions.all,
+        type: 'active',
       });
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.accounts.all,
+        type: 'active',
       });
 
       return response.message;
@@ -88,11 +92,13 @@ export const useDeleteTransaction = () => {
       );
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.transactions.all,
+        type: 'active',
       });
-      await queryClient.invalidateQueries({
+      await queryClient.refetchQueries({
         queryKey: queryKeys.accounts.all,
+        type: 'active',
       });
 
       return response.message;
@@ -115,11 +121,13 @@ export const useCreateTransfer = () => {
         );
       },
       onSuccess: async (response) => {
-        await queryClient.invalidateQueries({
+        await queryClient.refetchQueries({
           queryKey: queryKeys.transactions.all,
+          type: 'active',
         });
-        await queryClient.invalidateQueries({
+        await queryClient.refetchQueries({
           queryKey: queryKeys.accounts.all,
+          type: 'active',
         });
 
         return response.message;

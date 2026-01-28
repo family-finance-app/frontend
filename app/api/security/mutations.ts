@@ -23,7 +23,10 @@ export const useUpdateUserPassword = () => {
       return apiClient.put<ApiSuccess<UpdatedPassword>>('/user/password', data);
     },
     onSuccess: (resposne) => {
-      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      queryCLient.refetchQueries({
+        queryKey: queryKeys.profile.all,
+        type: 'active',
+      });
       return resposne.message;
     },
     onError: (error) => {
@@ -40,7 +43,10 @@ export const useUpdateUserEmail = () => {
       return apiClient.put<ApiSuccess<UpdatedEmail>>('/user/email', data);
     },
     onSuccess: (response) => {
-      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      queryCLient.refetchQueries({
+        queryKey: queryKeys.profile.all,
+        type: 'active',
+      });
       return response.message;
     },
     onError: (error) => {

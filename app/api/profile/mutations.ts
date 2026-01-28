@@ -21,7 +21,10 @@ export const useUpdateProfile = () => {
       return apiClient.put<ApiSuccess<UpdatedUser>>('/user/profile', data);
     },
     onSuccess: (resposne) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      queryClient.refetchQueries({
+        queryKey: queryKeys.profile.all,
+        type: 'active',
+      });
       return resposne.message;
     },
     onError: (error) => {
