@@ -13,8 +13,8 @@ import { useAuth } from '@/components/guards/AuthContext';
 export const useSignUp = () => {
   const { setToken } = useAuth();
 
-  return useMutation<ApiSuccess<NewUser>, ApiError, Partial<SignUpFormData>>({
-    mutationFn: async (data: Partial<SignUpFormData>) => {
+  return useMutation<ApiSuccess<NewUser>, ApiError, SignUpFormData>({
+    mutationFn: async (data: SignUpFormData) => {
       return apiClient.post<ApiSuccess<NewUser>>('/auth/signup', {
         data,
       });
