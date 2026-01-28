@@ -8,6 +8,7 @@ import {
   useState,
   ReactNode,
   useCallback,
+  useRef,
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(() => getAuthToken());
   const queryClient = useQueryClient();
+  const suppressAuthChangeRef = useRef(false);
 
   const invalidateProtectedData = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser });
@@ -41,6 +43,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const setToken = (newToken: string) => {
     console.log('🔐 AuthContext: Setting new token');
+    suppressAuthChangeRef.current = true;
     saveToken(newToken);
     setTokenState(newToken);
 
@@ -49,6 +52,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearToken = useCallback(() => {
     console.log('🔐 AuthContext: Clearing token');
+    suppressAuthChangeRef.current = true;
     removeToken();
     setTokenState(null);
 
@@ -61,11 +65,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'authToken') {
         console.log('🔐 AuthContext: Token changed in storage');
-        setTokenState(e.newValue);
+        const nextToken = e.newValue;
+        const prevToken = token;
+        setTokenState(nextToken);
 
-        if (e.newValue) {
+        if (nextToken && !prevToken) {
           invalidateProtectedData();
-        } else {
+        }
+
+        if (!nextToken) {
           queryClient.clear();
         }
       }
@@ -73,12 +81,21 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const handleAuthChange = () => {
       console.log('🔐 AuthContext: Auth changed event');
+      if (suppressAuthChangeRef.current) {
+        suppressAuthChangeRef.current = false;
+        return;
+      }
       const currentToken = getAuthToken();
+      if (currentToken === token) {
+        return;
+      }
       setTokenState(currentToken);
 
-      if (currentToken) {
+      if (currentToken && !token) {
         invalidateProtectedData();
-      } else {
+      }
+
+      if (!currentToken) {
         queryClient.clear();
       }
     };
@@ -90,7 +107,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('authChanged', handleAuthChange);
     };
-  }, [queryClient, invalidateProtectedData]);
+  }, [queryClient, invalidateProtectedData, token]);
 
   useEffect(() => {
     const handleLogout = () => {

@@ -11,7 +11,6 @@ import { queryKeys } from '@/lib/query-client';
 import { useAuth } from '@/components/guards/AuthContext';
 
 export const useSignUp = () => {
-  const queryClient = useQueryClient();
   const { setToken } = useAuth();
 
   return useMutation<ApiSuccess<NewUser>, ApiError, Partial<SignUpFormData>>({
@@ -25,10 +24,6 @@ export const useSignUp = () => {
         setToken(response.data.accessToken);
         await Promise.resolve();
       }
-
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.auth.currentUser,
-      });
       return response.message;
     },
     onError: (error) => {
@@ -38,7 +33,6 @@ export const useSignUp = () => {
 };
 
 export const useSignIn = () => {
-  const queryClient = useQueryClient();
   const { setToken } = useAuth();
 
   return useMutation<ApiSuccess<Login>, ApiError, SignInFormData>({
@@ -52,11 +46,6 @@ export const useSignIn = () => {
       } else {
         console.error('No token in login response!', response);
       }
-
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.auth.currentUser,
-      });
-
       return response.message;
     },
     onError: (error) => {

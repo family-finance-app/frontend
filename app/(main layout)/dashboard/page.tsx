@@ -6,7 +6,6 @@ import { useMyAccounts } from '@/api/accounts/queries';
 import { useTransactions } from '@/api/transactions/queries';
 import { useCategories } from '@/api/categories/queries';
 import { useExchangeRates } from '@/api/exchangeRate/queries';
-import { useAuth } from '@/hooks/useAuth';
 
 import {
   DashboardHeader,
@@ -41,7 +40,6 @@ export default function Dashboard() {
   const { categories, isLoading: categoriesLoading } = useCategories();
 
   const { exchangeRates } = useExchangeRates();
-  const { isLoading: userLoading } = useAuth();
 
   const { totalBalance } = useTotalBalanceInUAH(accounts);
 
@@ -98,12 +96,7 @@ export default function Dashboard() {
     exchangeRates,
   );
 
-  if (
-    userLoading ||
-    accountsLoading ||
-    transactionsLoading ||
-    categoriesLoading
-  ) {
+  if (accountsLoading || transactionsLoading || categoriesLoading) {
     return <Loader message="Loading dashboard..." />;
   }
 

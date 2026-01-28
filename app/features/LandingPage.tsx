@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-import { useAuth } from '@/hooks';
+import { useAuth } from '@/components/guards/AuthContext';
 
 import { Hero, Features, CTA } from './index';
 

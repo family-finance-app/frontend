@@ -18,7 +18,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
 
   // Используем централизованный AuthContext
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const id = setTimeout(() => setIsMounted(true), 0);
@@ -26,17 +26,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }, []);
 
   // Загружаем пользователя только если есть токен
-  const { user, isLoading, isError, refetch } = useCurrentUser({
+  const { user, isLoading, isError } = useCurrentUser({
     enabled: isAuthenticated,
   });
-
-  // Принудительный refetch при изменении токена
-  useEffect(() => {
-    if (isAuthenticated && isMounted) {
-      console.log('🛡️ Token changed, refetching user');
-      refetch();
-    }
-  }, [token, isAuthenticated, isMounted, refetch]);
 
   // Логика редиректов
   useEffect(() => {

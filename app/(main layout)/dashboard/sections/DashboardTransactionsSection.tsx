@@ -11,7 +11,6 @@ import {
   useUpdateTransaction,
   useDeleteTransaction,
 } from '@/api/transactions/mutations';
-import { queryClient, queryKeys } from '@/lib/query-client';
 
 import { Button, EditModal, DeleteModal, type FormField } from '@/components';
 
@@ -63,8 +62,6 @@ export default function DashboardTransactionsSection({
     if (!deletingTransactionId) return;
     await deleteTransaction.mutateAsync(deletingTransactionId);
     setDeletingTransactionId(null);
-    queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-    queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
@@ -157,8 +154,6 @@ export default function DashboardTransactionsSection({
         },
       });
       handleCloseEditModal();
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     } catch (err: any) {
       console.error('Failed to update transaction', err);
     }

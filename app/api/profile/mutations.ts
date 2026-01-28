@@ -9,8 +9,8 @@ import {
   UpdatedUser,
 } from '@/(main layout)/settings/profile/types';
 
-import { getAuthToken } from '@/utils';
 import { ApiSuccess } from '../types';
+import { queryKeys } from '@/lib/query-client';
 import { ApiError } from 'next/dist/server/api-utils';
 
 export const useUpdateProfile = () => {
@@ -21,7 +21,7 @@ export const useUpdateProfile = () => {
       return apiClient.put<ApiSuccess<UpdatedUser>>('/user/profile', data);
     },
     onSuccess: (resposne) => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
       return resposne.message;
     },
     onError: (error) => {

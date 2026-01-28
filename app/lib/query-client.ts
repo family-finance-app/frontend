@@ -9,7 +9,12 @@ export const queryClient = new QueryClient({
       gcTime: 1000 * 60 * 5, // time in cache
       refetchOnWindowFocus: true,
       refetchOnMount: true,
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        if (error?.status === 401) {
+          return false;
+        }
+        return failureCount < 1;
+      },
     },
     mutations: {
       retry: 1,
