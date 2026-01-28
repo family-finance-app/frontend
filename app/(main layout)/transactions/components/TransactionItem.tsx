@@ -242,7 +242,10 @@ export default function TransactionItem({
             text: 'Edit Transaction',
             type: 'button',
             variant: 'primary',
-            action: () => onEdit?.(transaction),
+            action: () => {
+              setIsModalOpen(false);
+              onEdit?.(transaction);
+            },
           },
           {
             text: 'Delete Transaction',

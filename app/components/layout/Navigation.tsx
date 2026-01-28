@@ -17,34 +17,26 @@ import { ProfileAvatar } from '@/(main layout)/settings/profile';
 
 import { RiAddLine, RiMenuLine } from '@remixicon/react';
 
-import { Logo_light, SuccessMessage, ErrorMessage } from '@/components/ui';
+import { Logo_light } from '@/components/ui';
 
 export default function Navigation() {
   const [notifications] = useState(3);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [notification, setNotification] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
-
-  const showNotification = (type: 'success' | 'error', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 4000);
-  };
-
   const handleTransactionSuccess = (transactionId: number) => {
     setShowTransactionModal(false);
-    showNotification(
-      'success',
-      `Transaction created successfully! ID: ${transactionId}`,
+    window.dispatchEvent(
+      new CustomEvent('transaction:success', {
+        detail: `Transaction created successfully! ID: ${transactionId}`,
+      }),
     );
   };
 
   const handleTransactionError = () => {
-    showNotification(
-      'error',
-      'Failed to create transaction. Please try again.',
+    window.dispatchEvent(
+      new CustomEvent('transaction:error', {
+        detail: 'Failed to create transaction. Please try again.',
+      }),
     );
   };
 
@@ -54,16 +46,6 @@ export default function Navigation() {
 
   return (
     <nav className="fixed z-30 w-full bg-primary-700/95 dark:bg-primary-800 backdrop-blur-md border-b border-primary-600">
-      {notification?.type === 'success' && (
-        <div className="absolute left-1/2 top-2 z-40 w-full max-w-xl -translate-x-1/2 px-4">
-          <SuccessMessage message={notification.message} />
-        </div>
-      )}
-      {notification?.type === 'error' && (
-        <div className="absolute left-1/2 top-2 z-40 w-full max-w-xl -translate-x-1/2 px-4">
-          <ErrorMessage message={notification.message} />
-        </div>
-      )}
       <div className="w-full px-2 sm:px-4 lg:px-8 xl:px-12 2xl:px-16">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-2 sm:gap-4">

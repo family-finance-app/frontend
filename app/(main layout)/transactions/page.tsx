@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import {
@@ -186,7 +186,7 @@ export default function MyTransactions() {
     try {
       await deleteTransaction.mutateAsync(deletingTransactionId);
       setDeletingTransactionId(null);
-      setSuccessMessage(`${deletingItemName} deleted`);
+      setSuccessMessage('Transaction deleted');
       setErrorMessage(null);
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: any) {
@@ -205,6 +205,39 @@ export default function MyTransactions() {
     deletingTransaction?.description ||
     deletingTransaction?.type ||
     'Transaction';
+
+  useEffect(() => {
+    const handleSuccess = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail;
+      setSuccessMessage(detail || 'Transaction created successfully');
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    };
+
+    const handleError = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail;
+      setErrorMessage(detail || 'Failed to create transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
+    };
+
+    window.addEventListener(
+      'transaction:success',
+      handleSuccess as EventListener,
+    );
+    window.addEventListener('transaction:error', handleError as EventListener);
+
+    return () => {
+      window.removeEventListener(
+        'transaction:success',
+        handleSuccess as EventListener,
+      );
+      window.removeEventListener(
+        'transaction:error',
+        handleError as EventListener,
+      );
+    };
+  }, []);
 
   return (
     <div className="space-y-6">
