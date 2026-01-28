@@ -94,6 +94,8 @@ class APIClient {
 
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      Pragma: 'no-cache',
     };
 
     const resolvedToken = token || getAuthToken();
@@ -109,6 +111,7 @@ class APIClient {
         ...headers,
       },
       credentials: 'include',
+      cache: restConfig.cache ?? 'no-store',
     });
 
     console.log(`📥 ${endpoint} - ${response.status}`);
@@ -151,6 +154,7 @@ class APIClient {
         ...restConfig,
         headers: retryHeaders,
         credentials: 'include',
+        cache: restConfig.cache ?? 'no-store',
       });
 
       console.log(`📥 RETRY ${endpoint} - ${retryResponse.status}`);
@@ -216,6 +220,7 @@ class APIClient {
         ...defaultHeaders,
         ...headers,
       },
+      cache: restConfig.cache ?? 'no-store',
     });
 
     if (response.status === 204) {
