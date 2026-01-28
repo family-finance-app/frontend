@@ -13,7 +13,7 @@ import {
 } from '@/(main layout)/transactions/types';
 
 import { ApiError, ApiSuccess } from '../types';
-import { queryKeys } from '@/lib/query-client';
+import { invalidateActiveQueries, queryKeys } from '@/lib/query-client';
 
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
@@ -30,14 +30,8 @@ export const useCreateTransaction = () => {
       );
     },
     onSuccess: async (response) => {
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.transactions.all,
-        type: 'active',
-      });
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.accounts.all,
-        type: 'active',
-      });
+      await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
+      await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
       return response.message;
     },
@@ -65,14 +59,8 @@ export const useUpdateTransaction = () => {
       );
     },
     onSuccess: async (response) => {
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.transactions.all,
-        type: 'active',
-      });
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.accounts.all,
-        type: 'active',
-      });
+      await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
+      await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
       return response.message;
     },
@@ -92,14 +80,8 @@ export const useDeleteTransaction = () => {
       );
     },
     onSuccess: async (response) => {
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.transactions.all,
-        type: 'active',
-      });
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.accounts.all,
-        type: 'active',
-      });
+      await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
+      await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
       return response.message;
     },
@@ -121,14 +103,8 @@ export const useCreateTransfer = () => {
         );
       },
       onSuccess: async (response) => {
-        await queryClient.refetchQueries({
-          queryKey: queryKeys.transactions.all,
-          type: 'active',
-        });
-        await queryClient.refetchQueries({
-          queryKey: queryKeys.accounts.all,
-          type: 'active',
-        });
+        await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
+        await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
         return response.message;
       },
