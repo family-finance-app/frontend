@@ -33,7 +33,12 @@ class APIClient {
         const refreshResp = await fetch(refreshUrl, {
           method: 'POST',
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+            Pragma: 'no-cache',
+          },
+          cache: 'no-store',
         });
 
         console.log('🔄 refreshToken: response status', refreshResp.status);
@@ -167,6 +172,12 @@ class APIClient {
 
       if (!retryResponse.ok) {
         console.log('❌ Retry failed:', retryResponse.status, retryData);
+        if (retryResponse.status === 401) {
+          clearAuthToken();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('auth:logout'));
+          }
+        }
         throw {
           status: retryResponse.status,
           ...retryData,
