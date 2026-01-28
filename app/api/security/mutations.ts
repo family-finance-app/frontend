@@ -9,7 +9,7 @@ import {
   UpdatedPassword,
 } from '@/(main layout)/settings/security/types';
 import { ApiError, ApiSuccess } from '../types';
-import { invalidateActiveQueries, queryKeys } from '@/lib/query-client';
+import { queryKeys } from '@/lib/query-client';
 
 export const useUpdateUserPassword = () => {
   const queryCLient = useQueryClient();
@@ -23,7 +23,7 @@ export const useUpdateUserPassword = () => {
       return apiClient.put<ApiSuccess<UpdatedPassword>>('/user/password', data);
     },
     onSuccess: (resposne) => {
-      invalidateActiveQueries(queryCLient, queryKeys.profile.all);
+      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
       return resposne.message;
     },
     onError: (error) => {
@@ -40,7 +40,7 @@ export const useUpdateUserEmail = () => {
       return apiClient.put<ApiSuccess<UpdatedEmail>>('/user/email', data);
     },
     onSuccess: (response) => {
-      invalidateActiveQueries(queryCLient, queryKeys.profile.all);
+      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
       return response.message;
     },
     onError: (error) => {

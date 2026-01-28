@@ -1,10 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useTransactions } from '@/api/transactions/queries';
-import { useCategories } from '@/api/categories/queries';
-import { useMyAccounts } from '@/api/accounts/queries';
-import { useExchangeRates } from '@/api/exchangeRate/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import { formatCurrencyAmount } from '@/utils';
 import {
   calculateMonthlyIncomeAndExpenses,
@@ -19,10 +16,7 @@ import { BarChart } from '@/components/charts/BarChart';
 import { useColorTheme } from '@/hooks';
 
 export default function Analytics() {
-  const { transactions, isLoading: transactionsLoading } = useTransactions();
-  const { categories } = useCategories();
-  const { accounts } = useMyAccounts();
-  const { exchangeRates } = useExchangeRates();
+  const { transactions, categories, accounts, exchangeRates } = useMainData();
   const exchangeRatesMemoized = useMemo(
     () => exchangeRates || {},
     [exchangeRates],

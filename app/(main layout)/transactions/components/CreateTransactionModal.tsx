@@ -9,16 +9,11 @@ import {
   CurrencyType,
 } from '../types';
 
-import { useCategories } from '@/api/categories/queries';
-import { useMyAccounts } from '@/api/accounts/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import { useCreateTransaction } from '@/api/transactions/mutations';
 import { useCreateTransfer } from '@/api/transactions/mutations';
 import { showGlobalSuccess, showGlobalError } from '@/lib/global-alerts';
-import { queryClient } from '@/lib/query-client';
-import {
-  useExchangeRates,
-  type ExchangeRateMap,
-} from '@/api/exchangeRate/queries';
+import { type ExchangeRateMap } from '@/api/exchangeRate/queries';
 import { convertToUAH } from '@/utils';
 
 import {
@@ -53,9 +48,7 @@ export default function CreateTransactionModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState('');
 
-  const { categories } = useCategories();
-  const { accounts } = useMyAccounts();
-  const { exchangeRates } = useExchangeRates();
+  const { categories, accounts, exchangeRates } = useMainData();
 
   const createMutation = useCreateTransaction();
   const createTransferMutation = useCreateTransfer();

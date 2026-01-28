@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 
-import { useMyAccounts } from '@/api/accounts/queries';
-import { useTransactions } from '@/api/transactions/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import { useUpdateAccount, useDeleteAccount } from '@/api/accounts/mutations';
-import { useCategories } from '@/api/categories/queries';
 
 import { Account, CreateAccountFormData } from '../types';
 import { ApiError } from '@/api/types';
@@ -13,9 +11,7 @@ import {
 } from '@/lib/global-alerts';
 
 export function useAccountsPageData() {
-  const { accounts } = useMyAccounts();
-  const { transactions } = useTransactions();
-  const { categories } = useCategories();
+  const { accounts, transactions, categories } = useMainData();
   const updateAccount = useUpdateAccount();
   const deleteAccount = useDeleteAccount();
 

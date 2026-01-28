@@ -1,14 +1,10 @@
 'use client';
 
-import { useMyAccounts } from '@/api/accounts/queries';
-import { useTransactions } from '@/api/transactions/queries';
-import { useCategories } from '@/api/categories/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 
 import { useTotalBalanceInUAH } from '@/hooks';
 
 import { periodStats } from '@/(main layout)/dashboard';
-
-import { useExchangeRates } from '@/api/exchangeRate/queries';
 
 import {
   enrichTransactions,
@@ -18,10 +14,8 @@ import {
 import { formatCurrencyAmount } from '@/utils';
 
 export function SidebarBalanceWidget() {
-  const { accounts, isLoading: accountsLoading } = useMyAccounts();
-  const { transactions, isLoading: transactionsLoading } = useTransactions();
-  const { categories, isLoading: categoriesLoading } = useCategories();
-  const { exchangeRates } = useExchangeRates();
+  const { accounts, transactions, categories, exchangeRates, isLoading } =
+    useMainData();
 
   const { totalBalance, isLoading: balanceLoading } =
     useTotalBalanceInUAH(accounts);
@@ -39,13 +33,9 @@ export function SidebarBalanceWidget() {
     exchangeRates,
   );
 
-  const isLoading =
-    accountsLoading ||
-    transactionsLoading ||
-    balanceLoading ||
-    categoriesLoading;
+  const isLoadingData = isLoading || balanceLoading;
 
-  if (isLoading) {
+  if (isLoadingData) {
     return (
       <div className="bg-background-50 rounded-lg p-4 space-y-3 animate-pulse">
         <div className="h-4 bg-background-200 rounded w-3/4"></div>

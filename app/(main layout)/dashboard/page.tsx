@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 
-import { useMyAccounts } from '@/api/accounts/queries';
-import { useTransactions } from '@/api/transactions/queries';
-import { useCategories } from '@/api/categories/queries';
-import { useExchangeRates } from '@/api/exchangeRate/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 
 import {
   DashboardHeader,
@@ -35,11 +32,8 @@ export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>(
     'month',
   );
-  const { accounts, isLoading: accountsLoading } = useMyAccounts();
-  const { transactions, isLoading: transactionsLoading } = useTransactions();
-  const { categories, isLoading: categoriesLoading } = useCategories();
-
-  const { exchangeRates } = useExchangeRates();
+  const { accounts, transactions, categories, exchangeRates, isLoading } =
+    useMainData();
 
   const { totalBalance } = useTotalBalanceInUAH(accounts);
 
@@ -96,7 +90,7 @@ export default function Dashboard() {
     exchangeRates,
   );
 
-  if (accountsLoading || transactionsLoading || categoriesLoading) {
+  if (isLoading) {
     return <Loader message="Loading dashboard..." />;
   }
 
@@ -110,7 +104,7 @@ export default function Dashboard() {
           <DashboardBalanceSection
             totalBalance={totalBalance}
             formattedAccounts={formattedAccounts}
-            isLoading={accountsLoading}
+            isLoading={isLoading}
           />
         </div>
 
@@ -155,7 +149,7 @@ export default function Dashboard() {
             transactions={enrichedTransactions}
             accounts={accounts || []}
             categories={categories}
-            isLoading={transactionsLoading}
+            isLoading={isLoading}
           />
         </div>
 
@@ -167,7 +161,7 @@ export default function Dashboard() {
               accounts,
               exchangeRates,
             )}
-            isLoading={categoriesLoading || transactionsLoading}
+            isLoading={isLoading}
           />
         </div>
       </div>

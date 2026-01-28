@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useRef, useState } from 'react';
 
-import { useExchangeRates } from '@/api/exchangeRate/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 
 import { formatCurrencyAmount } from '@/utils';
 
@@ -13,7 +13,7 @@ interface SidebarExchangeRatesWidgetProps {
 export function SidebarExchangeRatesWidget({
   compact = false,
 }: SidebarExchangeRatesWidgetProps) {
-  const { exchangeRates, lastUpdated, isLoading } = useExchangeRates();
+  const { exchangeRates, exchangeRatesUpdatedAt, isLoading } = useMainData();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const infoRef = useRef<HTMLDivElement>(null);
 
@@ -37,15 +37,15 @@ export function SidebarExchangeRatesWidget({
   }, [isInfoOpen]);
 
   const currentRates = useMemo(() => {
-    if (!lastUpdated) return '';
+    if (!exchangeRatesUpdatedAt) return '';
     try {
-      const date = new Date(lastUpdated);
+      const date = new Date(exchangeRatesUpdatedAt);
       return date.toLocaleString('uk-ua');
     } catch (error) {
       console.warn('Failed to format fetchedAt:', error);
       return '';
     }
-  }, [lastUpdated]);
+  }, [exchangeRatesUpdatedAt]);
 
   const currencies = [
     { code: 'USD', label: 'USD' },
@@ -84,8 +84,8 @@ export function SidebarExchangeRatesWidget({
               } md:group-hover:block bg-primary-900/95 border border-primary-700 text-primary-50 text-sm rounded-lg px-4 py-3 whitespace-normal z-80 w-52 backdrop-blur-sm shadow-lg`}
               id="exchange-rate-tooltip"
             >
-              {lastUpdated &&
-                `Monobank exchange rate. Last updated: ${new Date(lastUpdated).toLocaleString('uk-ua')}`}
+              {exchangeRatesUpdatedAt &&
+                `Monobank exchange rate. Last updated: ${new Date(exchangeRatesUpdatedAt).toLocaleString('uk-ua')}`}
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ export function SidebarExchangeRatesWidget({
           Exchange Rates
         </h3>
         <div className="text-xs text-background-500">
-          {lastUpdated && `Updated: ${lastUpdated}`}
+          {exchangeRatesUpdatedAt && `Updated: ${exchangeRatesUpdatedAt}`}
         </div>
       </div>
 

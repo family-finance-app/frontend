@@ -12,7 +12,7 @@ import {
   UpdatedAccount,
 } from '@/(main layout)/accounts/types';
 import { ApiSuccess, ApiError } from '../types';
-import { invalidateActiveQueries, queryKeys } from '@/lib/query-client';
+import { queryKeys } from '@/lib/query-client';
 
 // create, update, or delete FINANCIAL accounts
 
@@ -24,7 +24,9 @@ export const useCreateAccount = () => {
       return apiClient.post<ApiSuccess<NewAccount>>('/accounts/create', data);
     },
     onSuccess: async (response) => {
-      await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
       return response.message;
     },
 
@@ -46,8 +48,12 @@ export const useUpdateAccount = () => {
       return apiClient.put<ApiSuccess<UpdatedAccount>>(`/accounts/${id}`, data);
     },
     onSuccess: async (response) => {
-      await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
-      await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
       return response.message;
     },
     onError: (error) => {
@@ -64,8 +70,12 @@ export const useDeleteAccount = () => {
       return apiClient.delete<ApiSuccess<DeletedAccount>>(`/accounts/${id}`);
     },
     onSuccess: async (response) => {
-      await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
-      await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
       return response.message;
     },
     onError: (error) => {

@@ -3,9 +3,7 @@
 import { useState, useMemo } from 'react';
 import { showGlobalSuccess, showGlobalError } from '@/lib/global-alerts';
 
-import { useTransactions } from '@/api/transactions/queries';
-import { useMyAccounts } from '@/api/accounts/queries';
-import { useCategories } from '@/api/categories/queries';
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import {
   useUpdateTransaction,
   useDeleteTransaction,
@@ -42,10 +40,7 @@ export default function MyTransactions() {
     'all',
   );
 
-  const { transactions, isLoading: transactionsLoading } = useTransactions();
-
-  const { accounts, isLoading: accountsLoading } = useMyAccounts();
-  const { categories, isLoading: categoriesLoading } = useCategories();
+  const { transactions, accounts, categories, isLoading } = useMainData();
   const updateTransaction = useUpdateTransaction();
   const deleteTransaction = useDeleteTransaction();
 
@@ -204,7 +199,7 @@ export default function MyTransactions() {
         onTimeRangeChange={setTimeRange}
       />
 
-      {transactionsLoading ? (
+      {isLoading ? (
         <div className="bg-white rounded-2xl border border-background-200 p-6">
           <div className="animate-pulse">
             <div className="h-6 bg-background-200 rounded w-1/3 mb-6"></div>
