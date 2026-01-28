@@ -11,22 +11,17 @@ export const useLogin = () => {
     formData: SignInFormData,
   ): Promise<ApiSuccess<Login>> => {
     try {
-      console.log('🔐 Starting login...');
       const response = await signInMutation.mutateAsync({
         email: formData.email,
         password: formData.password,
       });
 
       if (!response?.data?.accessToken) {
-        console.error('❌ No token in response');
         return response;
       }
 
-      // Токен уже сохраняется в useSignIn.onSuccess
       await new Promise((resolve) => setTimeout(resolve, 100));
-
       router.push('/dashboard');
-
       return response;
     } catch (error) {
       console.error('Sign in failed', error);

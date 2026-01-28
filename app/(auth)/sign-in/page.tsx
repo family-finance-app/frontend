@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { Login, SignInFormData } from '@/(auth)/types';
@@ -14,7 +13,6 @@ import { roboto } from '@/assets/fonts/fonts';
 import { ApiSuccess } from '@/api/types';
 
 export default function SignIn() {
-  const router = useRouter();
   const colorTheme = useColorTheme();
   const isDarkMode = colorTheme === 'dark';
   const { handleSubmit, isLoading, isError, isSuccess, error, errorMessage } =

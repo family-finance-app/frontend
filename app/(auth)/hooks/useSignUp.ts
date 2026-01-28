@@ -1,9 +1,11 @@
 import { useSignUp } from '@/api/auth/mutations';
 import { NewUser, SignUpFormData } from '@/(auth)/types';
 import { ApiSuccess } from '@/api/types';
+import { useRouter } from 'next/navigation';
 
 export const useSignup = () => {
   const signUpMutation = useSignUp();
+  const router = useRouter();
 
   const handleSubmit = async (
     formData: SignUpFormData,
@@ -14,6 +16,13 @@ export const useSignup = () => {
         password: formData.password,
         terms: formData.terms,
       });
+
+      if (!response?.data?.accessToken) {
+        return response;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      router.push('/dashboard');
       return response;
     } catch (error) {
       console.error('Sign up failed', error);

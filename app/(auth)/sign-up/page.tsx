@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { useSignup, SignUpForm } from '../index';
@@ -11,10 +10,8 @@ import { useColorTheme } from '@/hooks/useColorTheme';
 
 import { roboto } from '@/assets/fonts/fonts';
 import { ApiSuccess } from '@/api/types';
-import { User } from '@/(main layout)/settings/profile/types';
 
 export default function SignUp() {
-  const router = useRouter();
   const colorTheme = useColorTheme();
   const isDarkMode = colorTheme === 'dark';
 
@@ -24,13 +21,11 @@ export default function SignUp() {
   const handleSignUp = async (
     signUpData: SignUpFormData,
   ): Promise<ApiSuccess<NewUser>> => {
-    const result = await handleSubmit({
+    return await handleSubmit({
       email: signUpData.email,
       password: signUpData.password,
       terms: signUpData.terms,
     });
-    if (result) router.push('/dashboard');
-    return result;
   };
 
   return (
