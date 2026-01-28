@@ -19,10 +19,9 @@ export const useCurrentUser = (options?: { enabled?: boolean }) => {
       return response;
     },
     enabled: options?.enabled ?? !!token,
-    retry: false, // НЕ повторяем при 401
-    staleTime: 1000 * 60 * 5, // 5 минут
-    gcTime: 1000 * 60 * 10, // 10 минут
-    // При ошибке НЕ храним старые данные
+    retry: false,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });

@@ -18,17 +18,13 @@ class APIClient {
   }
 
   private async refreshToken(): Promise<string | null> {
-    console.log('🔄 refreshToken: starting refresh...');
-
     if (this.refreshPromise) {
-      console.log('🔄 refreshToken: reusing existing promise');
       return this.refreshPromise;
     }
 
     this.refreshPromise = (async () => {
       try {
         const refreshUrl = `${this.baseURL}/auth/refresh`;
-        console.log('🔄 refreshToken: calling', refreshUrl);
 
         const refreshResp = await fetch(refreshUrl, {
           method: 'POST',
@@ -36,37 +32,28 @@ class APIClient {
           headers: { 'Content-Type': 'application/json' },
         });
 
-        console.log('🔄 refreshToken: response status', refreshResp.status);
-
         if (refreshResp.ok) {
           const refreshData = await refreshResp.json();
-          console.log('🔄 refreshToken: response data', refreshData);
 
           const newAccess =
             (refreshData?.data as any)?.accessToken ||
             (refreshData as any)?.accessToken;
 
           if (newAccess) {
-            console.log(
-              '✅ refreshToken: got new token',
-              newAccess.substring(0, 20) + '...',
-            );
+            console.log(newAccess.substring(0, 20) + '...');
             setAuthToken(newAccess);
             return newAccess;
           }
         }
 
-        console.log('❌ refreshToken: failed to get token, triggering logout');
         clearAuthToken();
 
-        // КРИТИЧНО: dispatch события для logout
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('auth:logout'));
         }
 
         return null;
       } catch (e) {
-        console.error('❌ refreshToken: error', e);
         clearAuthToken();
 
         if (typeof window !== 'undefined') {
@@ -75,7 +62,6 @@ class APIClient {
 
         return null;
       } finally {
-        console.log('🔄 refreshToken: clearing promise');
         this.refreshPromise = null;
       }
     })();
@@ -89,8 +75,6 @@ class APIClient {
   ): Promise<T> {
     const { token, headers, ...restConfig } = config;
     const url = `${this.baseURL}${endpoint}`;
-
-    console.log(`📤 ${config.method || 'GET'} ${endpoint}`);
 
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
@@ -113,14 +97,11 @@ class APIClient {
       cache: restConfig.cache ?? 'no-store',
     });
 
-    console.log(`📥 ${endpoint} - ${response.status}`);
-
-    // Обработка 401
+    // refresh handling
     if (response.status === 401) {
       const hadToken = !!resolvedToken;
 
       if (!hadToken) {
-        console.log('❌ 401: No token present');
         const responseData = await response.json();
         throw {
           status: 401,
@@ -128,27 +109,22 @@ class APIClient {
         } as ApiError & { status: number };
       }
 
-      console.log('🔄 401: Attempting refresh...');
       const newToken = await this.refreshToken();
 
       if (!newToken) {
-        console.log('❌ Refresh failed');
         throw { status: 401, message: 'Unauthorized' } as ApiError & {
           status: number;
         };
       }
 
-      console.log('✅ Refresh successful, retrying with new token');
+      console.log('Token refreshed');
 
-      // КРИТИЧНО: делаем НОВЫЙ fetch с новым токеном
-      // Не переиспользуем старый response!
       const retryHeaders: HeadersInit = {
         ...defaultHeaders,
         ...headers,
         Authorization: `Bearer ${newToken}`,
       };
 
-      // НОВЫЙ fetch запрос
       const retryResponse = await fetch(url, {
         ...restConfig,
         headers: retryHeaders,
@@ -156,9 +132,6 @@ class APIClient {
         cache: restConfig.cache ?? 'no-store',
       });
 
-      console.log(`📥 RETRY ${endpoint} - ${retryResponse.status}`);
-
-      // Обработка retry response
       if (retryResponse.status === 204) {
         return {} as T;
       }
@@ -166,34 +139,29 @@ class APIClient {
       const retryData = await retryResponse.json();
 
       if (!retryResponse.ok) {
-        console.log('❌ Retry failed:', retryResponse.status, retryData);
         throw {
           status: retryResponse.status,
           ...retryData,
         } as ApiError & { status: number };
       }
 
-      console.log('✅ Retry successful');
+      console.log('Retry successful');
       return retryData as T;
     }
 
-    // Обработка 204 No Content
     if (response.status === 204) {
       return {} as T;
     }
 
-    // Обработка всех остальных ответов
     const responseData = await response.json();
 
     if (!response.ok) {
-      console.log('❌ Request failed:', response.status, responseData);
       throw {
         status: response.status,
         ...responseData,
       } as ApiError & { status: number };
     }
 
-    console.log('✅ Request successful');
     return responseData as T;
   }
 

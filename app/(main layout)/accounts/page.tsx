@@ -14,8 +14,6 @@ import { CardGrid, FormField } from '@/components';
 
 import { currencyList, SELECT_ACCOUNT_TYPES } from './types';
 
-import { formatCurrencyAmount } from '@/utils';
-
 import { useAccountsPageData } from './hooks/useAccountsPageData';
 import AccountsHeader from './components/AccountsHeader';
 import AccountsLists from './components/AccountsLists';

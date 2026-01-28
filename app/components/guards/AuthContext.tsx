@@ -1,4 +1,3 @@
-// contexts/auth-context.tsx
 'use client';
 
 import {
@@ -42,7 +41,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const setToken = (newToken: string) => {
-    console.log('🔐 AuthContext: Setting new token');
     suppressAuthChangeRef.current = true;
     saveToken(newToken);
     setTokenState(newToken);
@@ -51,20 +49,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const clearToken = useCallback(() => {
-    console.log('🔐 AuthContext: Clearing token');
     suppressAuthChangeRef.current = true;
     removeToken();
     setTokenState(null);
 
-    // КРИТИЧНО: полностью очищаем весь кеш
     queryClient.clear();
   }, [queryClient]);
 
-  // Слушаем изменения токена из других вкладок/источников
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'authToken') {
-        console.log('🔐 AuthContext: Token changed in storage');
         const nextToken = e.newValue;
         const prevToken = token;
         setTokenState(nextToken);
@@ -80,7 +74,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const handleAuthChange = () => {
-      console.log('🔐 AuthContext: Auth changed event');
       if (suppressAuthChangeRef.current) {
         suppressAuthChangeRef.current = false;
         return;
@@ -111,7 +104,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleLogout = () => {
-      console.log('🔐 AuthContext: Logout event received from API client');
       clearToken();
     };
 

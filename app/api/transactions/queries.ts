@@ -24,6 +24,5 @@ export const useTransactions = () => {
     enabled: !!token,
   });
 
-  console.log(query.data);
   return { transactions: query.data?.data || [], ...query };
 };

@@ -26,32 +26,7 @@ export function MainDataProvider({ children }: { children: React.ReactNode }) {
   const categoriesQuery = useCategories();
   const exchangeRatesQuery = useExchangeRates();
 
-  useEffect(() => {
-    console.log('🧭 MainData snapshot', {
-      accounts: accountsQuery.accounts?.length ?? 0,
-      transactions: transactionsQuery.transactions?.length ?? 0,
-      categories: categoriesQuery.categories?.length ?? 0,
-      exchangeRatesReady: !!exchangeRatesQuery.exchangeRates,
-      isLoading: {
-        accounts: accountsQuery.isLoading,
-        transactions: transactionsQuery.isLoading,
-        categories: categoriesQuery.isLoading,
-        exchangeRates: exchangeRatesQuery.isLoading,
-      },
-      isFetching: {
-        accounts: accountsQuery.isFetching,
-        transactions: transactionsQuery.isFetching,
-        categories: categoriesQuery.isFetching,
-        exchangeRates: exchangeRatesQuery.isFetching,
-      },
-      error: {
-        accounts: accountsQuery.isError,
-        transactions: transactionsQuery.isError,
-        categories: categoriesQuery.isError,
-        exchangeRates: exchangeRatesQuery.isError,
-      },
-    });
-  }, [
+  useEffect(() => {}, [
     accountsQuery.accounts,
     accountsQuery.isLoading,
     accountsQuery.isFetching,
