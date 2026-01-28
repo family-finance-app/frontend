@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { showGlobalSuccess, showGlobalError } from '@/lib/global-alerts';
 
 import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import {
@@ -16,7 +15,13 @@ import {
   formatTransactions,
 } from './index';
 import { Category, Transaction } from './types';
-import { EditModal, DeleteModal, type FormField } from '@/components';
+import {
+  EditModal,
+  DeleteModal,
+  SuccessMessage,
+  ErrorMessage,
+  type FormField,
+} from '@/components';
 
 interface EditTransactionFormData {
   type: string;
@@ -39,6 +44,8 @@ export default function MyTransactions() {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year' | 'all'>(
     'all',
   );
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { transactions, accounts, categories, isLoading } = useMainData();
   const updateTransaction = useUpdateTransaction();
@@ -147,9 +154,14 @@ export default function MyTransactions() {
           description: data.description || '',
         },
       });
-      showGlobalSuccess('Transaction updated');
+      setSuccessMessage('Transaction updated');
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+      handleCloseEditModal();
     } catch (err: any) {
-      showGlobalError(err?.message || 'Failed to update transaction');
+      setErrorMessage(err?.message || 'Failed to update transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
@@ -174,10 +186,14 @@ export default function MyTransactions() {
     try {
       await deleteTransaction.mutateAsync(deletingTransactionId);
       setDeletingTransactionId(null);
-      showGlobalSuccess(`${deletingItemName} deleted`);
+      setSuccessMessage(`${deletingItemName} deleted`);
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: any) {
       setDeletingTransactionId(null);
-      showGlobalError(err?.message || 'Failed to delete transaction');
+      setErrorMessage(err?.message || 'Failed to delete transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
@@ -192,6 +208,16 @@ export default function MyTransactions() {
 
   return (
     <div className="space-y-6">
+      {successMessage && (
+        <div className="mb-2">
+          <SuccessMessage message={successMessage} />
+        </div>
+      )}
+      {errorMessage && (
+        <div className="mb-2">
+          <ErrorMessage message={errorMessage} />
+        </div>
+      )}
       <TransactionsFilters
         filterType={filterType}
         timeRange={timeRange}

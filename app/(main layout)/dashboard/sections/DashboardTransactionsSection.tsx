@@ -12,7 +12,14 @@ import {
   useDeleteTransaction,
 } from '@/api/transactions/mutations';
 
-import { Button, EditModal, DeleteModal, type FormField } from '@/components';
+import {
+  Button,
+  EditModal,
+  DeleteModal,
+  SuccessMessage,
+  ErrorMessage,
+  type FormField,
+} from '@/components';
 
 import { Account } from '@/(main layout)/accounts/types';
 
@@ -53,6 +60,8 @@ export default function DashboardTransactionsSection({
   const [deletingTransactionId, setDeletingTransactionId] = useState<
     number | null
   >(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleDeleteTransaction = (transactionId: number) => {
     setDeletingTransactionId(transactionId);
@@ -60,8 +69,18 @@ export default function DashboardTransactionsSection({
 
   const handleConfirmDelete = async () => {
     if (!deletingTransactionId) return;
-    await deleteTransaction.mutateAsync(deletingTransactionId);
-    setDeletingTransactionId(null);
+    try {
+      await deleteTransaction.mutateAsync(deletingTransactionId);
+      setDeletingTransactionId(null);
+      setSuccessMessage('Transaction deleted');
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err: any) {
+      setDeletingTransactionId(null);
+      setErrorMessage(err?.message || 'Failed to delete transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
@@ -154,8 +173,13 @@ export default function DashboardTransactionsSection({
         },
       });
       handleCloseEditModal();
+      setSuccessMessage('Transaction updated');
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: any) {
-      console.error('Failed to update transaction', err);
+      setErrorMessage(err?.message || 'Failed to update transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
@@ -183,6 +207,16 @@ export default function DashboardTransactionsSection({
 
   return (
     <>
+      {successMessage && (
+        <div className="mb-3">
+          <SuccessMessage message={successMessage} />
+        </div>
+      )}
+      {errorMessage && (
+        <div className="mb-3">
+          <ErrorMessage message={errorMessage} />
+        </div>
+      )}
       <TransactionList
         transactions={transactions}
         title="Recent Transactions"

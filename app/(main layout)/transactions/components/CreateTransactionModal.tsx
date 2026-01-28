@@ -12,16 +12,10 @@ import {
 import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import { useCreateTransaction } from '@/api/transactions/mutations';
 import { useCreateTransfer } from '@/api/transactions/mutations';
-import { showGlobalSuccess, showGlobalError } from '@/lib/global-alerts';
 import { type ExchangeRateMap } from '@/api/exchangeRate/queries';
 import { convertToUAH } from '@/utils';
 
-import {
-  FormInput,
-  FormActions,
-  FormSelectList,
-  SuccessMessage,
-} from '@/components';
+import { FormInput, FormActions, FormSelectList } from '@/components';
 
 import { roboto } from '@/assets/fonts/fonts';
 
@@ -46,7 +40,6 @@ export default function CreateTransactionModal({
   const [accountRecipientId, setAccountRecipientId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState('');
 
   const { categories, accounts, exchangeRates } = useMainData();
 
@@ -134,13 +127,10 @@ export default function CreateTransactionModal({
       createTransferMutation.mutate(transferData, {
         onSuccess: (data: any) => {
           onSuccess(data?.transaction?.id ?? 0);
-          setSuccess('Transaction created successfully');
-          showGlobalSuccess('Transaction created successfully');
         },
         onError: () => {
           onError?.();
           setErrors(newErrors);
-          showGlobalError('Failed to create transaction');
         },
       });
     } else {
@@ -165,11 +155,9 @@ export default function CreateTransactionModal({
       createMutation.mutate(payload, {
         onSuccess: (data: any) => {
           onSuccess(data.id || 0);
-          showGlobalSuccess('Transaction created successfully');
         },
         onError: () => {
           onError?.();
-          showGlobalError('Failed to create transaction');
         },
       });
     }

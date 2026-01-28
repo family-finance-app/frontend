@@ -17,9 +17,9 @@ export const useCategories = () => {
   const query = useQuery<ApiSuccess<Category[]>, ApiError>({
     queryKey: queryKeys.categories.all,
     queryFn: async () => {
-      const resposne =
+      const response =
         await apiClient.get<ApiSuccess<Category[]>>('/categories');
-      return resposne;
+      return response;
     },
     enabled: !!token,
   });

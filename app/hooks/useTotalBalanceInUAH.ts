@@ -13,7 +13,7 @@ export function useTotalBalanceInUAH(accounts: Account[]) {
     const balance = calculateTotalBalanceInUAH(accounts, exchangeRates);
     return {
       totalBalance: balance,
-      isLoading: exchangeRates,
+      isLoading: isLoading || !exchangeRates,
       error: null,
     };
   } catch (error) {
