@@ -24,7 +24,7 @@ export const useCurrentUser = (options?: { enabled?: boolean }) => {
     gcTime: 1000 * 60 * 10, // 10 минут
     // При ошибке НЕ храним старые данные
     refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   return { user: query.data?.data ?? undefined, ...query };

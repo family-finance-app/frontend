@@ -7,7 +7,7 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60, // data is considered fresh during 1 min
       gcTime: 1000 * 60 * 5, // time in cache
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       refetchOnMount: true,
       retry: (failureCount, error: any) => {
         if (error?.status === 401) {
@@ -61,7 +61,6 @@ export const invalidateActiveQueries = (
 ) => {
   return client.invalidateQueries({
     queryKey,
-    exact: true,
     refetchType: 'active',
   });
 };

@@ -5,6 +5,7 @@ import { apiClient } from '@/lib/api-client';
 import {
   CreateTransactionFormData,
   CreateTransferFormData,
+  Transaction,
   DeletedTransaction,
   NewTransaction,
   NewTransfer,
@@ -30,6 +31,20 @@ export const useCreateTransaction = () => {
       );
     },
     onSuccess: async (response) => {
+      queryClient.setQueryData(
+        queryKeys.transactions.all,
+        (oldData: ApiSuccess<Transaction[]> | undefined) => {
+          const prev = oldData?.data ?? [];
+          return {
+            ...(oldData ?? {
+              statusCode: 200,
+              message: response.message,
+              data: [],
+            }),
+            data: [response.data, ...prev],
+          } as ApiSuccess<Transaction[]>;
+        },
+      );
       await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
       await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
@@ -59,6 +74,22 @@ export const useUpdateTransaction = () => {
       );
     },
     onSuccess: async (response) => {
+      queryClient.setQueryData(
+        queryKeys.transactions.all,
+        (oldData: ApiSuccess<Transaction[]> | undefined) => {
+          const prev = oldData?.data ?? [];
+          return {
+            ...(oldData ?? {
+              statusCode: 200,
+              message: response.message,
+              data: [],
+            }),
+            data: prev.map((item) =>
+              item.id === response.data.id ? response.data : item,
+            ),
+          } as ApiSuccess<Transaction[]>;
+        },
+      );
       await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
       await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
@@ -80,6 +111,20 @@ export const useDeleteTransaction = () => {
       );
     },
     onSuccess: async (response) => {
+      queryClient.setQueryData(
+        queryKeys.transactions.all,
+        (oldData: ApiSuccess<Transaction[]> | undefined) => {
+          const prev = oldData?.data ?? [];
+          return {
+            ...(oldData ?? {
+              statusCode: 200,
+              message: response.message,
+              data: [],
+            }),
+            data: prev.filter((item) => item.id !== response.data.id),
+          } as ApiSuccess<Transaction[]>;
+        },
+      );
       await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
       await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
@@ -103,6 +148,20 @@ export const useCreateTransfer = () => {
         );
       },
       onSuccess: async (response) => {
+        queryClient.setQueryData(
+          queryKeys.transactions.all,
+          (oldData: ApiSuccess<Transaction[]> | undefined) => {
+            const prev = oldData?.data ?? [];
+            return {
+              ...(oldData ?? {
+                statusCode: 200,
+                message: response.message,
+                data: [],
+              }),
+              data: [response.data, ...prev],
+            } as ApiSuccess<Transaction[]>;
+          },
+        );
         await invalidateActiveQueries(queryClient, queryKeys.transactions.all);
         await invalidateActiveQueries(queryClient, queryKeys.accounts.all);
 
