@@ -95,7 +95,6 @@ class APIClient {
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-store',
-      Pragma: 'no-cache',
     };
 
     const resolvedToken = token || getAuthToken();
