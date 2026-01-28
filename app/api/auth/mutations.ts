@@ -15,9 +15,7 @@ export const useSignUp = () => {
 
   return useMutation<ApiSuccess<NewUser>, ApiError, SignUpFormData>({
     mutationFn: async (data: SignUpFormData) => {
-      return apiClient.post<ApiSuccess<NewUser>>('/auth/signup', {
-        data,
-      });
+      return apiClient.post<ApiSuccess<NewUser>>('/auth/signup', data);
     },
     onSuccess: async (response) => {
       if (response.data?.accessToken) {

@@ -92,7 +92,7 @@ export default function SignUpForm({
         {isError && errorMessage?.trim() && (
           <ErrorMessage
             message={`Registration failed. ${errorMessage ? errorMessage : ''}`}
-            classname="dark:bg-danger-100 p-4"
+            classname="dark:bg-danger-100 bg-danger-100 p-4"
           />
         )}
 
