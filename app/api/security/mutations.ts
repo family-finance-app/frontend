@@ -22,8 +22,11 @@ export const useUpdateUserPassword = () => {
     mutationFn: async (data) => {
       return apiClient.put<ApiSuccess<UpdatedPassword>>('/user/password', data);
     },
-    onSuccess: (resposne) => {
-      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    onSuccess: async (resposne) => {
+      await queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      await queryCLient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
+      });
       return resposne.message;
     },
     onError: (error) => {
@@ -41,6 +44,9 @@ export const useUpdateUserEmail = () => {
     },
     onSuccess: async (response) => {
       await queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      await queryCLient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
+      });
       return response.message;
     },
     onError: (error) => {

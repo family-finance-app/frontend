@@ -11,7 +11,6 @@ import { ChangePasswordFormData, ChangePasswordFormErrors } from '../types';
 import { validateChangePasswordForm } from '../utils/validation';
 
 import {
-  Button,
   ErrorMessage,
   SuccessMessage,
   FormInput,
@@ -90,7 +89,7 @@ export default function ChangePasswordForm({
   };
 
   return (
-    <div className="bg-white dark:bg-background-100 border-l-2 dark:border-l-primary-700 rounded-2xl shadow-financial p-6">
+    <div className="bg-background-50 dark:bg-background-100 border-l-2 dark:border-l-primary-700 rounded-2xl shadow-financial p-6">
       <h2
         className={`${roboto.className} text-lg font-bold text-primary-800 dark:text-stack-800 mb-6`}
       >
@@ -98,9 +97,7 @@ export default function ChangePasswordForm({
       </h2>
 
       {showSuccess && (
-        <div className="mb-6 p-4 bg-green-50 dark:bg-background-100 border border-green-200 dark:border-primary-500 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
-          <SuccessMessage message="Password changed successfully" />
-        </div>
+        <SuccessMessage message="Password changed successfully" />
       )}
 
       {errors.general && (

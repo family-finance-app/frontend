@@ -76,7 +76,7 @@ export default function ChangeEmail({
   };
 
   return (
-    <div className="bg-white dark:bg-background-100 border-l-2 dark:border-l-primary-700 rounded-2xl shadow-financial p-6">
+    <div className="bg-background-50 dark:bg-background-100 border-l-2 dark:border-l-primary-700 rounded-2xl shadow-financial p-6">
       <h2
         className={`${roboto.className} text-lg font-bold text-primary-800 dark:text-stack-800 mb-2`}
       >

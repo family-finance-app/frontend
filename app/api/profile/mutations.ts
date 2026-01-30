@@ -22,6 +22,9 @@ export const useUpdateProfile = () => {
     },
     onSuccess: async (response) => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
+      });
       return response.message;
     },
     onError: (error) => {
