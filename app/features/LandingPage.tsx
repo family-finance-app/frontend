@@ -8,6 +8,7 @@ import { useAuth } from '@/components/guards/AuthContext';
 import { Hero, Features, CTA } from './index';
 
 import { Footer, Logo_light } from '@/components';
+import { RiCloseLine, RiMenuLine } from '@remixicon/react';
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -77,12 +78,16 @@ export default function LandingPage() {
               </div>
 
               <button
-                className="sm:hidden inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/20 px-4 py-2 text-sm font-semibold text-background-800 shadow-inner shadow-white/40 backdrop-blur"
+                className="sm:hidden inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-primary-500"
                 onClick={() => setIsMobileNavOpen((prev) => !prev)}
                 aria-controls="landing-mobile-nav"
                 aria-expanded={isMobileNavOpen}
               >
-                {isMobileNavOpen ? 'Close' : 'Menu'}
+                {isMobileNavOpen ? (
+                  <RiCloseLine className="text-background-100" />
+                ) : (
+                  <RiMenuLine />
+                )}
               </button>
             </div>
           </div>
