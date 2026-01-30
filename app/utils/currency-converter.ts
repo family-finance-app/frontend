@@ -16,7 +16,11 @@ export function convertToUAH(
 
   const rate = rates?.[currency];
   if (!rate) {
-    console.warn(`Exchange rate for ${currency} not found, falling back to 1`);
+    if (rates && Object.keys(rates).length > 0) {
+      console.warn(
+        `Exchange rate for ${currency} not found, falling back to 1`,
+      );
+    }
     return amount;
   }
 
