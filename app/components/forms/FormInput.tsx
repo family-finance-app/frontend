@@ -17,6 +17,9 @@ interface FormInputProps {
   required?: boolean;
   disabled?: boolean;
   classname?: 'auth' | 'internal';
+  autocomplete?: 'on' | 'off';
+  onFocus?: React.FocusEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
 }
 
 export default function FormInput({
@@ -32,6 +35,9 @@ export default function FormInput({
   required = false,
   disabled = false,
   classname,
+  autocomplete,
+  onFocus,
+  onBlur,
 }: FormInputProps) {
   return (
     <div>
@@ -60,7 +66,8 @@ export default function FormInput({
           placeholder={placeholder}
           required={required}
           disabled={disabled}
-          className={`w-full ${
+          autoComplete={autocomplete}
+          className={`block w-full min-w-0 max-w-full box-border ${
             span ? 'pl-8' : 'pl-4'
           } pr-4 py-2 border rounded-md transition-colors focus:outline-none focus:ring-2 ${
             classname === 'internal'
@@ -78,6 +85,11 @@ export default function FormInput({
               : ''
           }
         `}
+          style={
+            type === 'date' ? { width: '100%', maxWidth: '100%' } : undefined
+          }
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
       </div>
 
