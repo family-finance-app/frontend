@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import Link from 'next/link';
@@ -18,30 +18,55 @@ import { ProfileAvatar } from '@/(main layout)/settings/profile';
 import { RiAddLine, RiMenuLine } from '@remixicon/react';
 
 import { Logo_light } from '@/components/ui';
+import { ErrorMessage, SuccessMessage } from '@/components';
 
 export default function Navigation() {
   const [notifications] = useState(3);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const handleTransactionSuccess = (transactionId: number) => {
-    setShowTransactionModal(false);
-    window.dispatchEvent(
-      new CustomEvent('transaction:success', {
-        detail: `Transaction created successfully! ID: ${transactionId}`,
-      }),
-    );
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const messageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (messageTimeoutRef.current) {
+        clearTimeout(messageTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const scheduleMessageClear = (onComplete?: () => void) => {
+    if (messageTimeoutRef.current) {
+      clearTimeout(messageTimeoutRef.current);
+    }
+
+    messageTimeoutRef.current = setTimeout(() => {
+      setSuccessMessage(null);
+      setErrorMessage(null);
+      onComplete?.();
+    }, 1000);
   };
 
-  const handleTransactionError = () => {
-    window.dispatchEvent(
-      new CustomEvent('transaction:error', {
-        detail: 'Failed to create transaction. Please try again.',
-      }),
-    );
+  const handleTransactionSuccess = (transactionId: number) => {
+    setSuccessMessage(`New transaction added successfully!`);
+    setErrorMessage(null);
+    scheduleMessageClear(() => setShowTransactionModal(false));
+  };
+
+  const handleTransactionError = (message: string) => {
+    setErrorMessage(message);
+    setSuccessMessage(null);
+    scheduleMessageClear();
   };
 
   const handleTransactionCancel = () => {
     setShowTransactionModal(false);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+    if (messageTimeoutRef.current) {
+      clearTimeout(messageTimeoutRef.current);
+    }
   };
 
   return (
@@ -125,6 +150,16 @@ export default function Navigation() {
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
+                {successMessage && (
+                  <div className="mb-4">
+                    <SuccessMessage message={successMessage} />
+                  </div>
+                )}
+                {errorMessage && (
+                  <div className="mb-4">
+                    <ErrorMessage message={errorMessage} />
+                  </div>
+                )}
                 <CreateTransactionModal
                   onSuccess={handleTransactionSuccess}
                   onCancel={handleTransactionCancel}
