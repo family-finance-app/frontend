@@ -1,9 +1,11 @@
 // requests configuration
-
+// COMMENTED LINES ARE FOR LOCAL DEVELOPMENT
 import { ApiError } from 'next/dist/server/api-utils';
 import { getAuthToken, setAuthToken, clearAuthToken } from '@/utils';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+// const IS_DEV = process.env.NODE_ENV === 'development';
+// const DEFAULT_BASE_URL = IS_DEV ? '/api' : BACKEND_URL;
 
 export interface RequestConfig extends RequestInit {
   token?: string;
@@ -13,6 +15,9 @@ class APIClient {
   private baseURL: string | undefined;
   private refreshPromise: Promise<string | null> | null = null;
 
+  // constructor(baseURL = DEFAULT_BASE_URL) {
+  //   this.baseURL = baseURL;
+  // }
   constructor(baseURL = BACKEND_URL) {
     this.baseURL = baseURL;
   }
