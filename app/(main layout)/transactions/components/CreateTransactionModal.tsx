@@ -12,7 +12,6 @@ import {
 import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import { useCreateTransaction } from '@/api/transactions/mutations';
 import { useCreateTransfer } from '@/api/transactions/mutations';
-import { type ExchangeRateMap } from '@/api/exchangeRate/queries';
 import { convertToUAH } from '@/utils';
 
 import { FormInput, FormActions, FormSelectList } from '@/components';
@@ -22,7 +21,7 @@ import { roboto } from '@/assets/fonts/fonts';
 interface CreateTransactionFormProps {
   onSuccess: (transactionId: number) => void;
   onCancel?: () => void;
-  onError?: () => void;
+  onError?: (message: string) => void;
 }
 
 export default function CreateTransactionModal({
@@ -128,8 +127,8 @@ export default function CreateTransactionModal({
         onSuccess: (data: any) => {
           onSuccess(data?.transaction?.id ?? 0);
         },
-        onError: () => {
-          onError?.();
+        onError: (error: any) => {
+          onError?.(error?.message ?? 'Failed to create transfer');
           setErrors(newErrors);
         },
       });
@@ -156,8 +155,8 @@ export default function CreateTransactionModal({
         onSuccess: (data: any) => {
           onSuccess(data.id || 0);
         },
-        onError: () => {
-          onError?.();
+        onError: (error: any) => {
+          onError?.(error?.message ?? 'Failed to create transaction');
         },
       });
     }
