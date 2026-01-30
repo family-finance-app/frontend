@@ -39,8 +39,8 @@ export const useUpdateUserEmail = () => {
     mutationFn: async (data) => {
       return apiClient.put<ApiSuccess<UpdatedEmail>>('/user/email', data);
     },
-    onSuccess: (response) => {
-      queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    onSuccess: async (response) => {
+      await queryCLient.invalidateQueries({ queryKey: queryKeys.profile.all });
       return response.message;
     },
     onError: (error) => {

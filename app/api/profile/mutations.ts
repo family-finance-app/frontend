@@ -20,8 +20,8 @@ export const useUpdateProfile = () => {
     mutationFn: async (data) => {
       return apiClient.put<ApiSuccess<UpdatedUser>>('/user/profile', data);
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
       return response.message;
     },
     onError: (error) => {
