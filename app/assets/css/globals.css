@@ -116,9 +116,11 @@
   --border-radius-4xl: 2rem;
   --border-radius-5xl: 2.5rem;
 
-  --shadow-financial: 0 4px 6px -1px rgba(91, 136, 127, 0.1),
+  --shadow-financial:
+    0 4px 6px -1px rgba(91, 136, 127, 0.1),
     0 2px 4px -1px rgba(91, 136, 127, 0.06);
-  --shadow-financial-lg: 0 10px 15px -3px rgba(91, 136, 127, 0.1),
+  --shadow-financial-lg:
+    0 10px 15px -3px rgba(91, 136, 127, 0.1),
     0 4px 6px -2px rgba(91, 136, 127, 0.05);
   --shadow-inset-financial: inset 0 2px 4px 0 rgba(91, 136, 127, 0.06);
 
@@ -291,4 +293,23 @@ body {
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/*ios-specific date input*/
+input[type='date'] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@supports (-webkit-touch-callout: none) {
+  input[type='date'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-right: 0.75rem;
+  }
 }
