@@ -14,7 +14,7 @@ import {
 import { useCurrentUser } from '@/api/auth/queries';
 import { useSignOut } from '@/api/auth/mutations';
 
-import { getInitials } from '../index';
+import { displayName, getInitials } from '../index';
 
 import Button_signout from './Button_signout';
 
@@ -55,7 +55,6 @@ export default function ProfileAvatar() {
   };
 
   const isAuthenticated = !!user;
-  const hasName = !!user?.name;
   const initials = getInitials(user?.name, user?.email);
 
   if (!isAuthenticated) {
@@ -86,7 +85,9 @@ export default function ProfileAvatar() {
           )}
         </div>
         <span className="text-sm font-medium">
-          {hasName ? user?.name : user?.email}
+          {user.name
+            ? displayName(user?.name)
+            : user?.email.slice(0, 20) + '...'}
         </span>
         {isDropdownOpen ? (
           <RiArrowUpSLine className="text-background-200" />
@@ -118,7 +119,9 @@ export default function ProfileAvatar() {
           <Button_signout
             onclick={handleLogout}
             disabled={signOut.isPending}
-            iconSize="w-4 h-4"
+            // iconSize="w-5 h-5"
+            iconColor="primary-500"
+            className="w-full text-left px-4.5 py-2 flex items-center space-x-2 text-primary-800 text-sm lg:text-sm"
           />
         </div>
       )}

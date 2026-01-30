@@ -2,11 +2,21 @@
 
 import { useState } from 'react';
 
-import { User, type ChangeProfileFormData } from '../types';
+import {
+  ChangeProfileFormErrors,
+  User,
+  type ChangeProfileFormData,
+} from '../types';
 
-import { SuccessMessage, FormActions, FormInput } from '@/components';
+import {
+  SuccessMessage,
+  FormActions,
+  FormInput,
+  ErrorMessage,
+} from '@/components';
 
 import { roboto } from '@/assets/fonts/fonts';
+import { validateChangeProfileForm } from '../utils';
 
 interface ProfileEditFormProps {
   user: User;
@@ -21,11 +31,12 @@ export default function ProfileEditForm({
 }: ProfileEditFormProps) {
   const [formData, setFormData] = useState<ChangeProfileFormData>({
     name: user?.name || '',
-    birthdate: user?.birthdate || '',
+    birthdate: user.birthdate || '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errors, setErrors] = useState<ChangeProfileFormErrors>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,6 +48,13 @@ export default function ProfileEditForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validationErrors = validateChangeProfileForm(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     if (onSubmit && !isSubmitting) {
       setIsSubmitting(true);
       try {
@@ -44,11 +62,15 @@ export default function ProfileEditForm({
           ...formData,
           birthdate: formData.birthdate
             ? new Date(formData.birthdate).toISOString()
-            : formData.birthdate,
+            : undefined,
         };
         await onSubmit(data);
+        setErrors({});
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
+      } catch (error: any) {
+        setErrors({ general: error.message });
+        setTimeout(() => setErrors({}), 3000);
       } finally {
         setIsSubmitting(false);
       }
@@ -63,11 +85,9 @@ export default function ProfileEditForm({
         Personal Information
       </h2>
 
-      {showSuccess && (
-        <div className="mb-6 p-4 bg-green-50  dark:bg-background-100 border border-green-200 dark:border-primary-500 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top">
-          <SuccessMessage message="Profile updated successfully" />
-        </div>
-      )}
+      {showSuccess && <SuccessMessage message="Profile updated successfully" />}
+      {errors.general && <ErrorMessage message={errors.general} />}
+      {errors.name && <ErrorMessage message={errors.name} />}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormInput
@@ -82,13 +102,17 @@ export default function ProfileEditForm({
         />
 
         <FormInput
-          label={{ type: 'dateOfBirth', text: 'Date of Birth' }}
+          label={{
+            type: 'dateOfBirth',
+            text: user.birthdate
+              ? new Date(user.birthdate || '').toLocaleDateString('ua-UA')
+              : 'Enter your birthdate',
+          }}
           name="birthdate"
           type="date"
           id="birthdate"
-          value={formData.birthdate}
+          value={formData.birthdate ?? ''}
           onChange={handleInputChange}
-          placeholder={user.birthdate}
           classname="internal"
         />
 

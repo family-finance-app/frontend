@@ -1,4 +1,4 @@
-export default function getInitials(name?: string, email?: string) {
+export function getInitials(name?: string, email?: string) {
   if (name) {
     const words = name.trim().split(' ');
     if (words.length === 1) {
@@ -14,4 +14,14 @@ export default function getInitials(name?: string, email?: string) {
   }
 
   return '';
+}
+
+export function displayName(name: string) {
+  const parts = name.trim().split(/\s+/) ?? [];
+  if (parts.length <= 1) {
+    return name;
+  }
+  const firstName = parts[0];
+  const lastInitial = parts[parts.length - 1]?.[0] ?? '';
+  return `${firstName} ${lastInitial}.`;
 }

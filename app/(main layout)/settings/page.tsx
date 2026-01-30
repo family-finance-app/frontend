@@ -68,16 +68,13 @@ export default function Settings() {
 
   return (
     <div className="w-full max-w-full sm:max-w-3xl lg:max-w-4xl mx-auto min-h-[calc(100vh-4rem)] bg-linear-to-br from-background-50 to-background-100 dark:from-primary-800 dark:to-primary-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-background-100 dark:border-background-700 shadow-financial overflow-hidden box-border">
-      <div className="bg-white dark:bg-background-200 rounded-2xl p-6 mb-8 border border-background-200 dark:border-background-800 shadow-sm">
+      <div className="rounded-2xl p-6 mb-8 ">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary-400 to-primary-600 dark:from-primary-600 dark:to-primary-800 flex items-center justify-center text-white dark:text-background-100 text-xl font-bold shadow-lg">
-            {getInitials(user.name)}
-          </div>
           <div className="flex-1">
-            <h2 className="text-xl font-semibold text-background-800 dark:text-stack-800">
+            <h2 className="lg:text-xl md:text-xl sm:text-sm font-semibold text-background-800 dark:text-background-200">
               {user.name || 'User'}
             </h2>
-            <p className="text-background-500 dark:text-stack-700 text-sm">
+            <p className="text-background-500 dark:text-stack-300 text-sm">
               {user.email}
             </p>
           </div>
@@ -85,8 +82,9 @@ export default function Settings() {
             <Button_Signout
               onclick={handleLogout}
               disabled={signOut.isPending}
-              className="text-primary-800 font-bold"
-              iconColor="primary-800"
+              className="text-stack-600 dark:text-background-400 font-semibold"
+              iconColor="background-400"
+              iconSize="w-4 h-4 sm:w-5 sm:h-5"
             />
           </div>
         </div>

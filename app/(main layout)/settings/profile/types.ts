@@ -1,6 +1,12 @@
 export interface ChangeProfileFormData {
   name: string;
-  birthdate: string;
+  birthdate?: string;
+}
+
+export interface ChangeProfileFormErrors {
+  name?: string;
+
+  general?: string;
 }
 
 export interface User {

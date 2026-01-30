@@ -7,10 +7,15 @@ export const useUpdateProfileForm = () => {
 
   const handleSubmit = async (formData: ChangeProfileFormData) => {
     try {
-      await updateProfileMutation.mutateAsync({
+      const payload: ChangeProfileFormData = {
         name: formData.name,
-        birthdate: formData.birthdate,
-      });
+      };
+
+      if (formData.birthdate) {
+        payload.birthdate = formData.birthdate;
+      }
+
+      await updateProfileMutation.mutateAsync(payload);
     } catch (error) {
       console.error('Failed to update profile:', error);
       throw error;

@@ -1,1 +1,3 @@
-export { default as getInitials } from './getInitials';
+export { getInitials } from './getInitials';
+export { displayName } from './getInitials';
+export * from './validation';
