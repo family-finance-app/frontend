@@ -34,6 +34,16 @@ export default function AccountTransactionList({
     };
   };
 
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+    if (dateA === dateB) {
+      return b.id - a.id;
+    }
+
+    return dateB - dateA;
+  });
+
   const typeConfig = {
     INCOME: {
       color: 'text-success-700 dark:text-primary-200',
@@ -84,7 +94,7 @@ export default function AccountTransactionList({
         </h3>
       </div>
       <div className="divide-y divide-background-100 dark:divide-background-200 dark:bg-background-50 max-h-[700px] overflow-y-auto">
-        {transactions.map((transaction) => (
+        {sortedTransactions.map((transaction) => (
           <div
             key={transaction.id}
             className="p-4 hover:bg-background-50 dark:hover:bg-background-100 transition-colors"
