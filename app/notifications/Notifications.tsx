@@ -46,7 +46,7 @@ export default function Notifications() {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute left-20 lg:right-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 top-full mt-2 w-[calc(100vw-2rem)] max-w-sm sm:max-w-none sm:w-80 bg-white dark:bg-primary-800 rounded-2xl shadow-2xl border border-background-100 dark:border-background-700 z-50 animate-scale-in">
+          <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[calc(100vw-1rem)] max-w-[20rem] sm:left-auto sm:translate-x-0 sm:right-0 sm:w-80 bg-white dark:bg-primary-800 rounded-2xl shadow-2xl border border-background-100 dark:border-background-700 z-50 animate-scale-in">
             <div className="p-4 border-b border-background-100 dark:border-background-700">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-primary-800 dark:text-background-100">
