@@ -6,8 +6,8 @@ import { useCurrentUser } from '@/api/auth/queries';
 import { useUpdatePassword } from '@/(main layout)/settings/hooks/useUpdatePassword';
 import { useUpdateEmail } from '@/(main layout)/settings/hooks/useUpdateEmail';
 import {
-  ChangePassword,
-  ChangeEmail,
+  ChangePasswordForm,
+  ChangeEmailForm,
   TwoFactorAuth,
 } from '@/(main layout)/settings/security';
 import { ChangePasswordFormData, ChangeEmailFormData } from './types';
@@ -59,12 +59,12 @@ export default function SecuritySettings() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChangePassword
+        <ChangePasswordForm
           onSubmit={handlePasswordChange}
           isLoading={isUpdating}
         />
 
-        <ChangeEmail
+        <ChangeEmailForm
           currentEmail={user.email}
           onSubmit={handleEmailChange}
           isLoading={isLoading}
