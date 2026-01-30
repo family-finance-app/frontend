@@ -152,7 +152,7 @@ export default function SignUpForm({
               I agree to the{' '}
               <Link
                 href="/sign-up" // TODO: write terms and conditions
-                className="text-primary-700 hover:text-moss-300"
+                className="text-primary-700 dark:text-background-300 hover:text-moss-300"
               >
                 Terms and Conditions
               </Link>

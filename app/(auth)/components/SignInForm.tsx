@@ -52,6 +52,7 @@ export default function SignInForm({
 
     if (!validateForm(formData)) return;
 
+    console.log('New login');
     try {
       await onSubmit(formData);
       setFormData({ email: '', password: '' });
@@ -86,6 +87,7 @@ export default function SignInForm({
           error={errors.email ? errors.email : ''}
           placeholder="email@example.com"
           classname="auth"
+          autocomplete="on"
         />
 
         <FormInput
@@ -98,6 +100,7 @@ export default function SignInForm({
           error={errors.password ? errors.password : ''}
           placeholder="••••••••"
           classname="auth"
+          autocomplete="on"
         />
 
         <Button
