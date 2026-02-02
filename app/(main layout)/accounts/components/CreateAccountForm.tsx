@@ -25,6 +25,8 @@ import {
   FormSelectGrid,
 } from '@/components';
 
+import { useOnboardingTrigger } from '@/onboarding';
+
 interface CreateAccountFormProps {
   onSuccess?: (accountName: string) => void;
   onError?: (errorMessage: string) => void;
@@ -39,6 +41,7 @@ export default function CreateAccountForm({
   const createMutation = useCreateAccount();
   const { formData, setFormField, reset } = useAccountForm();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { onAccountCreated } = useOnboardingTrigger();
 
   const selectedCurrency = currencyList.find(
     (curr) => curr.value === formData.currency,
@@ -73,6 +76,7 @@ export default function CreateAccountForm({
       const result = await createMutation.mutateAsync(accountData);
 
       onSuccess?.(formData.name);
+      onAccountCreated(); // Trigger onboarding step completion
       reset();
     } catch (error) {
       const createAccountErrors = handleCreateAccountErrors(error);

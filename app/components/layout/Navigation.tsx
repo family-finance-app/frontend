@@ -95,6 +95,7 @@ export default function Navigation() {
 
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
             <button
+              id="add-transaction-button"
               onClick={() => setShowTransactionModal(true)}
               className="flex items-center justify-center md:space-x-2 p-1.5 sm:p-2 md:px-4 md:py-2 bg-primary-500 hover:bg-primary-400 text-white rounded-lg md:rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
               aria-label="Add transaction"

@@ -105,7 +105,7 @@ export default function ProfileEditForm({
           label={{
             type: 'dateOfBirth',
             text: user.birthdate
-              ? new Date(user.birthdate || '').toLocaleDateString('ua-UA')
+              ? `Date of birth: ${new Date(user.birthdate || '').toLocaleDateString('ua-UA')}`
               : 'Enter your birthdate',
           }}
           name="birthdate"

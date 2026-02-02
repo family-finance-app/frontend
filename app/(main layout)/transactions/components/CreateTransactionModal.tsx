@@ -18,6 +18,8 @@ import { FormInput, FormActions, FormSelectList } from '@/components';
 
 import { roboto } from '@/assets/fonts/fonts';
 
+import { useOnboardingTrigger } from '@/onboarding';
+
 interface CreateTransactionFormProps {
   onSuccess: (transactionId: number) => void;
   onCancel?: () => void;
@@ -41,6 +43,7 @@ export default function CreateTransactionModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { categories, accounts, exchangeRates } = useMainData();
+  const { onTransactionCreated } = useOnboardingTrigger();
 
   const createMutation = useCreateTransaction();
   const createTransferMutation = useCreateTransfer();
@@ -126,6 +129,7 @@ export default function CreateTransactionModal({
       createTransferMutation.mutate(transferData, {
         onSuccess: (data: any) => {
           onSuccess(data?.transaction?.id ?? 0);
+          onTransactionCreated(); // Trigger onboarding step completion
         },
         onError: (error: any) => {
           onError?.(error?.message ?? 'Failed to create transfer');
@@ -154,6 +158,7 @@ export default function CreateTransactionModal({
       createMutation.mutate(payload, {
         onSuccess: (data: any) => {
           onSuccess(data.id || 0);
+          onTransactionCreated(); // Trigger onboarding step completion
         },
         onError: (error: any) => {
           onError?.(error?.message ?? 'Failed to create transaction');
