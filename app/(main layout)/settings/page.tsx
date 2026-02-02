@@ -8,9 +8,11 @@ import {
   RiShieldKeyholeLine,
   RiBankCardLine,
   RiArrowRightSLine,
+  RiGuideLine,
 } from '@remixicon/react';
 import { getInitials, Button_Signout } from './profile/index';
 import { useSignOut } from '@/api/auth/mutations';
+import { useOnboarding } from '@/onboarding';
 
 interface SettingsItem {
   title: string;
@@ -24,6 +26,7 @@ export default function Settings() {
   const router = useRouter();
   const { user, isLoading } = useCurrentUser();
   const signOut = useSignOut();
+  const { resetOnboarding, startOnboarding } = useOnboarding();
 
   const handleLogout = async () => {
     try {
@@ -32,6 +35,11 @@ export default function Settings() {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+  };
+
+  const handleRestartTutorial = () => {
+    resetOnboarding();
+    startOnboarding();
   };
 
   const settingsItems: SettingsItem[] = [
@@ -115,6 +123,26 @@ export default function Settings() {
             <RiArrowRightSLine className="w-5 h-5 text-background-400 dark:text-background-700 group-hover:text-primary-700 group-hover:translate-x-1 transition-all self-start sm:self-center" />
           </button>
         ))}
+
+        <button
+          onClick={handleRestartTutorial}
+          className="w-full text-left bg-white dark:bg-stack-200 rounded-2xl border border-background-200 dark:border-background-700 p-5 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-200 group flex flex-col items-start gap-4 sm:flex-row sm:items-center"
+        >
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0 bg-primary-400 text-background-100 dark:bg-background-100 dark:text-stack-600">
+            <RiGuideLine />
+          </div>
+
+          <div className="flex-1 min-w-0 w-full ">
+            <h3 className="text-lg font-semibold text-background-800 group-hover:text-primary-700 transition-colors">
+              Getting Started Guide
+            </h3>
+            <p className="text-sm text-background-500 dark:text-background-700 truncate">
+              Restart the tutorial to learn how to use the app
+            </p>
+          </div>
+
+          <RiArrowRightSLine className="w-5 h-5 text-background-400 dark:text-background-700 group-hover:text-primary-700 group-hover:translate-x-1 transition-all self-start sm:self-center" />
+        </button>
       </div>
 
       <div className="mt-12 text-center">

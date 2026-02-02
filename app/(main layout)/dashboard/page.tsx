@@ -100,12 +100,14 @@ export default function Dashboard() {
       <DashboardHeader timeframe={timeframe} onTimeframeChange={setTimeframe} />
 
       <div className="space-y-6 xl:space-y-0 xl:grid xl:grid-cols-3 xl:gap-8">
-        <div className="xl:col-span-1">
-          <DashboardBalanceSection
-            totalBalance={totalBalance}
-            formattedAccounts={formattedAccounts}
-            isLoading={isLoading}
-          />
+        <div className="xl:col-span-1" id="dashboard-balance-section">
+          <div id="total-balance-widget">
+            <DashboardBalanceSection
+              totalBalance={totalBalance}
+              formattedAccounts={formattedAccounts}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
 
         {/* timeframe select for small (s) and medium (m) screens */}
@@ -127,7 +129,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="xl:col-span-2">
+        <div className="xl:col-span-2" id="dashboard-stats-section">
           <DashboardStatsSection
             income={period.income}
             expenses={period.expenses}

@@ -20,14 +20,16 @@ export const AccountsHeader: React.FC<{
       </div>
 
       <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
-        <Button
-          text={showCreateForm ? 'Cancel' : '+ Add Account'}
-          type="button"
-          variant={showCreateForm ? 'outline' : 'primary'}
-          size="md"
-          className="w-full sm:w-auto"
-          onClick={() => setShowCreateForm(!showCreateForm)}
-        />
+        <div id="add-account-button">
+          <Button
+            text={showCreateForm ? 'Cancel' : '+ Add Account'}
+            type="button"
+            variant={showCreateForm ? 'outline' : 'primary'}
+            size="md"
+            className="w-full sm:w-auto"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          />
+        </div>
       </div>
     </div>
   );
