@@ -28,6 +28,7 @@ Family Finance helps users track personal and shared family finances with real-t
 
 - Node.js 18.17 or later
 - npm, yarn, pnpm, or bun
+- Backend setup (server, database) [https://github.com/family-finance-app/backend]
 
 ### Installation
 
