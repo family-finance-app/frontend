@@ -87,7 +87,7 @@ export default function ProfileAvatar() {
         <span className="text-sm font-medium">
           {user.name
             ? displayName(user?.name)
-            : user?.email.slice(0, 20) + '...'}
+            : user?.email.slice(0, 15) + '...'}
         </span>
         {isDropdownOpen ? (
           <RiArrowUpSLine className="text-background-200" />
