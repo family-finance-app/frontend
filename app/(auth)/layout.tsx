@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Authentication - FamilyFinance',
@@ -13,26 +12,9 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-linear-to-br from-background-50 via-background-200 to-primary-600 dark:from-background-700 dark:via-primary-700 dark:to-stack-700">
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
-          <Link href="/">
-            <div className="flex items-center justify-center mb-8">
-              <Image
-                src="/icons/logo-icon.svg"
-                alt="FamilyFinance Logo"
-                width={24}
-                height={24}
-                className="mr-3"
-              />
-              <span className="text-2xl text-gray-900 dark:text-white">
-                FamilyFinance
-              </span>
-            </div>
-          </Link>
-
-          {children}
-        </div>
+        <div className="mx-auto w-full max-w-sm lg:w-96">{children}</div>
       </div>
 
       <div className="hidden lg:block relative w-0 flex-2">
@@ -41,6 +23,7 @@ export default function AuthLayout({
           alt="Authentication background"
           fill
           className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
         />
       </div>
     </div>

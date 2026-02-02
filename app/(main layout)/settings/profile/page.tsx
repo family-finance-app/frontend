@@ -1,14 +1,11 @@
 'use client';
 
 import { roboto } from '@/assets/fonts/fonts';
-import Button from '@/components/ui/Button_financial';
+import Button from '@/components/ui/Button';
 import { useCurrentUser } from '@/api/auth/queries';
-import { useUpdateProfileForm } from '@/hooks/useUpdateProfile';
-import {
-  ProfileEditForm,
-  LinkedResources,
-  type ProfileFormData,
-} from '@/components/settings/profile';
+import { useUpdateProfileForm } from '@/(main layout)/settings/hooks/useUpdateProfile';
+import { ProfileEditForm, LinkedResources } from './index';
+import { ChangeProfileFormData } from './types';
 
 export default function ProfileSettings() {
   const { data: user, isLoading: userLoading } = useCurrentUser();
@@ -17,7 +14,7 @@ export default function ProfileSettings() {
   // TODO: Replace with actual family groups query
   const familyGroups = [{ id: 1, name: 'My Family', membersCount: 3 }];
 
-  const handleProfileSubmit = async (data: ProfileFormData) => {
+  const handleProfileSubmit = async (data: ChangeProfileFormData) => {
     await handleSubmit(data);
   };
 
@@ -31,17 +28,14 @@ export default function ProfileSettings() {
 
   return (
     <div className="space-y-8">
-      {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1
-            className={`${roboto.className} text-3xl font-bold text-background-900 mb-2`}
+            className={`${roboto.className} text-3xl font-bold text-primary-800 mb-2`}
           >
             Profile Settings
           </h1>
-          <p className="text-background-600">
-            Manage your personal information
-          </p>
+          <p className="text-primary-800">Manage your personal information</p>
         </div>
 
         <div className="mt-4 lg:mt-0">
@@ -55,16 +49,14 @@ export default function ProfileSettings() {
         </div>
       </div>
 
-      {/* Edit Form */}
       <div className="max-w-2xl">
         <ProfileEditForm
-          user={user}
+          user={user.data}
           onSubmit={handleProfileSubmit}
           isLoading={isSaving}
         />
       </div>
 
-      {/* Family Groups */}
       {familyGroups && familyGroups.length > 0 && (
         <LinkedResources familyGroups={familyGroups} accounts={[]} />
       )}

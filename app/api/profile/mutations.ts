@@ -1,25 +1,34 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
+
+import {
+  ChangeProfileFormData,
+  UpdatedUser,
+} from '@/(main layout)/settings/profile/types';
+
+import { ApiSuccess } from '../types';
 import { queryKeys } from '@/lib/query-client';
-import { User, UserResponse } from '@/types/profile';
-import { getAuthToken } from '@/utils/token';
+import { ApiError } from 'next/dist/server/api-utils';
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (formData: Partial<User>): Promise<UserResponse> => {
-      const token = getAuthToken();
-      return apiClient.put<UserResponse>('/user/profile', formData, {
-        token: token || undefined,
-      });
+  return useMutation<ApiSuccess<UpdatedUser>, ApiError, ChangeProfileFormData>({
+    mutationFn: async (data) => {
+      return apiClient.put<ApiSuccess<UpdatedUser>>('/user/profile', data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.profile.all,
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.auth.currentUser,
       });
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };

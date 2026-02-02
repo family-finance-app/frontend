@@ -1,103 +1,40 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
-import {
-  getTimeUntilNextUpdate,
-  isNearUpdateTime,
-} from '@/api/exchangeRate/scheduler';
-import {
-  getCachedRates,
-  setCachedRates,
-  ExchangeRate,
-  DEFAULT_RATES,
-} from '@/api/exchangeRate/cache';
+import { useAuth } from '@/components/guards/AuthContext';
+import { queryKeys } from '@/lib/query-client';
+import { ApiSuccess } from '../types';
+import { ApiError } from 'next/dist/server/api-utils';
 
-export interface CurrencyRateResponse {
-  r030: number;
-  txt: string;
-  rate: number;
-  cc: string;
-  exchangedate: string;
+export interface ExchangeRateMap {
+  [code: string]: number;
 }
 
-const NBU_API_URL = process.env.NEXT_PUBLIC_NBU_API_URL;
-
-async function fetchExchangeRates(): Promise<ExchangeRate> {
-  try {
-    // use central api client for third-party requests
-    const data = await apiClient.externalGet<CurrencyRateResponse[]>(
-      NBU_API_URL ||
-        'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json'
-    );
-
-    const rates: ExchangeRate = { UAH: 1 };
-
-    // parse currencies (USD, EUR, etc.)
-    data.forEach((item) => {
-      const cc = (item.cc || '').toUpperCase();
-      if (cc === 'USD') {
-        rates.USD = item.rate;
-      } else if (cc === 'EUR') {
-        rates.EUR = item.rate;
-      }
-    });
-
-    return rates;
-  } catch (error) {
-    console.warn('⚠️ Using fallback exchange rates (API unavailable)');
-    return DEFAULT_RATES;
-  }
+export interface ExchangeRatesResponse {
+  rates: ExchangeRateMap;
+  fetchedAt: string;
 }
 
-// React Query hook for exchange rates, fetches on mount and refetches according to schedule (8 AM and 3 PM), caches results to minimize API calls
+// get exchange rates from backend; also supplies defaults
 export const useExchangeRates = () => {
-  const queryClient = useQueryClient();
+  const { token } = useAuth();
 
-  const query = useQuery({
-    queryKey: ['exchange-rates'],
-    queryFn: async (): Promise<ExchangeRate> => {
-      // return cached rates if available and not near scheduled update
-      const cached = getCachedRates();
-      if (cached && !isNearUpdateTime()) {
-        return cached;
-      }
+  const query = useQuery<ApiSuccess<ExchangeRatesResponse>, ApiError>({
+    queryKey: queryKeys.exchangeRate.all,
 
-      const rates = await fetchExchangeRates();
-      setCachedRates(rates);
-      return rates;
+    queryFn: async () => {
+      const response =
+        await apiClient.get<ApiSuccess<ExchangeRatesResponse>>('/currency');
+      return response;
     },
-    staleTime: 1000 * 60 * 60 * 24,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    enabled: !!token,
   });
 
-  // schedule precise invalidation at next target times (8:00, 15:00)
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    function scheduleNext() {
-      const ms = getTimeUntilNextUpdate();
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(async () => {
-        try {
-          await queryClient.invalidateQueries({ queryKey: ['exchange-rates'] });
-        } catch (e) {
-          console.warn('Failed to invalidate exchange-rates query', e);
-        }
-        scheduleNext();
-      }, ms);
-    }
-
-    scheduleNext();
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [queryClient]);
-
-  return query;
+  return {
+    exchangeRates: query.data?.data.rates,
+    lastUpdated: query.data?.data.fetchedAt,
+    ...query,
+  };
 };

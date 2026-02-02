@@ -1,28 +1,30 @@
 'use client';
 
-// fetch current authenticated user
-
 import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
 import { queryKeys } from '@/lib/query-client';
-import { User, UserResponse } from '@/types/profile';
-import { getAuthToken } from '@/utils/token';
 
-// get current user based on token sent to server with query parameters
-export const useCurrentUser = () => {
-  return useQuery({
+import { useAuth } from '@/components/guards/AuthContext';
+import { ApiError, ApiSuccess } from '../types';
+import { CurrentUser } from '@/(auth)/types';
+
+// get current authenticated user
+export const useCurrentUser = (options?: { enabled?: boolean }) => {
+  const { token } = useAuth();
+  const query = useQuery<ApiSuccess<CurrentUser>, ApiError>({
     queryKey: queryKeys.auth.currentUser,
-    queryFn: async (): Promise<User> => {
-      const token = getAuthToken(); // Get token fresh each time
-      if (!token) {
-        throw new Error('No auth token');
-      }
-      const response = await apiClient.get<UserResponse>('/auth/me', {
-        token: token,
-      });
-      return response.user;
+    queryFn: async () => {
+      const response = await apiClient.get<ApiSuccess<CurrentUser>>('/auth/me');
+      return response;
     },
-    enabled: !!getAuthToken(), // Check token fresh each time
-    staleTime: 1000 * 60 * 10, // 10min
+    enabled: options?.enabled ?? !!token,
+    retry: false,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
+
+  return { user: query.data?.data ?? undefined, ...query };
 };

@@ -1,82 +1,85 @@
 'use client';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { apiClient } from '@/lib/api-client';
+
+import {
+  CreateAccountFormData,
+  DeletedAccount,
+  EditAccountFormData,
+  NewAccount,
+  UpdatedAccount,
+} from '@/(main layout)/accounts/types';
+import { ApiSuccess, ApiError } from '../types';
+import { queryKeys } from '@/lib/query-client';
+
 // create, update, or delete FINANCIAL accounts
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
-import { queryKeys } from '@/lib/query-client';
-import { CreateAccountFormData, Account } from '@/types/account';
-import { getAuthToken } from '@/utils/token';
-
-// create new account (card, cash etc)
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (formData: CreateAccountFormData): Promise<Account> => {
-      const token = getAuthToken();
-      return apiClient.post<Account>(
-        '/accounts/create',
-        {
-          name: formData.name,
-          type: formData.type,
-          balance: formData.balance,
-          currency: formData.currency,
-        },
-        { token: token || undefined }
-      );
+  return useMutation<ApiSuccess<NewAccount>, ApiError, CreateAccountFormData>({
+    mutationFn: async (data) => {
+      return apiClient.post<ApiSuccess<NewAccount>>('/accounts/create', data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
+      return response.message;
+    },
+
+    onError: (error) => {
+      return error.message;
     },
   });
 };
 
-// update account
 export const useUpdateAccount = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<CreateAccountFormData>;
-    }): Promise<Account> => {
-      const token = getAuthToken();
-      return apiClient.put<Account>(`/accounts/${id}`, data, {
-        token: token || undefined,
-      });
+  return useMutation<
+    ApiSuccess<UpdatedAccount>,
+    ApiError,
+    { id: number; data: Partial<EditAccountFormData> }
+  >({
+    mutationFn: async ({ id, data }) => {
+      return apiClient.put<ApiSuccess<UpdatedAccount>>(`/accounts/${id}`, data);
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.accounts.detail(variables.id),
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };
 
-// delete account
 export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: number): Promise<void> => {
-      const token = getAuthToken();
-      return apiClient.delete<void>(`/accounts/${id}`, {
-        token: token || undefined,
-      });
+  return useMutation<ApiSuccess<DeletedAccount>, ApiError, { id: number }>({
+    mutationFn: async ({ id }) => {
+      return apiClient.delete<ApiSuccess<DeletedAccount>>(`/accounts/${id}`);
     },
-    onSuccess: (_, id) => {
-      queryClient.removeQueries({
-        queryKey: queryKeys.accounts.detail(id),
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };

@@ -1,92 +1,223 @@
 'use client';
 
-import { useState } from 'react';
-import { Transaction } from '@/types/transaction';
-import { useMyTransactions } from '@/api/transactions/queries';
-import { useMyAccounts } from '@/api/accounts/queries';
-import { useCategories } from '@/api/categories/queries';
-import TransactionList from '@/components/ui/TransactionList';
-import EditTransactionModal from '@/components/ui/EditTransactionModal';
-import Button from '@/components/ui/Button';
+import { useState, useMemo } from 'react';
+
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 import {
-  TransactionsHeader,
-  // TransactionsStats,
+  useUpdateTransaction,
+  useDeleteTransaction,
+} from '@/api/transactions/mutations';
+import {
+  TransactionList,
   TransactionsFilters,
-  TransactionSuccessMessage,
-  CreateTransactionSection,
-} from '@/components/transactions';
-import {
   filterTransactions,
-  calculateTransactionStats,
-} from '@/utils/transactions';
-import { enrichTransactionsWithData } from '@/utils/transactions';
-import { formatTransactionsForList } from '@/utils/transactions';
+  enrichTransactions,
+  formatTransactions,
+} from './index';
+import { Category, Transaction } from './types';
+import {
+  EditModal,
+  DeleteModal,
+  SuccessMessage,
+  ErrorMessage,
+  type FormField,
+} from '@/components';
+
+interface EditTransactionFormData {
+  type: string;
+  amount: string;
+  date: string;
+  categoryId: string;
+  description: string;
+}
 
 export default function MyTransactions() {
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deletingTransactionId, setDeletingTransactionId] = useState<
+    number | null
+  >(null);
   const [filterType, setFilterType] = useState<
     'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER'
   >('all');
-  const [timeRange, setTimeRange] = useState<
-    'week' | 'month' | 'quarter' | 'year' | 'all'
-  >('all');
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year' | 'all'>(
+    'all',
+  );
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { data: transactions, isLoading: transactionsLoading } =
-    useMyTransactions();
-  const { data: accounts, isLoading: accountsLoading } = useMyAccounts();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { transactions, accounts, categories, isLoading } = useMainData();
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
 
-  const formattedTransactions = formatTransactionsForList(transactions || []);
+  const formattedTransactions = formatTransactions(transactions || []);
 
-  const enrichedTransactions = enrichTransactionsWithData(
+  const enrichedTransactions = enrichTransactions(
     formattedTransactions,
-    accounts || [],
-    categories || []
+    accounts,
+    categories,
   );
 
   const filteredTransactions = filterTransactions(
     enrichedTransactions,
     filterType,
-    timeRange
+    timeRange,
   );
 
-  const stats = calculateTransactionStats(filteredTransactions);
+  const transactionTypes = [
+    { value: 'INCOME', label: 'Income' },
+    { value: 'EXPENSE', label: 'Expense' },
+    { value: 'TRANSFER', label: 'Transfer' },
+  ];
 
-  const showSuccessMessage = () => {
-    setIsVisible(true);
-    setShowCreateForm(false);
+  const filteredCategories = useMemo(() => {
+    if (!editingTransaction || !categories) return [];
+    return categories.filter(
+      (category: Category) => category.type === editingTransaction.type,
+    );
+  }, [categories, editingTransaction]);
 
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 3000);
+  const categoryOptions = filteredCategories.map((category: Category) => ({
+    value: category.id.toString(),
+    label: category.name,
+  }));
+
+  const transactionFormFields: FormField[] = editingTransaction
+    ? [
+        {
+          name: 'type',
+          label: 'Type',
+          type: 'select',
+          required: true,
+          options: transactionTypes,
+        },
+        {
+          name: 'amount',
+          label: 'Amount',
+          type: 'number',
+          required: true,
+          placeholder: '0.00',
+        },
+        {
+          name: 'date',
+          label: 'Date',
+          type: 'date',
+          required: true,
+        },
+        {
+          name: 'categoryId',
+          label: 'Category',
+          type: 'select',
+          required: true,
+          options: categoryOptions,
+        },
+        {
+          name: 'description',
+          label: 'Description (Optional)',
+          type: 'textarea',
+          placeholder: 'Add a description to this transaction...',
+        },
+      ]
+    : [];
+
+  const validateTransactionForm = (
+    data: EditTransactionFormData,
+  ): Partial<Record<keyof EditTransactionFormData, string>> => {
+    const errors: Partial<Record<keyof EditTransactionFormData, string>> = {};
+
+    if (!data.amount) {
+      errors.amount = 'Amount is required';
+    }
+
+    if (!data.date) {
+      errors.date = 'Date is required';
+    }
+
+    if (!data.categoryId) {
+      errors.categoryId = 'Category is required';
+    }
+
+    return errors;
+  };
+
+  const handleSaveTransaction = async (data: EditTransactionFormData) => {
+    if (!editingTransaction) return;
+
+    try {
+      await updateTransaction.mutateAsync({
+        id: editingTransaction.id,
+        data: {
+          amount: parseFloat(data.amount),
+          date: data.date,
+          categoryId: parseInt(data.categoryId, 10),
+          description: data.description || '',
+        },
+      });
+      setSuccessMessage('Transaction updated');
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+      handleCloseEditModal();
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to update transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
+    console.log('Opening edit modal for transaction:', transaction);
     setEditingTransaction(transaction);
     setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
+    console.log('Closing edit modal');
     setIsEditModalOpen(false);
     setEditingTransaction(null);
   };
 
+  const handleDeleteTransaction = (transactionId: number) => {
+    setDeletingTransactionId(transactionId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTransactionId) return;
+    try {
+      await deleteTransaction.mutateAsync(deletingTransactionId);
+      setDeletingTransactionId(null);
+      setSuccessMessage('Transaction deleted');
+      setErrorMessage(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err: any) {
+      setDeletingTransactionId(null);
+      setErrorMessage(err?.message || 'Failed to delete transaction');
+      setSuccessMessage(null);
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
+  };
+
+  const deletingTransaction = filteredTransactions.find(
+    (t) => t.id === deletingTransactionId,
+  );
+
+  const deletingItemName =
+    deletingTransaction?.description ||
+    deletingTransaction?.type ||
+    'Transaction';
+
   return (
     <div className="space-y-6">
-      {/* <TransactionsHeader onAddClick={() => setShowCreateForm(true)} /> */}
-
-      <TransactionSuccessMessage visible={isVisible} />
-
-      {/* <CreateTransactionSection
-        isVisible={showCreateForm}
-        onSuccess={showSuccessMessage}
-        onCancel={() => setShowCreateForm(false)}
-      /> */}
-
+      {successMessage && (
+        <div className="mb-2">
+          <SuccessMessage message={successMessage} />
+        </div>
+      )}
+      {errorMessage && (
+        <div className="mb-2">
+          <ErrorMessage message={errorMessage} />
+        </div>
+      )}
       <TransactionsFilters
         filterType={filterType}
         timeRange={timeRange}
@@ -94,7 +225,7 @@ export default function MyTransactions() {
         onTimeRangeChange={setTimeRange}
       />
 
-      {transactionsLoading ? (
+      {isLoading ? (
         <div className="bg-white rounded-2xl border border-background-200 p-6">
           <div className="animate-pulse">
             <div className="h-6 bg-background-200 rounded w-1/3 mb-6"></div>
@@ -120,6 +251,7 @@ export default function MyTransactions() {
           accounts={accounts || []}
           categories={categories || []}
           onEditTransaction={handleEditTransaction}
+          onDeleteTransaction={handleDeleteTransaction}
           actions={
             <div className="flex items-center space-x-3">
               <span className="text-sm text-background-600 dark:text-background-100">
@@ -130,10 +262,37 @@ export default function MyTransactions() {
         />
       )}
 
-      <EditTransactionModal
-        transaction={editingTransaction}
-        isOpen={isEditModalOpen}
-        onClose={handleCloseEditModal}
+      {editingTransaction && (
+        <EditModal<EditTransactionFormData>
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          onSubmit={handleSaveTransaction}
+          title="Edit Transaction"
+          fields={transactionFormFields}
+          initialData={{
+            type: editingTransaction.type,
+            amount: editingTransaction.amount.toString(),
+            date:
+              typeof editingTransaction.date === 'string' &&
+              editingTransaction.date.match(/^\d{4}-\d{2}-\d{2}/)
+                ? editingTransaction.date.split('T')[0]
+                : new Date(editingTransaction.date).toISOString().split('T')[0],
+            categoryId: editingTransaction.categoryId.toString(),
+            description: editingTransaction.description || '',
+          }}
+          validateForm={validateTransactionForm}
+          isLoading={updateTransaction.isPending}
+        />
+      )}
+
+      <DeleteModal
+        isOpen={!!deletingTransactionId}
+        title="Delete Transaction"
+        itemName={deletingItemName}
+        isLoading={deleteTransaction.isPending}
+        warningMessage={`This transaction will be permanently deleted.`}
+        onClose={() => setDeletingTransactionId(null)}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

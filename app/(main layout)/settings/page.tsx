@@ -9,9 +9,8 @@ import {
   RiBankCardLine,
   RiArrowRightSLine,
 } from '@remixicon/react';
-import { getInitials } from '@/utils/uiUtils';
+import { getInitials, Button_Signout } from './profile/index';
 import { useSignOut } from '@/api/auth/mutations';
-import { Button_signout } from '@/components/ui/Button_signout';
 
 interface SettingsItem {
   title: string;
@@ -23,7 +22,7 @@ interface SettingsItem {
 
 export default function Settings() {
   const router = useRouter();
-  const { data: user, isLoading } = useCurrentUser();
+  const { user, isLoading } = useCurrentUser();
   const signOut = useSignOut();
 
   const handleLogout = async () => {
@@ -52,14 +51,6 @@ export default function Settings() {
       color:
         'bg-primary-400 text-background-100 dark:bg-background-100 dark:text-stack-600',
     },
-    {
-      title: 'Accounts',
-      description: 'Manage your financial accounts, cards, and wallets',
-      path: '/settings/accounts',
-      icon: <RiBankCardLine className="w-6 h-6" />,
-      color:
-        'bg-primary-400 text-background-100 dark:bg-background-100 dark:text-stack-600',
-    },
   ];
 
   if (isLoading || !user) {
@@ -76,61 +67,43 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background-50 to-background-100 dark:from-primary-800 dark:to-primary-800 rounded-3xl p-6 md:p-8">
-      {/* Header */}
-      <div className="mb-10">
-        <h1
-          className={`${roboto.variable} text-4xl md:text-5xl font-bold text-primary-800 dark:text-background-100 mb-3 font-roboto`}
-        >
-          Settings
-        </h1>
-        <p className="text-primary-800 dark:text-background-300 text-lg">
-          Manage your account preferences and configurations
-        </p>
-      </div>
-
-      {/* User Info Card */}
-      <div className="bg-white dark:bg-background-200 rounded-2xl p-6 mb-8 border border-background-200 dark:border-background-800 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary-400 to-primary-600 dark:from-primary-600 dark:to-primary-800 flex items-center justify-center text-white dark:text-background-100 text-xl font-bold shadow-lg">
-            {getInitials(user.name)}
-          </div>
+    <div className="w-full max-w-full sm:max-w-3xl lg:max-w-4xl mx-auto min-h-[calc(100vh-4rem)] bg-linear-to-br from-background-50 to-background-100 dark:from-primary-800 dark:to-primary-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-background-100 dark:border-background-700 shadow-financial overflow-hidden box-border">
+      <div className="rounded-2xl p-6 mb-8 ">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="flex-1">
-            <h2 className="text-xl font-semibold text-background-800 dark:text-stack-800">
+            <h2 className="lg:text-xl md:text-xl sm:text-sm font-semibold text-background-800 dark:text-background-200">
               {user.name || 'User'}
             </h2>
-            <p className="text-background-500 dark:text-stack-700 text-sm">
+            <p className="text-background-500 dark:text-stack-300 text-sm">
               {user.email}
             </p>
           </div>
-          <div className="">
-            <Button_signout
+          <div className="w-full sm:w-auto">
+            <Button_Signout
               onclick={handleLogout}
               disabled={signOut.isPending}
-              className="text-primary-800 font-bold"
-              iconColor="primary-800"
+              className="text-stack-600 dark:text-background-400 font-semibold"
+              iconColor="background-400"
+              iconSize="w-4 h-4 sm:w-5 sm:h-5"
             />
           </div>
         </div>
       </div>
 
-      {/* Settings List */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {settingsItems.map((item) => (
           <button
             key={item.path}
             onClick={() => router.push(item.path)}
-            className="w-full text-left bg-white dark:bg-stack-200 rounded-2xl border border-background-200 dark:border-background-700 p-5 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-200 group flex items-center gap-4"
+            className="w-full text-left bg-white dark:bg-stack-200 rounded-2xl border border-background-200 dark:border-background-700 p-5 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-200 group flex flex-col items-start gap-4 sm:flex-row sm:items-center"
           >
-            {/* Icon */}
             <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.color} transition-transform group-hover:scale-105 border border-primary-400 dark:border-stack-300`}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.color} transition-transform group-hover:scale-105 border border-primary-400 dark:border-stack-300 shrink-0`}
             >
               {item.icon}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 w-full">
               <h3 className="text-lg font-semibold text-background-800 group-hover:text-primary-700  transition-colors">
                 {item.title}
               </h3>
@@ -139,16 +112,14 @@ export default function Settings() {
               </p>
             </div>
 
-            {/* Arrow */}
-            <RiArrowRightSLine className="w-5 h-5 text-background-400 dark:text-background-700 group-hover:text-primary-700 group-hover:translate-x-1 transition-all" />
+            <RiArrowRightSLine className="w-5 h-5 text-background-400 dark:text-background-700 group-hover:text-primary-700 group-hover:translate-x-1 transition-all self-start sm:self-center" />
           </button>
         ))}
       </div>
 
-      {/* App Version */}
       <div className="mt-12 text-center">
         <p className="text-xs text-background-400 dark:text-background-600">
-          Family Finance App • Version 1.0.0
+          Family Finance App
         </p>
       </div>
     </div>

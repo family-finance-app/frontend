@@ -2,32 +2,45 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { queryKeys } from '@/lib/query-client';
-import type {
+import {
   CreateTransactionFormData,
   CreateTransferFormData,
-  Transaction,
-  TransactionResponse,
-} from '@/types/transaction';
-import type { Account } from '@/types/account';
-import { getAuthToken } from '@/utils/token';
+  DeletedTransaction,
+  NewTransaction,
+  NewTransfer,
+  UpdatedTransaction,
+  UpdateTransactionFormData,
+} from '@/(main layout)/transactions/types';
+
+import { ApiError, ApiSuccess } from '../types';
+import { queryKeys } from '@/lib/query-client';
 
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (
-      data: CreateTransactionFormData
-    ): Promise<Transaction> => {
-      const token = getAuthToken();
-      return apiClient.post<Transaction>('/transactions/create', data, {
-        token: token || undefined,
-      });
+  return useMutation<
+    ApiSuccess<NewTransaction>,
+    ApiError,
+    CreateTransactionFormData
+  >({
+    mutationFn: async (data) => {
+      return apiClient.post<ApiSuccess<NewTransaction>>(
+        '/transactions/create',
+        data,
+      );
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
+
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };
@@ -35,34 +48,32 @@ export const useCreateTransaction = () => {
 export const useUpdateTransaction = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<CreateTransactionFormData>;
-    }): Promise<Transaction> => {
-      const token = getAuthToken();
-
-      return apiClient.put<Transaction>(
+  return useMutation<
+    ApiSuccess<UpdatedTransaction>,
+    ApiError,
+    { id: number; data: UpdateTransactionFormData }
+  >({
+    mutationFn: async ({ id, data }) => {
+      return apiClient.put<ApiSuccess<UpdatedTransaction>>(
         `/transactions/update`,
         {
           id,
           ...data,
         },
-        {
-          token: token || undefined,
-        }
       );
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.transactions.detail(String(variables.id)),
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
+
+      return response.message;
+    },
+    onError: (error) => {
+      return error.message;
     },
   });
 };
@@ -70,34 +81,24 @@ export const useUpdateTransaction = () => {
 export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: number): Promise<void> => {
-      const token = getAuthToken();
-
-      try {
-        await apiClient.delete<void>(`/transactions/delete/${id}`, {
-          token: token || undefined,
-        });
-      } catch (error) {
-        const err = error as any;
-        console.error('Delete error details:', err);
-        throw new Error(
-          err?.message ||
-            err?.error ||
-            'Failed to delete transaction. Please try again.'
-        );
-      }
+  return useMutation<ApiSuccess<DeletedTransaction>, ApiError, number>({
+    mutationFn: async (id: number) => {
+      return apiClient.delete<ApiSuccess<DeletedTransaction>>(
+        `/transactions/delete/${id}`,
+      );
     },
-    onSuccess: (_, id) => {
-      queryClient.removeQueries({
-        queryKey: queryKeys.transactions.detail(String(id)),
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.all,
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.all,
+      });
+
+      return response.message;
     },
-    onError: (error: any) => {
-      console.error('Delete transaction error:', error);
+    onError: (error) => {
+      return error.message;
     },
   });
 };
@@ -105,23 +106,27 @@ export const useDeleteTransaction = () => {
 export const useCreateTransfer = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (
-      data: CreateTransferFormData
-    ): Promise<TransactionResponse> => {
-      const token = getAuthToken();
-      return apiClient.post<TransactionResponse>(
-        '/transactions/transfer',
-        { ...data, categoryId: 68 },
-        {
-          token: token || undefined,
-        }
-      );
+  return useMutation<ApiSuccess<NewTransfer>, ApiError, CreateTransferFormData>(
+    {
+      mutationFn: async (data) => {
+        return apiClient.post<ApiSuccess<NewTransfer>>(
+          '/transactions/transfer',
+          data,
+        );
+      },
+      onSuccess: async (response) => {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.transactions.all,
+        });
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.accounts.all,
+        });
+
+        return response.message;
+      },
+      onError: (error) => {
+        return error.message;
+      },
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.my });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.my });
-    },
-  });
+  );
 };

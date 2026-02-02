@@ -1,135 +1,28 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+
 import { apiClient } from '@/lib/api-client';
-import { Transaction } from '@/types/transaction';
-import { getAuthToken } from '@/utils/token';
-import { useEffect, useState } from 'react';
 
-const queryKeys = {
-  transactions: {
-    all: ['transactions'],
-    lists: () => [...queryKeys.transactions.all, 'list'],
-    list: (filters: Record<string, any>) => [
-      ...queryKeys.transactions.lists(),
-      filters,
-    ],
-    details: () => [...queryKeys.transactions.all, 'detail'],
-    detail: (id: string) => [...queryKeys.transactions.details(), id],
-    byAccount: (accountId: string) => [
-      ...queryKeys.transactions.lists(),
-      'byAccount',
-      accountId,
-    ],
-    my: ['transactions', 'my'],
-    family: ['transactions', 'family'],
-  },
-};
+import { Transaction } from '@/(main layout)/transactions/types';
 
-// get all transactions
+import { useAuth } from '@/components/guards/AuthContext';
+import { ApiError, ApiSuccess } from '../types';
+import { queryKeys } from '@/lib/query-client';
+
+// get all transactions of a current user
 export const useTransactions = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const { token } = useAuth();
 
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
-
-  return useQuery({
+  const query = useQuery<ApiSuccess<Transaction[]>, ApiError>({
     queryKey: queryKeys.transactions.all,
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/transactions', {
-        token: token || undefined,
-      });
+    queryFn: async () => {
+      const response =
+        await apiClient.get<ApiSuccess<Transaction[]>>('/transactions/all');
+      return response;
     },
-    enabled: !!token && isClient,
+    enabled: !!token,
   });
-};
 
-// get a transaction by id
-export const useTransaction = (id: string) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
-
-  return useQuery({
-    queryKey: queryKeys.transactions.detail(id),
-    queryFn: async (): Promise<Transaction> => {
-      return apiClient.get<Transaction>(`/transactions/${id}`, {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token && !!id && isClient,
-  });
-};
-
-/**
- * Get transactions by account ID
- */
-export const useTransactionsByAccount = (accountId: string) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
-
-  return useQuery({
-    queryKey: queryKeys.transactions.byAccount(accountId),
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>(
-        `/transactions?accountId=${accountId}`,
-        { token: token || undefined }
-      );
-    },
-    enabled: !!token && !!accountId && isClient,
-  });
-};
-
-// get the current user's transactions
-export const useMyTransactions = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
-
-  return useQuery({
-    queryKey: queryKeys.transactions.my,
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/transactions/all', {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token && isClient,
-  });
-};
-
-// get family transactions
-export const useFamilyTransactions = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    setToken(getAuthToken());
-  }, []);
-
-  return useQuery({
-    queryKey: queryKeys.transactions.family,
-    queryFn: async (): Promise<Transaction[]> => {
-      return apiClient.get<Transaction[]>('/transactions/family', {
-        token: token || undefined,
-      });
-    },
-    enabled: !!token && isClient,
-  });
+  return { transactions: query.data?.data || [], ...query };
 };

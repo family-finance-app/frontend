@@ -1,34 +1,26 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Account } from '@/types/account';
-import { calculateTotalBalanceInUAH } from '@/utils/currency-converter';
-import { useExchangeRates } from '@/api/exchangeRate/queries';
+import { Account } from '@/(main layout)/accounts/types';
 
-export function useTotalBalanceInUAH(accounts: Account[] | undefined) {
-  const {
-    data: rates = {},
-    isLoading: ratesLoading,
-    error: ratesError,
-  } = useExchangeRates();
+import { calculateTotalBalanceInUAH } from '@/utils';
 
-  const { totalBalance, isLoading } = useMemo(() => {
-    if (!accounts || ratesLoading) {
-      return { totalBalance: 0, isLoading: true };
-    }
+import { useMainData } from '@/(main layout)/data/MainDataProvider';
 
-    try {
-      const balance = calculateTotalBalanceInUAH(accounts, rates);
-      return { totalBalance: balance, isLoading: false };
-    } catch (error) {
-      console.error('Error calculating total balance:', error);
-      return { totalBalance: 0, isLoading: false };
-    }
-  }, [accounts, rates, ratesLoading]);
+export function useTotalBalanceInUAH(accounts: Account[]) {
+  const { exchangeRates, isLoading } = useMainData();
 
-  return {
-    totalBalance,
-    isLoading: ratesLoading || isLoading,
-    error: ratesError ? (ratesError as Error).message : null,
-  };
+  try {
+    const balance = calculateTotalBalanceInUAH(accounts, exchangeRates);
+    return {
+      totalBalance: balance,
+      isLoading: isLoading || !exchangeRates,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      totalBalance: 0,
+      isLoading: isLoading,
+      error: (error as Error).message,
+    };
+  }
 }

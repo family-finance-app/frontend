@@ -126,7 +126,9 @@ const LegendItem = ({
           'text-gray-700 dark:text-background-50',
           hasOnValueChange &&
             'group-hover:text-gray-900 dark:group-hover:text-gray-50',
-          activeLegend && activeLegend !== name ? 'opacity-40' : 'opacity-100'
+          activeLegend && activeLegend !== name
+            ? 'opacity-40 outline-0'
+            : 'opacity-100'
         )}
       >
         {name}
@@ -582,6 +584,33 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
       isDarkMode,
       ...other
     } = props;
+
+    const containerRef = React.useRef<HTMLDivElement>(null); // CUSTOM
+    const [containerSize, setContainerSize] = React.useState({
+      //
+      width: 0,
+      height: 0,
+    });
+
+    React.useEffect(() => {
+      if (!containerRef.current) return;
+
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          if (width > 0 && height > 0) {
+            setContainerSize({ width, height });
+          }
+        }
+      });
+
+      resizeObserver.observe(containerRef.current);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, []); //
+
     const paddingValue = !showXAxis && !showYAxis ? 0 : 20;
     const [legendHeight, setLegendHeight] = React.useState(60);
     const [activeLegend, setActiveLegend] = React.useState<string | undefined>(
@@ -635,12 +664,28 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
 
     return (
       <div
-        ref={forwardedRef}
-        className={cx('h-80 w-full', className)}
+        ref={containerRef}
+        className={cx(
+          'h-80 w-full',
+          [
+            '[&_.recharts-wrapper]:outline-none',
+            '[&_.recharts-wrapper:focus]:outline-none',
+            '[&_.recharts-wrapper:focus-visible]:outline-none',
+            '[&_.recharts-surface]:outline-none',
+            '[&_.recharts-surface:focus]:outline-none',
+            '[&_.recharts-surface:focus-visible]:outline-none',
+            '[&_.recharts-surface]:ring-0',
+            '[&_.recharts-surface:focus]:ring-0',
+            '[&_.recharts-surface:focus-visible]:ring-0',
+          ].join(' '),
+          className
+        )}
         {...other}
       >
-        <ResponsiveContainer>
+        {containerSize.width > 0 && containerSize.height > 0 ? (
           <RechartsBarChart
+            width={containerSize.width}
+            height={containerSize.height}
             data={data}
             onClick={
               hasOnValueChange && (activeLegend || activeBar)
@@ -761,7 +806,7 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
               )}
             </YAxis>
             <Tooltip
-              wrapperStyle={{ outline: 'none' }}
+              wrapperStyle={{ outline: 'none', zIndex: 10 }}
               isAnimationActive={true}
               animationDuration={100}
               cursor={{ fill: '#d1d5db', opacity: '0.15' }}
@@ -819,7 +864,7 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
               />
             ))}
           </RechartsBarChart>
-        </ResponsiveContainer>
+        ) : null}
       </div>
     );
   }
