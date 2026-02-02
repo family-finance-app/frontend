@@ -5,10 +5,6 @@ import { useUpdateAccount, useDeleteAccount } from '@/api/accounts/mutations';
 
 import { Account, CreateAccountFormData } from '../types';
 import { ApiError } from '@/api/types';
-import {
-  registerGlobalAlerts,
-  clearGlobalAlertsRegistration,
-} from '@/lib/global-alerts';
 
 export function useAccountsPageData() {
   const { accounts, transactions, categories } = useMainData();
@@ -55,15 +51,6 @@ export function useAccountsPageData() {
     setErrorMessage(error);
     setTimeout(() => setErrorMessage(null), 5000);
   };
-
-  useEffect(() => {
-    registerGlobalAlerts({
-      onSuccess: (msg: string) => showSuccessMessage(msg),
-      onError: (msg: string) => showErrorMessage(msg),
-    });
-
-    return () => clearGlobalAlertsRegistration();
-  }, []);
 
   const handleSelectAccount = (accountId: number) => {
     if (selectedAccountId === accountId) {
