@@ -174,6 +174,7 @@ class APIClient {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
   }
 
+  // exchange rates api
   async externalGet<T>(
     absoluteUrl: string,
     config?: RequestConfig,
